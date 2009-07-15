@@ -1,11 +1,17 @@
 from setuptools import setup, find_packages
 import sys, os
 
-import premailer
-version = premailer.__version__ # hate repeating myself
+version = open(os.path.join(os.path.dirname(__file__),
+                            'premailer', 'version.txt')
+              ).read().strip() # hate repeating myself
 
 README = os.path.join(os.path.dirname(__file__), 'README.md')
 long_description = open(README).read().strip() + "\n\n"
+def md2stx(s):
+    import re
+    s = re.sub(':\n(\s{8,10})', r'::\n\1', s)
+    return s
+long_description = md2stx(long_description)
 
 
 setup(name='premailer',

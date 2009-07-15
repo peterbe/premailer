@@ -1,12 +1,13 @@
 # http://www.peterbe.com/plog/premailer.py
-import re
+import re, os
 from collections import defaultdict
 from cStringIO import StringIO
 import lxml.html
 from lxml.cssselect import CSSSelector
 from lxml import etree
 
-__version__ = '1.0'
+__version__ = open(os.path.join(os.path.dirname(__file__), 'version.txt')
+                   ).read().strip()
 
 __all__ = ['PremailerError','Premailer','transform']
 
