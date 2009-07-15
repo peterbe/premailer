@@ -6,8 +6,7 @@ import lxml.html
 from lxml.cssselect import CSSSelector
 from lxml import etree
 
-__version__ = open(os.path.join(os.path.dirname(__file__), 'version.txt')
-                   ).read().strip()
+__version__ = '1.3'
 
 __all__ = ['PremailerError','Premailer','transform']
 
