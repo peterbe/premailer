@@ -6,7 +6,7 @@ import lxml.html
 from lxml.cssselect import CSSSelector
 from lxml import etree
 
-__version__ = '1.3'
+__version__ = '1.4'
 
 __all__ = ['PremailerError','Premailer','transform']
 
@@ -25,11 +25,11 @@ def _merge_styles(old, new):
     In other words, the new style bits replace the old ones
     """
     news = {}
-    for k, v in [x.strip().split(':') for x in new.split(';') if x.strip()]:
+    for k, v in [x.strip().split(':', 1) for x in new.split(';') if x.strip()]:
         news[k.strip()] = v.strip()
 
     olds = {}
-    for k, v in [x.strip().split(':') for x in old.split(';') if x.strip()]:
+    for k, v in [x.strip().split(':', 1) for x in old.split(';') if x.strip()]:
         olds[k.strip()] = v.strip()
         
     merged = news

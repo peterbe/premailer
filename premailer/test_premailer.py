@@ -138,3 +138,52 @@ def test_base_url_fixer():
     assert expect_html == result_html
     
     
+def test_style_block_with_external_urls():
+    """
+    From http://github.com/peterbe/premailer/issues/#issue/2
+    
+    If you have 
+      body { background:url(http://example.com/bg.png); }
+    the ':' inside '://' is causing a problem
+    """
+    if not etree:
+        # can't test it
+        return
+    
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    body {
+      color:#123;
+      background: url(http://example.com/bg.png);
+      font-family: Omerta;
+    }
+    </style>
+    </head>
+    <body>
+    <h1>Hi!</h1>
+    </body>
+    </html>"""
+    
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body style="color:#123; font-family:Omerta; background:url(http://example.com/bg.png)">
+    <h1>Hi!</h1>
+    </body>
+    </html>""" #"
+    
+    p = Premailer(html)
+    result_html = p.transform()
+    
+    whitespace_between_tags = re.compile('>\s*<',)
+    
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+    print result_html
+    print expect_html
+    
+    assert expect_html == result_html
+    
