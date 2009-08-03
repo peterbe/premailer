@@ -1,7 +1,7 @@
 import re
 import nose.tools
 
-from premailer import Premailer, etree, _merge_styles
+from premailer import Premailer, etree, _merge_styles, transform
 
     
 def test_merge_styles():
@@ -182,8 +182,46 @@ def test_style_block_with_external_urls():
     
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
-    print result_html
-    print expect_html
+    #print result_html
+    #print expect_html
     
     assert expect_html == result_html
+    
+def test_shortcut_function():
+    # you don't have to use this approach:
+    #   from premailer import Premailer
+    #   p = Premailer(html, base_url=base_url)
+    #   print p.transform()
+    # You can do it this way:
+    #   from premailer import transform
+    #   print transform(html, base_url=base_url)
+    
+    if not etree:
+        # can't test it
+        return
+    
+    html = """<html>
+    <head>
+    <style type="text/css">h1{color:#123}</style>
+    </head>
+    <body>
+    <h1>Hi!</h1>
+    </body>
+    </html>"""
+    
+    expect_html = """<html>
+    <head></head>
+    <body>
+    <h1 style="color:#123">Hi!</h1>
+    </body>
+    </html>""" #"
+    
+    result_html = transform(html)
+    
+    whitespace_between_tags = re.compile('>\s*<',)
+    
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+    
+    assert expect_html == result_html, result_html
     

@@ -6,7 +6,7 @@ import lxml.html
 from lxml.cssselect import CSSSelector
 from lxml import etree
 
-__version__ = '1.4'
+__version__ = '1.5'
 
 __all__ = ['PremailerError','Premailer','transform']
 
@@ -135,12 +135,12 @@ class Premailer(object):
                     if '://' not in parent.attrib[attr]:
                         parent.attrib[attr] = make_full_url(parent.attrib[attr])
                         
-        
-        return etree.tostring(page, pretty_print=pretty_print)
+        return etree.tostring(page, pretty_print=pretty_print)\
+          .replace('<head/>','<head></head>')
             
                     
 def transform(html, base_url=None):
-    return PremailerError(html, base_url=base_url).transform()
+    return Premailer(html, base_url=base_url).transform()
         
         
 if __name__=='__main__':
