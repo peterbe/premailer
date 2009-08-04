@@ -10,18 +10,18 @@ have to put inline `style` attributes on every element. So from this:
 
         <html>
         <style type="text/css">
-	h1 { border:1px solid black }
+        h1 { border:1px solid black }
         p { color:red;}
-	p::first-letter { float:left; }
+        p::first-letter { float:left; }
         </style>
-	<h1 style="font-weight:bolder">Peter</h1>
+        <h1 style="font-weight:bolder">Peter</h1>
         <p>Hej</p>
         </html>
         
 You want this:
 
         <html>
-	<h1 style="font-weight:bolder; border:1px solid black">Peter</h1>
+        <h1 style="font-weight:bolder; border:1px solid black">Peter</h1>
         <p style="{color:red} ::first-letter{float:left}">Hej</p>
         </html>
 
