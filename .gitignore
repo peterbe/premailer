@@ -5,3 +5,5 @@ Paste-1.7.2-py2.5.egg
 dist
 premailer.egg-info
 NOTES.peter
+.venv
+premailer/gorunsettings.py

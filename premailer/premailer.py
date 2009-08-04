@@ -6,14 +6,14 @@ import lxml.html
 from lxml.cssselect import CSSSelector
 from lxml import etree
 
-__version__ = '1.5'
+__version__ = '1.6'
 
-__all__ = ['PremailerError','Premailer','transform']
+__all__ = ['PremailerError', 'Premailer', 'transform']
 
 class PremailerError(Exception):
     pass
 
-def _merge_styles(old, new):
+def _merge_styles(old, new, class_=''):
     """
     if ::
       old = 'font-size:1px; color: red'
@@ -22,22 +22,48 @@ def _merge_styles(old, new):
     then ::
       return 'color: red; font-size:2px; font-weight: bold'
       
-    In other words, the new style bits replace the old ones
+    In other words, the new style bits replace the old ones.
+    
+    The @class_ parameter can be something like ':hover' and if that
+    is there, you split up the style with '{...} :hover{...}'
+    Note: old could be something like '{...} ::first-letter{...}'
+    
     """
     news = {}
     for k, v in [x.strip().split(':', 1) for x in new.split(';') if x.strip()]:
         news[k.strip()] = v.strip()
 
-    olds = {}
-    for k, v in [x.strip().split(':', 1) for x in old.split(';') if x.strip()]:
-        olds[k.strip()] = v.strip()
-        
+    groups = {}
+    grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
+    grouped_split = grouping_regex.findall(old)
+    if grouped_split:
+        for old_class, old_content in grouped_split:
+            olds = {}
+            for k, v in [x.strip().split(':', 1) for x in old_content.split(';') if x.strip()]:
+                olds[k.strip()] = v.strip()
+            groups[old_class] = olds
+    else:
+        olds = {}
+        for k, v in [x.strip().split(':', 1) for x in old.split(';') if x.strip()]:
+            olds[k.strip()] = v.strip()
+        groups[''] = olds
+            
+    # Perform the merge
+    
     merged = news
-    for k, v in olds.items():
+    for k, v in groups.get(class_, {}).items():
         if k not in merged:
             merged[k] = v
-        
-    return '; '.join(['%s:%s' % (k, v) for (k, v) in merged.items()])
+    groups[class_] = merged
+    
+    if len(groups) == 1:
+        return '; '.join(['%s:%s' % (k, v) for (k, v) in groups.values()[0].items()])
+    else:
+        all = []
+        for class_, mergeable in sorted(groups.items(), lambda x, y: cmp(x.count(':'), y.count(':'))):
+            all.append('%s{%s}' % (class_,
+                                   '; '.join(['%s:%s' % (k, v) for (k, v) in mergeable.items()])))
+        return ' '.join([x for x in all if x != '{}'])
 
 
 _css_comments = re.compile(r'/\*.*?\*/', re.MULTILINE|re.DOTALL)
@@ -48,25 +74,32 @@ _colon_regex = re.compile(':(\s+)')
 
 class Premailer(object):
     
-    def __init__(self, html, base_url=None, encoding='utf8'):
+    def __init__(self, html, base_url=None, encoding='utf8',
+                 exclude_pseudoclasses=False):
         self.html = html
         self.base_url = base_url
         self.encoding = encoding
+        self.exclude_pseudoclasses = exclude_pseudoclasses
         
     def _parse_style_rules(self, css_body):
+        leftover = []
         rules = []        
         css_body = _css_comments.sub('', css_body)
         for each in _regex.findall(css_body.strip()):
             __, selectors, bulk = each
-            
+
             bulk = _semicolon_regex.sub(';', bulk.strip())
             bulk = _colon_regex.sub(':', bulk.strip())
             if bulk.endswith(';'):
                 bulk = bulk[:-1]
             for selector in [x.strip() for x in selectors.split(',') if x.strip()]:
+                if ':' in selector and self.exclude_pseudoclasses:
+                    # a pseudoclass
+                    leftover.append((selector, bulk))
+                    continue
                 rules.append((selector, bulk))
 
-        return rules
+        return rules, leftover
         
     def transform(self, pretty_print=True):
         """change the self.html and return it with CSS turned into style
@@ -93,15 +126,25 @@ class Premailer(object):
         for style in CSSSelector('style')(page):
             css_body = etree.tostring(style)
             css_body = css_body.split('>')[1].split('</')[0]
-            rules.extend(self._parse_style_rules(css_body))
+            these_rules, these_leftover = self._parse_style_rules(css_body)
+            rules.extend(these_rules)
+            
             parent_of_style = style.getparent()
-            parent_of_style.remove(style)
+            if these_leftover:
+                style.text = '\n'.join(['%s {%s}' % (k, v) for (k, v) in these_leftover])
+            else:
+                parent_of_style.remove(style)
             
         for selector, style in rules:
+            class_ = ''
+            if ':' in selector:
+                selector, class_ = re.split(':', selector, 1)
+                class_ = ':%s' % class_
+            
             sel = CSSSelector(selector)
             for item in sel(page):
                 old_style = item.attrib.get('style','')
-                new_style = _merge_styles(old_style, style)
+                new_style = _merge_styles(old_style, style, class_)
                 item.attrib['style'] = new_style
                 
         # now we can delete all 'class' attributes
