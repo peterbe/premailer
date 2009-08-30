@@ -315,6 +315,8 @@ def test_css_with_pseudoclasses_included():
     assert ' :visited{border:1px solid green}' in result_html
     assert ' :hover{border:1px solid green; text-decoration:none}' in \
       result_html
+    print result_html
+    #assert 0
 
 
 def test_css_with_pseudoclasses_excluded():
@@ -349,6 +351,68 @@ def test_css_with_pseudoclasses_excluded():
     <body>
     <a href="#" style="color:red; border:1px solid green">Page</a>
     <p>Paragraph</p>
+    </body>
+    </html>""" #"
+    
+    p = Premailer(html, exclude_pseudoclasses=True)
+    result_html = p.transform()
+    
+    whitespace_between_tags = re.compile('>\s*<',)
+    
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+    
+    expect_html = re.sub('}\s+', '}', expect_html)
+    result_html = result_html.replace('}\n','}')
+    
+    print ""
+    print "EXPECT"
+    print expect_html
+    print "--"
+    print "RESULT"
+    print result_html
+    
+    assert expect_html == result_html, result_html
+
+
+def test_css_with_html_attributes():
+    """Some CSS styles can be applied as normal HTML attribute like 
+    'background-color' can be turned into 'bgcolor'
+    """
+    if not etree:
+        # can't test it
+        return
+    
+    html = """<html>
+    <head>
+    <style type="text/css">
+    td { background-color:red; }
+    p { text-align:center; }
+    table { width:200px; }
+    </style>
+    </head>
+    <body>
+    <p>Text</p>
+    <table>
+      <tr>
+        <td>Cell 1</td>
+        <td>Cell 2</td>
+      </tr>
+    </table>
+    </body>
+    </html>"""
+    
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <p style="text-align:center" align="center">Text</p>
+    <table style="width:200px" width="200">
+      <tr>
+        <td style="background-color:red" bgcolor="red">Cell 1</td>
+        <td style="background-color:red" bgcolor="red">Cell 2</td>
+      </tr>
+    </table>
     </body>
     </html>""" #"
     

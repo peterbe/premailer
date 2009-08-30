@@ -60,3 +60,15 @@ Into this:
         </html>
         
         
+HTML attributes created additionally
+------------------------------------
+
+Certain HTML attributes are also created on the HTML if the CSS
+contains any ones that are easily translated into HTML attributes. For
+example, if you have this CSS: `td { background-color:#eee; }` then
+this is transformed into `style="background-color:#eee"` AND as an
+HTML attribute `bgcolor="#eee"`.
+
+Having these extra attributes basically as a "back up" for really shit
+email clients that can't even take the style attributes. A lot of
+professional HTML newsletters such as Amazon's use this.

@@ -6,7 +6,7 @@ import lxml.html
 from lxml.cssselect import CSSSelector
 from lxml import etree
 
-__version__ = '1.6'
+__version__ = '1.7'
 
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
@@ -146,6 +146,7 @@ class Premailer(object):
                 old_style = item.attrib.get('style','')
                 new_style = _merge_styles(old_style, style, class_)
                 item.attrib['style'] = new_style
+                self._style_to_basic_html_attributes(item, new_style)
                 
         # now we can delete all 'class' attributes
         for item in page.xpath('//@class'):
@@ -180,7 +181,42 @@ class Premailer(object):
                         
         return etree.tostring(page, pretty_print=pretty_print)\
           .replace('<head/>','<head></head>')
+    
+    def _style_to_basic_html_attributes(self, element, style_content):
+        """given an element and styles like 
+        'background-color:red; font-family:Arial' turn some of that into HTML
+        attributes. like 'bgcolor', etc.
+        
+        Note, the style_content can contain pseudoclasses like:
+        '{color:red; border:1px solid green} :visited{border:1px solid green}'
+        """
+        if style_content.count('}') and \
+          style_content.count('{') == style_content.count('{'):
+            style_content = style_content.split('}')[0][1:]
             
+        attributes = {}
+        for key, value in [x.split(':') for x in style_content.split(';')
+                           if len(x.split(':'))==2]:
+            key = key.strip()
+            
+            if key == 'text-align':
+                attributes['align'] = value.strip()
+            elif key == 'background-color':
+                attributes['bgcolor'] = value.strip()
+            elif key == 'width':
+                value = value.strip()
+                if value.endswith('px'):
+                    value = value[:-2]
+                attributes['width'] = value
+            #else:
+            #    print "key", repr(key)
+            #    print 'value', repr(value)
+            
+        for key, value in attributes.items():
+            if key in element.attrib:
+                # already set, don't dare to overwrite
+                continue
+            element.attrib[key] = value
                     
 def transform(html, base_url=None):
     return Premailer(html, base_url=base_url).transform()
