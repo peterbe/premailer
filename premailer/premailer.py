@@ -60,9 +60,12 @@ def _merge_styles(old, new, class_=''):
         return '; '.join(['%s:%s' % (k, v) for (k, v) in groups.values()[0].items()])
     else:
         all = []
-        for class_, mergeable in sorted(groups.items(), lambda x, y: cmp(x.count(':'), y.count(':'))):
+        for class_, mergeable in sorted(groups.items(),
+                                        lambda x, y: cmp(x[0].count(':'), y[0].count(':'))):
             all.append('%s{%s}' % (class_,
-                                   '; '.join(['%s:%s' % (k, v) for (k, v) in mergeable.items()])))
+                                   '; '.join(['%s:%s' % (k, v) 
+                                              for (k, v) 
+                                              in mergeable.items()])))
         return ' '.join([x for x in all if x != '{}'])
 
 
@@ -75,11 +78,17 @@ _colon_regex = re.compile(':(\s+)')
 class Premailer(object):
     
     def __init__(self, html, base_url=None, encoding='utf8',
-                 exclude_pseudoclasses=False):
+                 exclude_pseudoclasses=False,
+                 keep_style_tags=False,
+                 include_star_selectors=False):
         self.html = html
         self.base_url = base_url
         self.encoding = encoding
         self.exclude_pseudoclasses = exclude_pseudoclasses
+        # whether to delete the <style> tag once it's been processed
+        self.keep_style_tags = keep_style_tags
+        # whether to process or ignore selectors like '* { foo:bar; }'
+        self.include_star_selectors = include_star_selectors
         
     def _parse_style_rules(self, css_body):
         leftover = []
@@ -97,6 +106,9 @@ class Premailer(object):
                     # a pseudoclass
                     leftover.append((selector, bulk))
                     continue
+                elif selector == '*' and not self.include_star_selectors:
+                    continue
+                
                 rules.append((selector, bulk))
 
         return rules, leftover
@@ -132,7 +144,7 @@ class Premailer(object):
             parent_of_style = style.getparent()
             if these_leftover:
                 style.text = '\n'.join(['%s {%s}' % (k, v) for (k, v) in these_leftover])
-            else:
+            elif not self.keep_style_tags:
                 parent_of_style.remove(style)
             
         for selector, style in rules:

@@ -270,6 +270,7 @@ def test_shortcut_function():
     
 
 
+
 def test_css_with_pseudoclasses_included():
     "Pick up the pseudoclasses too and include them"
     if not etree:
@@ -279,6 +280,7 @@ def test_css_with_pseudoclasses_included():
     html = """<html>
     <head>
     <style type="text/css">
+    a.special:link { text-decoration:none; }
     a { color:red; }
     a:hover { text-decoration:none; }
     a,a:hover, 
@@ -287,6 +289,7 @@ def test_css_with_pseudoclasses_included():
     </style>
     </head>
     <body>
+    <a href="#" class="special">Special!</a>
     <a href="#">Page</a>
     <p>Paragraph</p>
     </body>
@@ -296,6 +299,7 @@ def test_css_with_pseudoclasses_included():
     <head>
     </head>
     <body>
+    <a href="#" style="color:red;text-decoration:none">Special!</a>
     <a href="#" style="{color:red; border:1px solid green} :hover{text-decoration:none; border:1px solid green} :visited{border:1px solid green}">Page</a>
     <p style="::first-letter{float: left; font-size: 300%}">Paragraph</p>
     </body>
@@ -437,4 +441,23 @@ def test_css_with_html_attributes():
     assert expect_html == result_html, result_html
 
 
+def test_apple_newsletter_example():
+    # stupidity test
+    import os
+    html_file = os.path.join(os.path.dirname(__file__),
+                             'test-apple-newsletter.html')
+    html = open(html_file).read()
+    
+    p = Premailer(html, exclude_pseudoclasses=False,
+                  keep_style_tags=True)
+    result_html = p.transform()
+    assert '<html>' in result_html
+    assert """<style media="only screen and (max-device-width: 480px)" type="text/css">
+* {line-height: normal !important; -webkit-text-size-adjust: 125%}
+</style>""" in result_html
+    _p = result_html.find('Add this to your calendar')
+    assert '''style="{color:#5b7ab3; font-size:11px; font-family:Lucida Grande, Arial, Helvetica, Geneva, Verdana, sans-serif} :link{color:#5b7ab3; text-decoration:none} :visited{color:#5b7ab3; text-decoration:none} :hover{color:#5b7ab3; text-decoration:underline} :active{color:#5b7ab3; text-decoration:none}">Add this to your calendar''' in result_html
+                      
+    assert 1
+    
 
