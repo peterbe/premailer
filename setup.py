@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '1.7'
+version = '1.8'
 
 README = os.path.join(os.path.dirname(__file__), 'README.md')
 long_description = open(README).read().strip() + "\n\n"

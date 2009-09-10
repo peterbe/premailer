@@ -6,7 +6,7 @@ import lxml.html
 from lxml.cssselect import CSSSelector
 from lxml import etree
 
-__version__ = '1.7'
+__version__ = '1.8'
 
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
