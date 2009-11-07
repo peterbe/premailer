@@ -5,6 +5,7 @@ from cStringIO import StringIO
 import lxml.html
 from lxml.cssselect import CSSSelector
 from lxml import etree
+import urlparse
 
 __version__ = '1.8'
 
@@ -172,24 +173,11 @@ class Premailer(object):
         
         if self.base_url:
             
-            def make_full_url(rel_url):
-                if rel_url.startswith('/'):
-                    if self.base_url.endswith('/'):
-                        return self.base_url + rel_url[1:]
-                    else:
-                        return self.base_url + rel_url
-                else:
-                    # e.g. rel_url = "page.html"
-                    if self.base_url.endswith('/'):
-                        return self.base_url + rel_url
-                    else:
-                        return self.base_url + '/' + rel_url
-                    
             for attr in ('href', 'src'):
                 for item in page.xpath("//@%s" % attr):
                     parent = item.getparent()
-                    if '://' not in parent.attrib[attr]:
-                        parent.attrib[attr] = make_full_url(parent.attrib[attr])
+                    parent.attrib[attr] = urlparse.urljoin(self.base_url, 
+                                                           parent.attrib[attr])
                         
         return etree.tostring(page, pretty_print=pretty_print)\
           .replace('<head/>','<head></head>')

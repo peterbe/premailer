@@ -460,4 +460,38 @@ def test_apple_newsletter_example():
                       
     assert 1
     
-
+def test_mailto_url():
+    """if you use URL with mailto: protocol, they should stay as mailto:
+    when baseurl is used
+    """
+    if not etree:
+        # can't test it
+        return
+    
+    html = """<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body>
+    <a href="mailto:e-mail@example.com">e-mail@example.com</a>
+    </body>
+    </html>"""
+    
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body>
+    <a href="mailto:e-mail@example.com">e-mail@example.com</a>
+    </body>
+    </html>"""
+    
+    p = Premailer(html, base_url='http://kungfupeople.com')
+    result_html = p.transform()
+    
+    whitespace_between_tags = re.compile('>\s*<',)
+    
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+    
+    assert expect_html == result_html
