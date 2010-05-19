@@ -1,7 +1,7 @@
 # http://www.peterbe.com/plog/premailer.py
 import re, os
 from collections import defaultdict
-from cStringIO import StringIO
+import codecs
 import lxml.html
 from lxml.cssselect import CSSSelector
 from lxml import etree
@@ -78,13 +78,12 @@ _colon_regex = re.compile(':(\s+)')
 
 class Premailer(object):
     
-    def __init__(self, html, base_url=None, encoding='utf8',
+    def __init__(self, html, base_url=None,
                  exclude_pseudoclasses=False,
                  keep_style_tags=False,
                  include_star_selectors=False):
         self.html = html
         self.base_url = base_url
-        self.encoding = encoding
         self.exclude_pseudoclasses = exclude_pseudoclasses
         # whether to delete the <style> tag once it's been processed
         self.keep_style_tags = keep_style_tags
@@ -122,7 +121,7 @@ class Premailer(object):
             return self.html
         
         parser = etree.HTMLParser()
-        tree = etree.parse(StringIO(self.html.strip().encode(self.encoding)), parser)
+        tree = etree.fromstring(self.html.strip(), parser).getroottree()
         page = tree.getroot()
         
         if page is None:
