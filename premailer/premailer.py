@@ -5,7 +5,7 @@ import codecs
 import lxml.html
 from lxml.cssselect import CSSSelector
 from lxml import etree
-import urlparse
+import urlparse, urllib
 
 __version__ = '1.8'
 
@@ -81,7 +81,8 @@ class Premailer(object):
     def __init__(self, html, base_url=None,
                  exclude_pseudoclasses=False,
                  keep_style_tags=False,
-                 include_star_selectors=False):
+                 include_star_selectors=False,
+                 external_styles=None):
         self.html = html
         self.base_url = base_url
         self.exclude_pseudoclasses = exclude_pseudoclasses
@@ -89,6 +90,9 @@ class Premailer(object):
         self.keep_style_tags = keep_style_tags
         # whether to process or ignore selectors like '* { foo:bar; }'
         self.include_star_selectors = include_star_selectors
+        if isinstance(external_styles, basestring):
+            external_styles = [external_styles]
+        self.external_styles = external_styles
         
     def _parse_style_rules(self, css_body):
         leftover = []
@@ -146,6 +150,22 @@ class Premailer(object):
                 style.text = '\n'.join(['%s {%s}' % (k, v) for (k, v) in these_leftover])
             elif not self.keep_style_tags:
                 parent_of_style.remove(style)
+                       
+        if self.external_styles:
+            for stylefile in self.external_styles:
+                print stylefile
+                if stylefile.startswith('http://'):
+                    css_body = urllib.urlopen(stylefile).read()
+                elif os.path.exists(stylefile):
+                    try:
+                        f = codecs.open(stylefile)
+                        css_body = f.read()
+                    finally:
+                        f.close()
+                else:
+                    raise ValueError(u"Could not find external style: %s" % stylefile) 
+                these_rules, these_leftover = self._parse_style_rules(css_body)
+                rules.extend(these_rules)              
             
         for selector, style in rules:
             class_ = ''
