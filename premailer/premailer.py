@@ -1,13 +1,12 @@
 # http://www.peterbe.com/plog/premailer.py
 import re, os
-from collections import defaultdict
 import codecs
 import lxml.html
 from lxml.cssselect import CSSSelector
 from lxml import etree
 import urlparse, urllib
 
-__version__ = '1.8'
+__version__ = '1.9'
 
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
