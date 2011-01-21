@@ -152,6 +152,7 @@ def test_base_url_fixer():
     <a href="/home">Home</a>
     <a href="http://www.peterbe.com">External</a>
     <a href="subpage">Subpage</a>
+    <a href="#internal_link">Internal Link</a>    
     </body>
     </html>"""
     
@@ -166,10 +167,12 @@ def test_base_url_fixer():
     <a href="http://kungfupeople.com/home">Home</a>
     <a href="http://www.peterbe.com">External</a>
     <a href="http://kungfupeople.com/subpage">Subpage</a>
+    <a href="#internal_link">Internal Link</a>    
     </body>
     </html>"""
     
-    p = Premailer(html, base_url='http://kungfupeople.com')
+    p = Premailer(html, base_url='http://kungfupeople.com',
+                  preserve_internal_links=True)
     result_html = p.transform()
     
     whitespace_between_tags = re.compile('>\s*<',)

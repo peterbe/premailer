@@ -78,12 +78,14 @@ _colon_regex = re.compile(':(\s+)')
 class Premailer(object):
     
     def __init__(self, html, base_url=None,
+                 preserve_internal_links=False,
                  exclude_pseudoclasses=False,
                  keep_style_tags=False,
                  include_star_selectors=False,
                  external_styles=None):
         self.html = html
         self.base_url = base_url
+        self.preserve_internal_links = preserve_internal_links
         self.exclude_pseudoclasses = exclude_pseudoclasses
         # whether to delete the <style> tag once it's been processed
         self.keep_style_tags = keep_style_tags
@@ -190,10 +192,12 @@ class Premailer(object):
         ##
         
         if self.base_url:
-            
             for attr in ('href', 'src'):
                 for item in page.xpath("//@%s" % attr):
                     parent = item.getparent()
+                    if attr == 'href' and self.preserve_internal_links \
+                           and parent.attrib[attr].startswith('#'):
+                        continue
                     parent.attrib[attr] = urlparse.urljoin(self.base_url, 
                                                            parent.attrib[attr])
                         
