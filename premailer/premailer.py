@@ -225,11 +225,11 @@ class Premailer(object):
                 attributes['align'] = value.strip()
             elif key == 'background-color':
                 attributes['bgcolor'] = value.strip()
-            elif key == 'width':
+            elif key == 'width' or key == 'height':
                 value = value.strip()
                 if value.endswith('px'):
                     value = value[:-2]
-                attributes['width'] = value
+                attributes[key] = value
             #else:
             #    print "key", repr(key)
             #    print 'value', repr(value)
