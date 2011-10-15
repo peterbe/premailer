@@ -610,3 +610,41 @@ def test_last_child():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
+
+def test_last_child_exclude_pseudo():
+    html = """<html>
+    <head>
+    <style type="text/css">
+    div {
+        text-align: right;
+    }
+    div:last-child {
+        text-align: left;
+    }
+    </style>
+    </head>
+    <body>
+    <div>First child</div>
+    <div>Last child</div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div style="text-align:right" align="right">First child</div>
+    <div style="text-align:left" align="left">Last child</div>
+    </body>
+    </html>"""
+
+    p = Premailer(html, exclude_pseudoclasses=True)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)

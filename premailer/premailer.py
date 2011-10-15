@@ -15,6 +15,9 @@ class PremailerError(Exception):
     pass
 
 
+grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
+
+
 def _merge_styles(old, new, class_=''):
     """
     if ::
@@ -36,7 +39,6 @@ def _merge_styles(old, new, class_=''):
         news[k.strip()] = v.strip()
 
     groups = {}
-    grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
     grouped_split = grouping_regex.findall(old)
     if grouped_split:
         for old_class, old_content in grouped_split:
@@ -53,7 +55,6 @@ def _merge_styles(old, new, class_=''):
         groups[''] = olds
 
     # Perform the merge
-
     merged = news
     for k, v in groups.get(class_, {}).items():
         if k not in merged:
@@ -122,7 +123,9 @@ class Premailer(object):
                 bulk = bulk[:-1]
             for selector in [x.strip() for
                              x in selectors.split(',') if x.strip()]:
-                if ':' in selector and self.exclude_pseudoclasses:
+                if (':' in selector and self.exclude_pseudoclasses and
+                    ':' + selector.split(':', 1)[1]
+                        not in FILTER_PSEUDOSELECTORS):
                     # a pseudoclass
                     leftover.append((selector, bulk))
                     continue
