@@ -1,5 +1,6 @@
 import re
-import nose.tools
+from nose import SkipTest
+from nose.tools import eq_
 
 from premailer import Premailer, etree, _merge_styles, transform
 
@@ -498,3 +499,114 @@ def test_mailto_url():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
     
     assert expect_html == result_html
+
+
+def test_strip_important():
+    """Get rid of !important. Makes no sense inline."""
+    html = """<html>
+    <head>
+    <style type="text/css">
+    p {
+        height:100% !important;
+        width:100% !important;
+    }
+    </style>
+    </head>
+    <body>
+    <p>Paragraph</p>
+    </body>
+    </html>
+    """
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <p style="width:100%; height:100%" width="100%" height="100%">Paragraph</p>
+    </body>
+    </html>"""
+
+    p = Premailer(html, strip_important=True)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_inline_wins_over_external():
+    html = """<html>
+    <head>
+    <style type="text/css">
+    div {
+        text-align: left;
+    }
+    /* This tests that a second loop for the same style still doesn't
+     * overwrite it. */
+    div {
+        text-align: left;
+    }
+    </style>
+    </head>
+    <body>
+    <div style="text-align:right">Some text</div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div style="text-align:right" align="right">Some text</div>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+    
+    whitespace_between_tags = re.compile('>\s*<',)
+    
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+    
+    eq_(expect_html, result_html)
+
+
+def test_last_child():
+    html = """<html>
+    <head>
+    <style type="text/css">
+    div {
+        text-align: right;
+    }
+    div:last-child {
+        text-align: left;
+    }
+    </style>
+    </head>
+    <body>
+    <div>First child</div>
+    <div>Last child</div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div style="text-align:right" align="right">First child</div>
+    <div style="text-align:left" align="left">Last child</div>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+    
+    whitespace_between_tags = re.compile('>\s*<',)
+    
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+    
+    eq_(expect_html, result_html)

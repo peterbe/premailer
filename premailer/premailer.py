@@ -6,7 +6,7 @@ from lxml.cssselect import CSSSelector
 from lxml import etree
 import urlparse, urllib
 
-__version__ = '1.9'
+__version__ = '1.10'
 
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
@@ -73,6 +73,10 @@ _css_comments = re.compile(r'/\*.*?\*/', re.MULTILINE|re.DOTALL)
 _regex = re.compile('((.*?){(.*?)})', re.DOTALL|re.M)
 _semicolon_regex = re.compile(';(\s+)')
 _colon_regex = re.compile(':(\s+)')
+_importants = re.compile('\s*!important')
+# These selectors don't apply to all elements. Rather, they specify
+# which elements to apply to.
+FILTER_PSEUDOSELECTORS = [':last-child', ':first-child', 'nth-child']
 
 
 class Premailer(object):
@@ -82,6 +86,8 @@ class Premailer(object):
                  exclude_pseudoclasses=False,
                  keep_style_tags=False,
                  include_star_selectors=False,
+                 remove_classes=True,
+                 strip_important=True,
                  external_styles=None):
         self.html = html
         self.base_url = base_url
@@ -89,11 +95,13 @@ class Premailer(object):
         self.exclude_pseudoclasses = exclude_pseudoclasses
         # whether to delete the <style> tag once it's been processed
         self.keep_style_tags = keep_style_tags
+        self.remove_classes = remove_classes
         # whether to process or ignore selectors like '* { foo:bar; }'
         self.include_star_selectors = include_star_selectors
         if isinstance(external_styles, basestring):
             external_styles = [external_styles]
         self.external_styles = external_styles
+        self.strip_important = strip_important
         
     def _parse_style_rules(self, css_body):
         leftover = []
@@ -167,24 +175,51 @@ class Premailer(object):
                     raise ValueError(u"Could not find external style: %s" % stylefile) 
                 these_rules, these_leftover = self._parse_style_rules(css_body)
                 rules.extend(these_rules)              
-            
+
+        first_time = []
+        first_time_styles = []
         for selector, style in rules:
+            new_selector = selector
             class_ = ''
             if ':' in selector:
-                selector, class_ = re.split(':', selector, 1)
+                new_selector, class_ = re.split(':', selector, 1)
                 class_ = ':%s' % class_
-            
+            # Keep filter-type selectors untouched.
+            if class_ in FILTER_PSEUDOSELECTORS:
+                class_ = ''
+            else:
+                selector = new_selector
+
             sel = CSSSelector(selector)
             for item in sel(page):
                 old_style = item.attrib.get('style','')
-                new_style = _merge_styles(old_style, style, class_)
+                if not item in first_time:
+                    if old_style:
+                        new_style = _merge_styles(style, old_style, class_)
+                    else:
+                        new_style = _merge_styles(old_style, style, class_)
+                    first_time.append(item)
+                    first_time_styles.append((item, old_style))
+                else:
+                    new_style = _merge_styles(old_style, style, class_)
                 item.attrib['style'] = new_style
-                self._style_to_basic_html_attributes(item, new_style)
+                self._style_to_basic_html_attributes(item, new_style,
+                                                     force=True)
+
+        # Re-apply initial inline styles.
+        for item, inline_style in first_time_styles:
+            old_style = item.attrib.get('style','')
+            if not inline_style:
+                continue
+            new_style = _merge_styles(old_style, inline_style, class_)
+            item.attrib['style'] = new_style
+            self._style_to_basic_html_attributes(item, new_style, force=True)
                 
-        # now we can delete all 'class' attributes
-        for item in page.xpath('//@class'):
-            parent = item.getparent()
-            del parent.attrib['class']
+        if self.remove_classes:
+            # now we can delete all 'class' attributes
+            for item in page.xpath('//@class'):
+                parent = item.getparent()
+                del parent.attrib['class']
             
                     
         ##
@@ -201,10 +236,14 @@ class Premailer(object):
                     parent.attrib[attr] = urlparse.urljoin(self.base_url, 
                                                            parent.attrib[attr])
                         
-        return etree.tostring(page, pretty_print=pretty_print)\
+        out = etree.tostring(page, pretty_print=pretty_print)\
           .replace('<head/>','<head></head>')
+        if self.strip_important:
+            out = _importants.sub('', out)
+        return out
     
-    def _style_to_basic_html_attributes(self, element, style_content):
+    def _style_to_basic_html_attributes(self, element, style_content,
+                                        force=False):
         """given an element and styles like 
         'background-color:red; font-family:Arial' turn some of that into HTML
         attributes. like 'bgcolor', etc.
@@ -235,7 +274,7 @@ class Premailer(object):
             #    print 'value', repr(value)
             
         for key, value in attributes.items():
-            if key in element.attrib:
+            if key in element.attrib and not force:
                 # already set, don't dare to overwrite
                 continue
             element.attrib[key] = value
@@ -266,5 +305,3 @@ if __name__=='__main__':
         </html>"""
     p = Premailer(html)
     print p.transform()
-    
-    
