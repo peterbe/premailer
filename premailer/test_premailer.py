@@ -1,5 +1,5 @@
 import re
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 
 from premailer import Premailer, etree, _merge_styles
 
@@ -23,17 +23,17 @@ def test_merge_styles_with_class():
     #  {color:red; font-size:1px} :hover{font-size:2px; font-weight:bold}
 
     result = _merge_styles(old, new, class_)
-    assert result.startswith('{')
-    assert result.endswith('}')
-    assert ' :hover{' in result
+    ok_(result.startswith('{'))
+    ok_(result.endswith('}'))
+    ok_(' :hover{' in result)
     split_regex = re.compile('{([^}]+)}')
-    assert len(split_regex.findall(result)) == 2
+    eq_(len(split_regex.findall(result)), 2)
     expect_first = 'color:red', 'font-size:1px'
     expect_second = 'font-weight:bold', 'font-size:2px'
     for each in expect_first:
-        assert each in split_regex.findall(result)[0]
+        ok_(each in split_regex.findall(result)[0])
     for each in expect_second:
-        assert each in split_regex.findall(result)[1]
+        ok_(each in split_regex.findall(result)[1])
 
 
 def test_basic_html():
@@ -141,7 +141,7 @@ def test_base_url_fixer():
         # can't test it
         return
 
-    html = """<html>
+    html = '''<html>
     <head>
     <title>Title</title>
     </head>
@@ -154,9 +154,10 @@ def test_base_url_fixer():
     <a href="subpage">Subpage</a>
     <a href="#internal_link">Internal Link</a>
     </body>
-    </html>"""
+    </html>
+    '''
 
-    expect_html = """<html>
+    expect_html = '''<html>
     <head>
     <title>Title</title>
     </head>
@@ -169,7 +170,7 @@ def test_base_url_fixer():
     <a href="http://kungfupeople.com/subpage">Subpage</a>
     <a href="#internal_link">Internal Link</a>
     </body>
-    </html>"""
+    </html>'''
 
     p = Premailer(html, base_url='http://kungfupeople.com',
                   preserve_internal_links=True)
@@ -211,14 +212,14 @@ def test_style_block_with_external_urls():
     </body>
     </html>"""
 
-    expect_html = """<html>
+    expect_html = '''<html>
     <head>
     <title>Title</title>
     </head>
     <body style="color:#123; font-family:Omerta; background:url(http://example.com/bg.png)">
     <h1>Hi!</h1>
     </body>
-    </html>"""
+    </html>'''
 
     p = Premailer(html)
     result_html = p.transform()
@@ -227,9 +228,6 @@ def test_style_block_with_external_urls():
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
-    #print result_html
-    #print expect_html
-
     assert expect_html == result_html
 
 
@@ -246,21 +244,21 @@ def test_shortcut_function():
         # can't test it
         return
 
-    html = """<html>
+    html = '''<html>
     <head>
     <style type="text/css">h1{color:#123}</style>
     </head>
     <body>
     <h1>Hi!</h1>
     </body>
-    </html>"""
+    </html>'''
 
-    expect_html = """<html>
+    expect_html = '''<html>
     <head></head>
     <body>
     <h1 style="color:#123">Hi!</h1>
     </body>
-    </html>"""
+    </html>'''
 
     p = Premailer(html)
     result_html = p.transform()
@@ -279,7 +277,7 @@ def test_css_with_pseudoclasses_included():
         # can't test it
         return
 
-    html = """<html>
+    html = '''<html>
     <head>
     <style type="text/css">
     a.special:link { text-decoration:none; }
@@ -295,7 +293,7 @@ def test_css_with_pseudoclasses_included():
     <a href="#">Page</a>
     <p>Paragraph</p>
     </body>
-    </html>"""
+    </html>'''
 
     ''' Unused, for reading purposes.
     expect_html = """<html>
@@ -333,7 +331,7 @@ def test_css_with_pseudoclasses_excluded():
         # can't test it
         return
 
-    html = """<html>
+    html = '''<html>
     <head>
     <style type="text/css">
     a { color:red; }
@@ -347,9 +345,9 @@ def test_css_with_pseudoclasses_excluded():
     <a href="#">Page</a>
     <p>Paragraph</p>
     </body>
-    </html>"""
+    </html>'''
 
-    expect_html = """<html>
+    expect_html = '''<html>
     <head>
     <style type="text/css">a:hover {text-decoration:none}
     a:hover {border:1px solid green}
@@ -360,7 +358,7 @@ def test_css_with_pseudoclasses_excluded():
     <a href="#" style="color:red; border:1px solid green">Page</a>
     <p>Paragraph</p>
     </body>
-    </html>"""
+    </html>'''
 
     p = Premailer(html, exclude_pseudoclasses=True)
     result_html = p.transform()
@@ -373,14 +371,7 @@ def test_css_with_pseudoclasses_excluded():
     expect_html = re.sub('}\s+', '}', expect_html)
     result_html = result_html.replace('}\n', '}')
 
-    print ""
-    print "EXPECT"
-    print expect_html
-    print "--"
-    print "RESULT"
-    print result_html
-
-    assert expect_html == result_html, result_html
+    eq_(expect_html, result_html)
 
 
 def test_css_with_html_attributes():
@@ -435,14 +426,7 @@ def test_css_with_html_attributes():
     expect_html = re.sub('}\s+', '}', expect_html)
     result_html = result_html.replace('}\n', '}')
 
-    print ""
-    print "EXPECT"
-    print expect_html
-    print "--"
-    print "RESULT"
-    print result_html
-
-    assert expect_html == result_html, result_html
+    eq_(expect_html, result_html)
 
 
 def test_apple_newsletter_example():
@@ -453,16 +437,14 @@ def test_apple_newsletter_example():
     html = open(html_file).read()
 
     p = Premailer(html, exclude_pseudoclasses=False,
-                  keep_style_tags=True)
+                  keep_style_tags=True,
+                  strip_important=False)
     result_html = p.transform()
-    assert '<html>' in result_html
-    assert """<style media="only screen and (max-device-width: 480px)" type="text/css">
-* {line-height: normal !important; -webkit-text-size-adjust: 125%}
-</style>""" in result_html
-    assert '''style="{color:#5b7ab3; font-size:11px; font-family:Lucida Grande, Arial, Helvetica, Geneva, Verdana, sans-serif} :link{color:#5b7ab3; text-decoration:none} :visited{color:#5b7ab3; text-decoration:none} :hover{color:#5b7ab3; text-decoration:underline} :active{color:#5b7ab3; text-decoration:none}">Add this to your calendar''' in result_html
-
-    assert 1
-
+    ok_('<html>' in result_html)
+    ok_('<style media="only screen and (max-device-width: 480px)" '
+        'type="text/css">\n'
+        '* {line-height: normal !important; -webkit-text-size-adjust: 125%}\n'
+        '</style>' in result_html)
 
 def test_mailto_url():
     """if you use URL with mailto: protocol, they should stay as mailto:
