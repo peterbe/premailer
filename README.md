@@ -17,7 +17,7 @@ have to put inline `style` attributes on every element. So from this:
         <h1 style="font-weight:bolder">Peter</h1>
         <p>Hej</p>
         </html>
-        
+
 You want this:
 
         <html>
@@ -28,7 +28,7 @@ You want this:
 
 premailer does this. It parses an HTML page, looks up `style` blocks
 and parses the CSS. It then uses the `lxml.html` parser to modify the
-DOM tree of the page accordingly. 
+DOM tree of the page accordingly.
 
 
 Turning relative URLs into absolute URLs
@@ -47,7 +47,7 @@ part in it. For example, turning this:
         <img src="/folder/">Folder</a>
         </body>
         </html>
-        
+
 Into this:
 
         <html>
@@ -58,8 +58,8 @@ Into this:
         <img src="http://www.peterbe.com/folder/">Folder</a>
         </body>
         </html>
-        
-        
+
+
 HTML attributes created additionally
 ------------------------------------
 
