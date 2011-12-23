@@ -176,8 +176,8 @@ class Premailer(object):
             
             sel = CSSSelector(selector)
             for item in sel(page):
-                old_style = item.attrib.get('style','')
-                new_style = _merge_styles(old_style, style, class_)
+                inline_style = item.attrib.get('style','')
+                new_style = _merge_styles(style, inline_style, class_)
                 item.attrib['style'] = new_style
                 self._style_to_basic_html_attributes(item, new_style)
                 
