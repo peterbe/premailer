@@ -1,7 +1,7 @@
 import os
 from setuptools import setup, find_packages
 
-version = '1.10'
+version = '1.11'
 
 README = os.path.join(os.path.dirname(__file__), 'README.md')
 long_description = open(README).read().strip() + "\n\n"
@@ -22,8 +22,8 @@ setup(name='premailer',
       keywords='html lxml email mail style',
       author='Peter Bengtsson',
       author_email='peter@fry-it.com',
-      url='http://github.com/sowink/premailer',
-      download_url='http://github.com/sowink/premailer',
+      url='http://github.com/peterbe/premailer',
+      download_url='http://github.com/peterbe/premailer',
       license='Python',
       classifiers=[
         "Development Status :: 5 - Production/Stable",
