@@ -72,3 +72,35 @@ HTML attribute `bgcolor="#eee"`.
 Having these extra attributes basically as a "back up" for really shit
 email clients that can't even take the style attributes. A lot of
 professional HTML newsletters such as Amazon's use this.
+
+
+Using with Media Queries
+------------------------
+
+For advanced designs this technique can be combined with CSS media queries. But
+style blocks with such queries must not be put inline. You can specify that
+using the `premailer="ignore"` attribute like this:
+
+    <html>
+    <head>
+        <style type="text/css">
+        /* This is put inline */
+        h1 { border:1px solid black }
+        p { color:red;}
+        p::first-letter { float:left; }
+        </style>
+        <style type="text/css" premailer="ignore">
+        /* This block is left intact and can be used to target modern mail
+         * clients that don't need inlining */
+        @media only screen and (max-device-width: 480px) {
+            /* ... */
+        }
+        </style>
+    </head>
+    <body>
+        <!-- ...... -->
+    </body>
+    </html>
+
+See the [HTML Email Boilerplate](http://htmlemailboilerplate.com/) project for
+more information about this technique.
