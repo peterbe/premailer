@@ -668,3 +668,36 @@ def test_mediaquery():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
+
+def test_child_selector():
+    html = """<html>
+    <head>
+    <style type="text/css">
+    body > div {
+        text-align: right;
+    }
+    </style>
+    </head>
+    <body>
+    <div>First div</div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div style="text-align:right" align="right">First div</div>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
