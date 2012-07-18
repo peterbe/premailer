@@ -245,7 +245,7 @@ class Premailer(object):
                     parent.attrib[attr] = urlparse.urljoin(self.base_url,
                                                            parent.attrib[attr])
 
-        out = etree.tostring(page, pretty_print=pretty_print).replace(
+        out = etree.tostring(tree, pretty_print=pretty_print).replace(
             '<head/>', '<head></head>')
         if self.strip_important:
             out = _importants.sub('', out)
