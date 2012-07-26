@@ -146,8 +146,8 @@ def test_base_url_fixer():
     <title>Title</title>
     </head>
     <body>
-    <img src="/images/foo.jpg"/>
-    <img src="/images/bar.gif"/>
+    <img src="/images/foo.jpg">
+    <img src="/images/bar.gif">
     <img src="http://www.googe.com/photos/foo.jpg">
     <a href="/home">Home</a>
     <a href="http://www.peterbe.com">External</a>
@@ -162,9 +162,9 @@ def test_base_url_fixer():
     <title>Title</title>
     </head>
     <body>
-    <img src="http://kungfupeople.com/images/foo.jpg"/>
-    <img src="http://kungfupeople.com/images/bar.gif"/>
-    <img src="http://www.googe.com/photos/foo.jpg"/>
+    <img src="http://kungfupeople.com/images/foo.jpg">
+    <img src="http://kungfupeople.com/images/bar.gif">
+    <img src="http://www.googe.com/photos/foo.jpg">
     <a href="http://kungfupeople.com/home">Home</a>
     <a href="http://www.peterbe.com">External</a>
     <a href="http://kungfupeople.com/subpage">Subpage</a>
@@ -181,7 +181,7 @@ def test_base_url_fixer():
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
-    assert expect_html == result_html
+    eq_(expect_html, result_html)
 
 
 def test_style_block_with_external_urls():
@@ -689,6 +689,33 @@ def test_child_selector():
     </head>
     <body>
     <div style="text-align:right" align="right">First div</div>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+def test_doctype():
+    html = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html>
+    <head>
+    </head>
+    <body>
+    </body>
+    </html>"""
+
+    expect_html = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html>
+    <head>
+    </head>
+    <body>
     </body>
     </html>"""
 

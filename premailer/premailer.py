@@ -145,8 +145,12 @@ class Premailer(object):
             return self.html
 
         parser = etree.HTMLParser()
-        tree = etree.fromstring(self.html.strip(), parser).getroottree()
+        stripped = self.html.strip()
+        tree = etree.fromstring(stripped, parser).getroottree()
         page = tree.getroot()
+        # lxml inserts a doctype if none exists, so only include it in
+        # the root if it was in the original html.
+        root = tree if stripped.startswith(tree.docinfo.doctype) else page
 
         if page is None:
             print repr(self.html)
@@ -244,8 +248,7 @@ class Premailer(object):
                     parent.attrib[attr] = urlparse.urljoin(self.base_url,
                                                            parent.attrib[attr])
 
-        out = etree.tostring(page, pretty_print=pretty_print).replace(
-            '<head/>', '<head></head>')
+        out = etree.tostring(root, method="html", pretty_print=pretty_print)
         if self.strip_important:
             out = _importants.sub('', out)
         return out
