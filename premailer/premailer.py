@@ -176,7 +176,6 @@ class Premailer(object):
 
         if self.external_styles:
             for stylefile in self.external_styles:
-                print stylefile
                 if stylefile.startswith('http://'):
                     css_body = urllib.urlopen(stylefile).read()
                 elif os.path.exists(stylefile):
