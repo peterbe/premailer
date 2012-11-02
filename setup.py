@@ -16,7 +16,7 @@ long_description = md2stx(long_description)
 
 
 setup(name='premailer',
-      version=version,
+      version=version + os.environ.get('BUILD_SUFFIX', ''),
       description="Turns CSS blocks into style attributes",
       long_description=long_description,
       keywords='html lxml email mail style',
@@ -45,6 +45,7 @@ setup(name='premailer',
       zip_safe=True,
       install_requires=[
         'lxml',
+        'cssselect'
       ],
       entry_points="""
       # -*- Entry points: -*-

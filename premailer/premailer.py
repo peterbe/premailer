@@ -7,7 +7,7 @@ import urllib
 import urlparse
 
 
-__version__ = '1.11'
+__version__ = '1.12'
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
 
@@ -81,6 +81,7 @@ _regex = re.compile('((.*?){(.*?)})', re.DOTALL | re.M)
 _semicolon_regex = re.compile(';(\s+)')
 _colon_regex = re.compile(':(\s+)')
 _importants = re.compile('\s*!important')
+_style_url_regex = re.compile('url\(\s*[\'"]?(?P<url>.*?)[\'"]?\s*\)')
 # These selectors don't apply to all elements. Rather, they specify
 # which elements to apply to.
 FILTER_PSEUDOSELECTORS = [':last-child', ':first-child', 'nth-child']
@@ -95,7 +96,8 @@ class Premailer(object):
                  include_star_selectors=False,
                  remove_classes=True,
                  strip_important=True,
-                 external_styles=None):
+                 external_styles=None,
+                 url_transform=None):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
@@ -109,6 +111,7 @@ class Premailer(object):
             external_styles = [external_styles]
         self.external_styles = external_styles
         self.strip_important = strip_important
+        self.url_transform = url_transform
 
     def _parse_style_rules(self, css_body):
         leftover = []
@@ -238,20 +241,41 @@ class Premailer(object):
         ##
         ## URLs
         ##
-        if self.base_url:
-            for attr in ('href', 'src'):
+        if self.base_url or self.url_transform:
+            for attr in ('href', 'src', 'style'):
                 for item in page.xpath("//@%s" % attr):
                     parent = item.getparent()
                     if attr == 'href' and self.preserve_internal_links \
                            and parent.attrib[attr].startswith('#'):
                         continue
-                    parent.attrib[attr] = urlparse.urljoin(self.base_url,
-                                                           parent.attrib[attr])
+                    if attr == 'style':
+                        attr_txt = parent.attrib[attr]
+                        pos = 0
+                        fixed = ''
+                        for m in _style_url_regex.finditer(attr_txt):
+                            url = m.group('url')
+                            url = self._process_url(url)
+                            fixed += attr_txt[pos:m.start('url')] + url
+                            pos = m.end('url')
+                        fixed += attr_txt[pos:]
+                        parent.attrib[attr] = fixed
+                    else:
+                        url = parent.attrib[attr]
+                        parent.attrib[attr] = self._process_url(url)
 
         out = etree.tostring(root, method="html", pretty_print=pretty_print)
         if self.strip_important:
             out = _importants.sub('', out)
         return out
+
+    def _process_url(self, url):
+        """given a url apply the base_url and url_transform."""
+
+        if self.url_transform:
+            url = self.url_transform(url)
+        if self.base_url:
+            url = urlparse.urljoin(self.base_url, url)
+        return url
 
     def _style_to_basic_html_attributes(self, element, style_content,
                                         force=False):

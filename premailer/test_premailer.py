@@ -1,4 +1,5 @@
 import re
+import urlparse
 from nose.tools import eq_, ok_
 
 from premailer import Premailer, etree, _merge_styles
@@ -231,6 +232,122 @@ def test_style_block_with_external_urls():
     assert expect_html == result_html
 
 
+def test_base_url_for_style_block_urls():
+    """base_url should also fix style block urls.
+
+    If you have
+      body { background:url(/images/bg.png); }
+    then a transform with a base_url should change the url
+    to prepend the base_url.
+    """
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    body {
+      color:#123;
+      background: url(/images/bg.png);
+      fun: url('/images/fun.png');
+      extra-fun:  url(  \"/images/extra_fun.png\" );
+      font-family: Omerta;
+    }
+    </style>
+    </head>
+    <body>
+    <h1>Hi!</h1>
+    </body>
+    </html>"""
+
+    expect_html = '''<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body style="color:#123; fun:url(\'http://example.com/images/fun.png\'); ''' \
+     'font-family:Omerta; background:url(http://example.com/images/bg.png); ' \
+     'extra-fun:url(  &quot;http://example.com/images/extra_fun.png&quot; )">' \
+    '''<h1>Hi!</h1>
+    </body>
+    </html>'''
+
+    p = Premailer(html, base_url='http://example.com')
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+    assert expect_html == result_html
+
+
+def test_url_transform():
+
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    body {
+      color:#123;
+      background: url(/images/bg.png);
+      font-family: Omerta;
+    }
+    </style>
+    </head>
+    <body>
+    <h1>Hi!</h1>
+    <img src="/images/foo.jpg">
+    <img src="http://www.googe.com/photos/foo.jpg">
+    <a href="/home">Home</a>
+    <a href="http://www.peterbe.com">External</a>
+    </body>
+    </html>"""
+
+    expect_html = '''<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body style="color:#123; font-family:Omerta; background:url(http://example.com/static/images/bg.png)">
+    <h1>Hi!</h1>
+    <img src="http://example.com/static/images/foo.jpg">
+    <img src="http://www.googe.com/photos/foo.jpg">
+    <a href="http://example.com/home">Home</a>
+    <a href="http://www.peterbe.com">External</a>
+    </body>
+    </html>'''
+
+    def url_transform(url):
+        """Add 'static/' before 'example.com' image urls."""
+
+        uscheme, netloc, path, query, fragment = urlparse.urlsplit(url)
+
+        if path.startswith('/images'):
+            if not netloc or netloc == 'example.com':
+                path = 'static' + path
+
+        return urlparse.urlunsplit((uscheme, netloc, path, query, fragment))
+
+    p = Premailer(html,
+                  base_url='http://example.com',
+                  url_transform=url_transform)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+    print expect_html
+    print
+    print result_html
+    assert expect_html == result_html
+
+
 def test_shortcut_function():
     # you don't have to use this approach:
     #   from premailer import Premailer
@@ -322,7 +439,7 @@ def test_css_with_pseudoclasses_included():
     assert ' :hover{border:1px solid green; text-decoration:none}' in \
       result_html
     print result_html
-    #assert 0
+    # assert 0
 
 
 def test_css_with_pseudoclasses_excluded():
