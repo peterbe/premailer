@@ -7,7 +7,7 @@ import urllib
 import urlparse
 
 
-__version__ = '1.12'
+__version__ = '1.12-LL'
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
 
@@ -249,16 +249,10 @@ class Premailer(object):
                            and parent.attrib[attr].startswith('#'):
                         continue
                     if attr == 'style':
-                        attr_txt = parent.attrib[attr]
-                        pos = 0
-                        fixed = ''
-                        for m in _style_url_regex.finditer(attr_txt):
-                            url = m.group('url')
-                            url = self._process_url(url)
-                            fixed += attr_txt[pos:m.start('url')] + url
-                            pos = m.end('url')
-                        fixed += attr_txt[pos:]
-                        parent.attrib[attr] = fixed
+                        parent.attrib[attr] = _style_url_regex.sub(
+                            lambda match: "url(\'{url}\')".format(
+                                url=self._process_url(match.group('url'))),
+                            parent.attrib[attr])
                     else:
                         url = parent.attrib[attr]
                         parent.attrib[attr] = self._process_url(url)
