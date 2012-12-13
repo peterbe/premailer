@@ -163,7 +163,7 @@ class Premailer(object):
 
         rules = []
 
-        for style in CSSSelector('style')(page):
+        for style in (style for style in CSSSelector('style')(page) if 'media' not in style.attrib):
             these_rules, these_leftover = self._parse_style_rules(style.text)
             rules.extend(these_rules)
 
