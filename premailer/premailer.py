@@ -5,6 +5,7 @@ import os
 import re
 import urllib
 import urlparse
+import operator
 
 
 __version__ = '1.12'
@@ -34,52 +35,53 @@ def _merge_styles(old, new, class_=''):
     Note: old could be something like '{...} ::first-letter{...}'
 
     """
-    news = {}
+    new_keys = set()
+    news = []
     for k, v in [x.strip().split(':', 1) for x in new.split(';') if x.strip()]:
-        news[k.strip()] = v.strip()
+        news.append((k.strip(), v.strip()))
+        new_keys.add(k.strip())
 
     groups = {}
     grouped_split = grouping_regex.findall(old)
     if grouped_split:
         for old_class, old_content in grouped_split:
-            olds = {}
+            olds = []
             for k, v in [x.strip().split(':', 1) for
                          x in old_content.split(';') if x.strip()]:
-                olds[k.strip()] = v.strip()
+                olds.append((k.strip(), v.strip()))
             groups[old_class] = olds
     else:
-        olds = {}
+        olds = []
         for k, v in [x.strip().split(':', 1) for
                      x in old.split(';') if x.strip()]:
-            olds[k.strip()] = v.strip()
+            olds.append((k.strip(), v.strip()))
         groups[''] = olds
 
     # Perform the merge
-    merged = news
-    for k, v in groups.get(class_, {}).items():
-        if k not in merged:
-            merged[k] = v
+    relevant_olds = groups.get(class_, {})
+    merged = [style for style in relevant_olds if style[0] not in new_keys] + news
     groups[class_] = merged
 
     if len(groups) == 1:
-        return '; '.join(['%s:%s' % (k, v) for
-                          (k, v) in groups.values()[0].items()])
+        return '; '.join('%s:%s' % (k, v) for
+                          (k, v) in groups.values()[0])
     else:
         all = []
         for class_, mergeable in sorted(groups.items(),
                                         lambda x, y: cmp(x[0].count(':'),
                                                          y[0].count(':'))):
             all.append('%s{%s}' % (class_,
-                                   '; '.join(['%s:%s' % (k, v)
+                                   '; '.join('%s:%s' % (k, v)
                                               for (k, v)
-                                              in mergeable.items()])))
-        return ' '.join([x for x in all if x != '{}'])
+                                              in mergeable)))
+        return ' '.join(x for x in all if x != '{}')
 
 
 _css_comments = re.compile(r'/\*.*?\*/', re.MULTILINE | re.DOTALL)
 _regex = re.compile('((.*?){(.*?)})', re.DOTALL | re.M)
 _semicolon_regex = re.compile(';(\s+)')
 _colon_regex = re.compile(':(\s+)')
+_element_selector_regex = re.compile(r'(^|\s)\w')
 _importants = re.compile('\s*!important')
 # These selectors don't apply to all elements. Rather, they specify
 # which elements to apply to.
@@ -110,10 +112,11 @@ class Premailer(object):
         self.external_styles = external_styles
         self.strip_important = strip_important
 
-    def _parse_style_rules(self, css_body):
+    def _parse_style_rules(self, css_body, ruleset_index):
         leftover = []
         rules = []
         css_body = _css_comments.sub('', css_body)
+        rule_index = 0
         for each in _regex.findall(css_body.strip()):
             __, selectors, bulk = each
 
@@ -121,9 +124,9 @@ class Premailer(object):
             bulk = _colon_regex.sub(':', bulk.strip())
             if bulk.endswith(';'):
                 bulk = bulk[:-1]
-            for selector in [x.strip() for
+            for selector in (x.strip() for
                              x in selectors.split(',') if x.strip() and
-                             not x.strip().startswith('@')]:
+                             not x.strip().startswith('@')):
                 if (':' in selector and self.exclude_pseudoclasses and
                     ':' + selector.split(':', 1)[1]
                         not in FILTER_PSEUDOSELECTORS):
@@ -133,8 +136,17 @@ class Premailer(object):
                 elif selector == '*' and not self.include_star_selectors:
                     continue
 
-                rules.append((selector, bulk))
+                # Crudely calculate specificity
+                id_count = selector.count('#')
+                class_count = selector.count('.')
+                element_count = len(_element_selector_regex.findall(selector))
 
+                specificity = (id_count, class_count, element_count, ruleset_index, rule_index)
+
+                rules.append((specificity, selector, bulk))
+                rule_index += 1
+
+        print rules
         return rules, leftover
 
     def transform(self, pretty_print=True):
@@ -163,8 +175,8 @@ class Premailer(object):
 
         rules = []
 
-        for style in CSSSelector('style')(page):
-            these_rules, these_leftover = self._parse_style_rules(style.text)
+        for index,style in enumerate(CSSSelector('style')(page)):
+            these_rules, these_leftover = self._parse_style_rules(style.text, index)
             rules.extend(these_rules)
 
             parent_of_style = style.getparent()
@@ -187,12 +199,14 @@ class Premailer(object):
                 else:
                     raise ValueError(u"Could not find external style: %s" %
                                      stylefile)
-                these_rules, these_leftover = self._parse_style_rules(css_body)
+                these_rules, these_leftover = self._parse_style_rules(css_body, -1)
                 rules.extend(these_rules)
+
+        rules.sort(key=operator.itemgetter(0))
 
         first_time = []
         first_time_styles = []
-        for selector, style in rules:
+        for _, selector, style in rules:
             new_selector = selector
             class_ = ''
             if ':' in selector:
@@ -208,10 +222,7 @@ class Premailer(object):
             for item in sel(page):
                 old_style = item.attrib.get('style', '')
                 if not item in first_time:
-                    if old_style:
-                        new_style = _merge_styles(style, old_style, class_)
-                    else:
-                        new_style = _merge_styles(old_style, style, class_)
+                    new_style = _merge_styles(old_style, style, class_)
                     first_time.append(item)
                     first_time_styles.append((item, old_style))
                 else:
