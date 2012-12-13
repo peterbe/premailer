@@ -92,23 +92,20 @@ def test_parse_style_rules():
         }
     ul li {  list-style: 2px; }
     a:hover { text-decoration: underline }
-    """)
+    """, 0)
 
     # 'rules' is a list, turn it into a dict for
     # easier assertion testing
     rules_dict = {}
-    for k, v in rules:
+    rules_specificity = {}
+    for specificity, k, v in rules:
         rules_dict[k] = v
+        rules_specificity[k] = specificity
 
     assert 'h1' in rules_dict
     assert 'h2' in rules_dict
     assert 'strong' in rules_dict
     assert 'ul li' in rules_dict
-
-    # order is important
-    rules_keys = [x[0] for x in rules]
-    assert rules_keys.index('h1') < rules_keys.index('h2')
-    assert rules_keys.index('strong') < rules_keys.index('ul li')
 
     assert rules_dict['h1'] == 'color:red'
     assert rules_dict['h2'] == 'color:red'
@@ -121,16 +118,45 @@ def test_parse_style_rules():
     rules, leftover = func("""
     ul li {  list-style: 2px; }
     a:hover { text-decoration: underline }
-    """)
+    """, 0)
 
     assert len(rules) == 1
-    k, v = rules[0]
+    specificity, k, v = rules[0]
     assert k == 'ul li'
     assert v == 'list-style:2px'
 
     assert len(leftover) == 1
     k, v = leftover[0]
     assert (k, v) == ('a:hover', 'text-decoration:underline'), (k, v)
+
+def test_precedence_comparison():
+    p = Premailer('html')  # won't need the html
+    rules, leftover = p._parse_style_rules("""
+    #identified { color:blue; }
+    h1, h2 { color:red; }
+    ul li {  list-style: 2px; }
+    li.example { color:green; }
+    strong { text-decoration:none }
+    div li.example p.sample { color:black; }
+    """, 0)
+
+    # 'rules' is a list, turn it into a dict for
+    # easier assertion testing
+    rules_specificity = {}
+    for specificity, k, v in rules:
+        rules_specificity[k] = specificity
+
+    # Last in file wins
+    assert rules_specificity['h1'] < rules_specificity['h2']
+    # More elements wins
+    assert rules_specificity['strong'] < rules_specificity['ul li']
+    # IDs trump everything
+    assert (rules_specificity['div li.example p.sample'] <
+        rules_specificity['#identified'])
+
+    # Classes trump multiple elements
+    assert (rules_specificity['ul li'] <
+        rules_specificity['li.example'])
 
 
 def test_base_url_fixer():
@@ -216,7 +242,7 @@ def test_style_block_with_external_urls():
     <head>
     <title>Title</title>
     </head>
-    <body style="color:#123; font-family:Omerta; background:url(http://example.com/bg.png)">
+    <body style="color:#123; background:url(http://example.com/bg.png); font-family:Omerta">
     <h1>Hi!</h1>
     </body>
     </html>'''
@@ -228,7 +254,7 @@ def test_style_block_with_external_urls():
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
-    assert expect_html == result_html
+    eq_(expect_html,result_html)
 
 
 def test_shortcut_function():
@@ -314,12 +340,12 @@ def test_css_with_pseudoclasses_included():
     # order the style attribute will be written in so we'll look for things
     # manually.
     assert '<head></head>' in result_html
-    assert '<p style="::first-letter{font-size:300%; float:left}">'\
+    assert '<p style="::first-letter{float:left; font-size:300%}">'\
            'Paragraph</p>' in result_html
 
     assert 'style="{color:red; border:1px solid green}' in result_html
     assert ' :visited{border:1px solid green}' in result_html
-    assert ' :hover{border:1px solid green; text-decoration:none}' in \
+    assert ' :hover{text-decoration:none; border:1px solid green}' in \
       result_html
     print result_html
     #assert 0
@@ -503,7 +529,7 @@ def test_strip_important():
     <head>
     </head>
     <body>
-    <p style="width:100%; height:100%" width="100%" height="100%">Paragraph</p>
+    <p style="height:100%; width:100%" width="100%" height="100%">Paragraph</p>
     </body>
     </html>"""
 
@@ -716,6 +742,146 @@ def test_doctype():
     <head>
     </head>
     <body>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+def test_prefer_inline_to_class():
+    html = """<html>
+    <head>
+    <style>
+    .example {
+        color: black;
+    }
+    </style>
+    </head>
+    <body>
+    <div class="example" style="color:red"></div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div style="color:red"></div>
+    </body>
+    </html>"""
+    
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_favour_rule_with_element_over_generic():
+    html = """<html>
+    <head>
+    <style>
+    div.example {
+        color: green;
+    }
+    .example {
+        color: black;
+    }
+    </style>
+    </head>
+    <body>
+    <div class="example"></div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div style="color:green"></div>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_favour_rule_with_class_over_generic():
+    html = """<html>
+    <head>
+    <style>
+    div.example {
+        color: green;
+    }
+    div {
+        color: black;
+    }
+    </style>
+    </head>
+    <body>
+    <div class="example"></div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div style="color:green"></div>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_favour_rule_with_id_over_others():
+    html = """<html>
+    <head>
+    <style>
+    #identified {
+        color: green;
+    }
+    div.example {
+        color: black;
+    }
+    </style>
+    </head>
+    <body>
+    <div class="example" id="identified"></div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div id="identified" style="color:green"></div>
     </body>
     </html>"""
 
