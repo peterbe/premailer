@@ -97,7 +97,8 @@ class Premailer(object):
                  include_star_selectors=False,
                  remove_classes=True,
                  strip_important=True,
-                 external_styles=None):
+                 external_styles=None,
+                 selector_cache=None):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
@@ -111,6 +112,7 @@ class Premailer(object):
             external_styles = [external_styles]
         self.external_styles = external_styles
         self.strip_important = strip_important
+        self.selector_cache = selector_cache if selector_cache is not None else {}
 
     def _parse_style_rules(self, css_body, ruleset_index):
         leftover = []
@@ -215,7 +217,11 @@ class Premailer(object):
             else:
                 selector = new_selector
 
-            sel = CSSSelector(selector)
+            sel = self.selector_cache.get(selector)
+            if sel is None:
+                sel = CSSSelector(selector)
+                self.selector_cache[selector] = sel
+
             for item in sel(page):
                 old_style = item.attrib.get('style', '')
                 if not item in first_time:
