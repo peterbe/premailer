@@ -7,7 +7,6 @@ import urllib
 import urlparse
 
 
-__version__ = '1.12-LL'
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
 

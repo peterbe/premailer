@@ -1,1 +1,2 @@
-from premailer import Premailer, transform, __version__
+__version__ = '1.12-LL'
+__build__ = ''  # set by the build server
