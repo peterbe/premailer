@@ -920,3 +920,86 @@ def test_css_specificity():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
+
+def test_css_selector_grouping():
+    html = """<html>
+    <head>
+    <style type="text/css">
+    h1,h2,h3 {color: black}
+    h1 {font-size: 24px; color: red}
+    h1.major {font-size: 48px}
+    h1#title {font-weight: bold}
+    h2#subtitle {font-size: 12px}
+    </style>
+    </head>
+    <body>
+    <h1 id="title" class="major">h1 title text</h1>
+    <h1>h1 text</h1>
+    <h2 id="subtitle">h2 text</h2>
+    <h3>h3 text</h3>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <h1 id="title" style="color:red; font-size:48px; font-weight:bold">h1 title text</h1>
+    <h1 style="color:red; font-size:24px">h1 text</h1>
+    <h2 id="subtitle" style="color:black; font-size:12px">h2 text</h2>
+    <h3 style="color:black">h3 text</h3>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_general():
+    html = """<html>
+        <head>
+        <title>Test</title>
+        <style>
+        h1, h2 { color:red; }
+        strong {
+          text-decoration:none
+          }
+        p { font-size:2px }
+        p.footer { font-size: 1px}
+        </style>
+        </head>
+        <body>
+        <h1>Hi!</h1>
+        <p><strong>Yes!</strong></p>
+        <p class="footer" style="color:red">Feetnuts</p>
+        </body>
+        </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Test</title>
+    </head>
+    <body>
+    <h1 style="color:red">Hi!</h1>
+    <p style="font-size:2px"><strong style="text-decoration:none">Yes!</strong></p>
+    <p style="color:red; font-size:1px">Feetnuts</p>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)

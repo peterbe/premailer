@@ -32,7 +32,7 @@ def _inline_specificity():
     return (sys.maxint, sys.maxint, sys.maxint)
 
 
-grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
+grouping_regex = re.compile('([:\-\w]*)\s*{([^}]+)}')
 
 
 def _parse_style_groups(style_text, specificity):
@@ -90,14 +90,15 @@ def _merge_styles(item_styles, item, style, specificity, class_=''):
             style_group[style_key] = value_and_specificity
         else:
             # override if the new style is more specific
+            # or with the same specificity but defined later
             old_value, old_specificity = old_style
-            if value_and_specificity[1] > old_specificity:
+            if value_and_specificity[1] >= old_specificity:
                 style_group[style_key] = value_and_specificity
 
 
 def _apply_styles(item_styles):
     """Apply the calculated styles in the item_styles dictionary to the html document."""
-    
+
     for item, style_groups in item_styles.iteritems():
         if len(style_groups) == 1:
             new_style = '; '.join(['%s:%s' % (k, v[0]) for
@@ -336,26 +337,3 @@ def _style_to_basic_html_attributes(element, style_content, force=False):
 
 def transform(html, base_url=None):
     return Premailer(html, base_url=base_url).transform()
-
-
-if __name__ == '__main__':
-    html = """<html>
-        <head>
-        <title>Test</title>
-        <style>
-        h1, h2 { color:red; }
-        strong {
-          text-decoration:none
-          }
-        p { font-size:2px }
-        p.footer { font-size: 1px}
-        </style>
-        </head>
-        <body>
-        <h1>Hi!</h1>
-        <p><strong>Yes!</strong></p>
-        <p class="footer" style="color:red">Feetnuts</p>
-        </body>
-        </html>"""
-    p = Premailer(html)
-    print p.transform()
