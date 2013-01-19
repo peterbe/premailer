@@ -30,6 +30,39 @@ premailer does this. It parses an HTML page, looks up `style` blocks
 and parses the CSS. It then uses the `lxml.html` parser to modify the
 DOM tree of the page accordingly.
 
+Getting started
+---------------
+
+If you havena't already done so, install `premailer` first:
+
+        $ pip install premailer
+
+Next, the most basic use is to use the shortcut function, like this:
+
+        >>> from premailer import transform
+	>>> print transform("""
+        ...         <html>
+        ...         <style type="text/css">
+        ...         h1 { border:1px solid black }
+        ...         p { color:red;}
+        ...         p::first-letter { float:left; }
+        ...         </style>
+        ...         <h1 style="font-weight:bolder">Peter</h1>
+        ...         <p>Hej</p>
+        ...         </html>
+        ... """)
+        <html>
+        <head></head>
+        <body>
+        <h1 style="{font-weight:bolder; border:1px solid black}::first-lette\
+        r{font-weight:bolder}">Peter</h1>
+                <p style="{color:red} ::first-letter{float:left}">Hej</p>
+                </body>
+        </html>
+
+For more advanced options, check out the code of the `Premailer` class
+and all its options in its constructor.
+
 
 Turning relative URLs into absolute URLs
 ----------------------------------------
