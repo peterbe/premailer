@@ -40,7 +40,7 @@ If you havena't already done so, install `premailer` first:
 Next, the most basic use is to use the shortcut function, like this:
 
         >>> from premailer import transform
-	>>> print transform("""
+        >>> print transform("""
         ...         <html>
         ...         <style type="text/css">
         ...         h1 { border:1px solid black }
