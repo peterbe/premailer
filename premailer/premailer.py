@@ -98,6 +98,7 @@ class Premailer(object):
                  remove_classes=True,
                  strip_important=True,
                  external_styles=None,
+                 strip_pseudoclasses=False,
                  selector_cache=None):
         self.html = html
         self.base_url = base_url
@@ -112,6 +113,7 @@ class Premailer(object):
             external_styles = [external_styles]
         self.external_styles = external_styles
         self.strip_important = strip_important
+        self.strip_pseudoclasses = strip_pseudoclasses
         self.selector_cache = selector_cache if selector_cache is not None else {}
 
     def _parse_style_rules(self, css_body, ruleset_index):
@@ -132,7 +134,8 @@ class Premailer(object):
                     ':' + selector.split(':', 1)[1]
                         not in FILTER_PSEUDOSELECTORS):
                     # a pseudoclass
-                    leftover.append((selector, bulk))
+                    if not self.strip_pseudoclasses:
+                        leftover.append((selector, bulk))
                     continue
                 elif selector == '*' and not self.include_star_selectors:
                     continue
