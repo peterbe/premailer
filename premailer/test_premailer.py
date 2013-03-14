@@ -92,13 +92,15 @@ def test_parse_style_rules():
         }
     ul li {  list-style: 2px; }
     a:hover { text-decoration: underline }
-    """)
+    """, 0)
 
     # 'rules' is a list, turn it into a dict for
     # easier assertion testing
     rules_dict = {}
-    for k, v in rules:
+    rules_specificity = {}
+    for specificity, k, v in rules:
         rules_dict[k] = v
+        rules_specificity[k] = specificity
 
     assert 'h1' in rules_dict
     assert 'h2' in rules_dict
@@ -107,8 +109,8 @@ def test_parse_style_rules():
 
     # order is important
     rules_keys = [x[0] for x in rules]
-    assert rules_keys.index('h1') < rules_keys.index('h2')
-    assert rules_keys.index('strong') < rules_keys.index('ul li')
+    assert rules_specificity['h1'][4] < rules_specificity['h2'][4]
+    assert rules_specificity['strong'][4] < rules_specificity['ul li'][4]
 
     assert rules_dict['h1'] == 'color:red'
     assert rules_dict['h2'] == 'color:red'
@@ -121,10 +123,10 @@ def test_parse_style_rules():
     rules, leftover = func("""
     ul li {  list-style: 2px; }
     a:hover { text-decoration: underline }
-    """)
+    """, 0)
 
     assert len(rules) == 1
-    k, v = rules[0]
+    specificity, k, v = rules[0]
     assert k == 'ul li'
     assert v == 'list-style:2px'
 
@@ -216,7 +218,7 @@ def test_style_block_with_external_urls():
     <head>
     <title>Title</title>
     </head>
-    <body style="color:#123; font-family:Omerta; background:url(http://example.com/bg.png)">
+    <body style="color:#123; background:url(http://example.com/bg.png); font-family:Omerta">
     <h1>Hi!</h1>
     </body>
     </html>'''
@@ -228,7 +230,7 @@ def test_style_block_with_external_urls():
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
-    assert expect_html == result_html
+    eq_(expect_html,result_html)
 
 
 def test_shortcut_function():
@@ -314,12 +316,12 @@ def test_css_with_pseudoclasses_included():
     # order the style attribute will be written in so we'll look for things
     # manually.
     assert '<head></head>' in result_html
-    assert '<p style="::first-letter{font-size:300%; float:left}">'\
+    assert '<p style="::first-letter{float:left; font-size:300%}">'\
            'Paragraph</p>' in result_html
 
     assert 'style="{color:red; border:1px solid green}' in result_html
     assert ' :visited{border:1px solid green}' in result_html
-    assert ' :hover{border:1px solid green; text-decoration:none}' in \
+    assert ' :hover{text-decoration:none; border:1px solid green}' in \
       result_html
     print result_html
     #assert 0
@@ -503,7 +505,7 @@ def test_strip_important():
     <head>
     </head>
     <body>
-    <p style="width:100%; height:100%" width="100%" height="100%">Paragraph</p>
+    <p style="height:100%; width:100%" width="100%" height="100%">Paragraph</p>
     </body>
     </html>"""
 
