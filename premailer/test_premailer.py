@@ -730,3 +730,143 @@ def test_doctype():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
+def test_prefer_inline_to_class():
+    html = """<html>
+    <head>
+    <style>
+    .example {
+        color: black;
+    }
+    </style>
+    </head>
+    <body>
+    <div class="example" style="color:red"></div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div style="color:red"></div>
+    </body>
+    </html>"""
+    
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_favour_rule_with_element_over_generic():
+    html = """<html>
+    <head>
+    <style>
+    div.example {
+        color: green;
+    }
+    .example {
+        color: black;
+    }
+    </style>
+    </head>
+    <body>
+    <div class="example"></div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div style="color:green"></div>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_favour_rule_with_class_over_generic():
+    html = """<html>
+    <head>
+    <style>
+    div.example {
+        color: green;
+    }
+    div {
+        color: black;
+    }
+    </style>
+    </head>
+    <body>
+    <div class="example"></div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div style="color:green"></div>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_favour_rule_with_id_over_others():
+    html = """<html>
+    <head>
+    <style>
+    #identified {
+        color: green;
+    }
+    div.example {
+        color: black;
+    }
+    </style>
+    </head>
+    <body>
+    <div class="example" id="identified"></div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div id="identified" style="color:green"></div>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
