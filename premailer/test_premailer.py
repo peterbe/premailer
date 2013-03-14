@@ -107,11 +107,6 @@ def test_parse_style_rules():
     assert 'strong' in rules_dict
     assert 'ul li' in rules_dict
 
-    # order is important
-    rules_keys = [x[0] for x in rules]
-    assert rules_specificity['h1'][4] < rules_specificity['h2'][4]
-    assert rules_specificity['strong'][4] < rules_specificity['ul li'][4]
-
     assert rules_dict['h1'] == 'color:red'
     assert rules_dict['h2'] == 'color:red'
     assert rules_dict['strong'] == 'text-decoration:none'
@@ -133,6 +128,35 @@ def test_parse_style_rules():
     assert len(leftover) == 1
     k, v = leftover[0]
     assert (k, v) == ('a:hover', 'text-decoration:underline'), (k, v)
+
+def test_precedence_comparison():
+    p = Premailer('html')  # won't need the html
+    rules, leftover = p._parse_style_rules("""
+    #identified { color:blue; }
+    h1, h2 { color:red; }
+    ul li {  list-style: 2px; }
+    li.example { color:green; }
+    strong { text-decoration:none }
+    div li.example p.sample { color:black; }
+    """, 0)
+
+    # 'rules' is a list, turn it into a dict for
+    # easier assertion testing
+    rules_specificity = {}
+    for specificity, k, v in rules:
+        rules_specificity[k] = specificity
+
+    # Last in file wins
+    assert rules_specificity['h1'] < rules_specificity['h2']
+    # More elements wins
+    assert rules_specificity['strong'] < rules_specificity['ul li']
+    # IDs trump everything
+    assert (rules_specificity['div li.example p.sample'] <
+        rules_specificity['#identified'])
+
+    # Classes trump multiple elements
+    assert (rules_specificity['ul li'] <
+        rules_specificity['li.example'])
 
 
 def test_base_url_fixer():
