@@ -146,7 +146,6 @@ class Premailer(object):
                 rules.append((specificity, selector, bulk))
                 rule_index += 1
 
-        print rules
         return rules, leftover
 
     def transform(self, pretty_print=True):
@@ -206,7 +205,7 @@ class Premailer(object):
 
         first_time = []
         first_time_styles = []
-        for _, selector, style in rules:
+        for __, selector, style in rules:
             new_selector = selector
             class_ = ''
             if ':' in selector:
