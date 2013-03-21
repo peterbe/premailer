@@ -201,6 +201,8 @@ class Premailer(object):
                 these_rules, these_leftover = self._parse_style_rules(css_body, -1)
                 rules.extend(these_rules)
 
+        # rules is a tuple of (specificity, selector, styles), where specificity is a tuple
+        # ordered such that more specific rules sort larger.
         rules.sort(key=operator.itemgetter(0))
 
         first_time = []
