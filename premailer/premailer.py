@@ -8,7 +8,6 @@ import urlparse
 import operator
 
 
-__version__ = '1.2.0'
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
 
@@ -20,11 +19,6 @@ grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
 
 
 def merge_styles(old, new, class_=''):
-#    print "INPUT"
-#    result = _merge_styles(old, new, class_=class_)
-#    print locals()
-#    return result
-#def _merge_styles(old, new, class_=''):
     """
     if ::
       old = 'font-size:1px; color: red'

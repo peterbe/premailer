@@ -1,7 +1,8 @@
-import os
+import codecs
+import os.path
+import re
 from setuptools import setup, find_packages
 
-version = '1.2.0'
 
 README = os.path.join(os.path.dirname(__file__), 'README.md')
 long_description = open(README).read().strip() + "\n\n"
@@ -15,17 +16,28 @@ def md2stx(s):
 long_description = md2stx(long_description)
 
 
-setup(name='premailer',
-      version=version,
-      description="Turns CSS blocks into style attributes",
-      long_description=long_description,
-      keywords='html lxml email mail style',
-      author='Peter Bengtsson',
-      author_email='peter@fry-it.com',
-      url='http://github.com/peterbe/premailer',
-      download_url='http://github.com/peterbe/premailer',
-      license='Python',
-      classifiers=[
+def find_version(*file_paths):
+    version_file = codecs.open(os.path.join(os.path.dirname(__file__),
+                               *file_paths)).read()
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                              version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
+
+
+setup(
+    name='premailer',
+    version=find_version('premailer', '__init__.py'),
+    description="Turns CSS blocks into style attributes",
+    long_description=long_description,
+    keywords='html lxml email mail style',
+    author='Peter Bengtsson',
+    author_email='mail@peterbe.com',
+    url='http://github.com/peterbe/premailer',
+    download_url='http://github.com/peterbe/premailer',
+    license='Python',
+    classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Other Environment",
         "Environment :: Web Environment",
@@ -37,17 +49,17 @@ setup(name='premailer',
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Other/Nonlisted Topic",
         "Topic :: Software Development :: Libraries :: Python Modules",
-      ],
-      packages=find_packages(),
-      include_package_data=True,
-      test_suite='nose.collector',
-      tests_require=['Nose'],
-      zip_safe=True,
-      install_requires=[
+    ],
+    packages=find_packages(),
+    include_package_data=True,
+    test_suite='nose.collector',
+    tests_require=['Nose'],
+    zip_safe=True,
+    install_requires=[
         'lxml',
         'cssselect',
-      ],
-      entry_points="""
-      # -*- Entry points: -*-
-      """,
-      )
+    ],
+    entry_points="""
+    # -*- Entry points: -*-
+    """,
+)
