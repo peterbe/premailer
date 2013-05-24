@@ -1,14 +1,14 @@
 import re
 from nose.tools import eq_, ok_
 
-from premailer import Premailer, etree, _merge_styles
+from premailer import Premailer, etree, merge_styles
 
 
 def test_merge_styles_basic():
     old = 'font-size:1px; color: red'
     new = 'font-size:2px; font-weight: bold'
     expect = 'color:red;', 'font-size:2px;', 'font-weight:bold'
-    result = _merge_styles(old, new)
+    result = merge_styles(old, new)
     for each in expect:
         assert each in result
 
@@ -22,7 +22,7 @@ def test_merge_styles_with_class():
     # We expect something like this:
     #  {color:red; font-size:1px} :hover{font-size:2px; font-weight:bold}
 
-    result = _merge_styles(old, new, class_)
+    result = merge_styles(old, new, class_)
     ok_(result.startswith('{'))
     ok_(result.endswith('}'))
     ok_(' :hover{' in result)
@@ -76,11 +76,92 @@ def test_basic_html():
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
-    assert expect_html == result_html
+    eq_(expect_html, result_html)
+
+
+def test_mixed_pseudo_selectors():
+    """mixing pseudo selectors with straight forward selectors"""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    p { color: yellow }
+    a { color: blue }
+    a:hover { color: pink }
+    </style>
+    </head>
+    <body>
+    <p>
+      <a href="#">Page</a>
+    </p>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">a:hover {color:pink}</style>
+    </head>
+    <body>
+    <p style="color:yellow"><a href="#" style="color:blue">Page</a></p>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_basic_html_with_pseudo_selector():
+    """test the simplest case"""
+    if not etree:
+        # can't test it
+        return
+
+    html = """
+    <html>
+    <style type="text/css">
+    h1 { border:1px solid black }
+    p { color:red;}
+    p::first-letter { float:left; }
+    </style>
+    <h1 style="font-weight:bolder">Peter</h1>
+    <p>Hej</p>
+    </html>
+    """
+
+    expect_html = """<html>
+    <head>
+    <style type="text/css">p::first-letter {float:left}</style>
+    </head>
+    <body>
+    <h1 style="border:1px solid black; font-weight:bolder">Peter</h1>
+    <p style="color:red">Hej</p>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
 
 
 def test_parse_style_rules():
-
     p = Premailer('html')  # won't need the html
     func = p._parse_style_rules
     rules, leftover = func("""
@@ -111,7 +192,7 @@ def test_parse_style_rules():
     assert rules_dict['h2'] == 'color:red'
     assert rules_dict['strong'] == 'text-decoration:none'
     assert rules_dict['ul li'] == 'list-style:2px'
-    assert rules_dict['a:hover'] == 'text-decoration:underline'
+    assert 'a:hover' not in rules_dict
 
     p = Premailer('html', exclude_pseudoclasses=True)  # won't need the html
     func = p._parse_style_rules
@@ -333,13 +414,12 @@ def test_css_with_pseudoclasses_included():
     </html>"""
     '''
 
-    p = Premailer(html)
+    p = Premailer(html, exclude_pseudoclasses=False)
     result_html = p.transform()
 
     # because we're dealing with random dicts here we can't predict what
     # order the style attribute will be written in so we'll look for things
     # manually.
-    assert '<head></head>' in result_html
     assert '<p style="::first-letter{float:left; font-size:300%}">'\
            'Paragraph</p>' in result_html
 
@@ -347,8 +427,6 @@ def test_css_with_pseudoclasses_included():
     assert ' :visited{border:1px solid green}' in result_html
     assert ' :hover{text-decoration:none; border:1px solid green}' in \
       result_html
-    print result_html
-    #assert 0
 
 
 def test_css_with_pseudoclasses_excluded():
@@ -776,7 +854,7 @@ def test_prefer_inline_to_class():
     <div style="color:red"></div>
     </body>
     </html>"""
-    
+
     p = Premailer(html)
     result_html = p.transform()
 

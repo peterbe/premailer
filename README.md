@@ -53,9 +53,8 @@ Next, the most basic use is to use the shortcut function, like this:
         <html>
         <head></head>
         <body>
-        <h1 style="{font-weight:bolder; border:1px solid black}::first-lette\
-        r{font-weight:bolder}">Peter</h1>
-                <p style="{color:red} ::first-letter{float:left}">Hej</p>
+        <h1 style="font-weight:bolder; border:1px solid black">Peter</h1>
+                <p style="color:red">Hej</p>
                 </body>
         </html>
 

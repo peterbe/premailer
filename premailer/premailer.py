@@ -8,7 +8,7 @@ import urlparse
 import operator
 
 
-__version__ = '1.12'
+__version__ = '1.2.0'
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
 
@@ -19,7 +19,12 @@ class PremailerError(Exception):
 grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
 
 
-def _merge_styles(old, new, class_=''):
+def merge_styles(old, new, class_=''):
+#    print "INPUT"
+#    result = _merge_styles(old, new, class_=class_)
+#    print locals()
+#    return result
+#def _merge_styles(old, new, class_=''):
     """
     if ::
       old = 'font-size:1px; color: red'
@@ -92,7 +97,7 @@ class Premailer(object):
 
     def __init__(self, html, base_url=None,
                  preserve_internal_links=False,
-                 exclude_pseudoclasses=False,
+                 exclude_pseudoclasses=True,
                  keep_style_tags=False,
                  include_star_selectors=False,
                  remove_classes=True,
@@ -127,6 +132,7 @@ class Premailer(object):
             for selector in (x.strip() for
                              x in selectors.split(',') if x.strip() and
                              not x.strip().startswith('@')):
+
                 if (':' in selector and self.exclude_pseudoclasses and
                     ':' + selector.split(':', 1)[1]
                         not in FILTER_PSEUDOSELECTORS):
@@ -174,7 +180,7 @@ class Premailer(object):
 
         rules = []
 
-        for index,style in enumerate(CSSSelector('style')(page)):
+        for index, style in enumerate(CSSSelector('style')(page)):
             these_rules, these_leftover = self._parse_style_rules(style.text, index)
             rules.extend(these_rules)
 
@@ -223,11 +229,11 @@ class Premailer(object):
             for item in sel(page):
                 old_style = item.attrib.get('style', '')
                 if not item in first_time:
-                    new_style = _merge_styles(old_style, style, class_)
+                    new_style = merge_styles(old_style, style, class_)
                     first_time.append(item)
                     first_time_styles.append((item, old_style))
                 else:
-                    new_style = _merge_styles(old_style, style, class_)
+                    new_style = merge_styles(old_style, style, class_)
                 item.attrib['style'] = new_style
                 self._style_to_basic_html_attributes(item, new_style,
                                                      force=True)
@@ -237,7 +243,7 @@ class Premailer(object):
             old_style = item.attrib.get('style', '')
             if not inline_style:
                 continue
-            new_style = _merge_styles(old_style, inline_style, class_)
+            new_style = merge_styles(old_style, inline_style, class_)
             item.attrib['style'] = new_style
             self._style_to_basic_html_attributes(item, new_style, force=True)
 
