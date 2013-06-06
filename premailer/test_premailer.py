@@ -972,3 +972,108 @@ def test_favour_rule_with_id_over_others():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
+
+def test_multiple_style_elements():
+    """Asserts that rules from multiple style elements are inlined correctly."""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    h1, h2 { color:red; }
+    strong {
+        text-decoration:none
+        }
+    </style>
+    <style type="text/css">
+    h1, h2 { color:green; }
+    p {
+        font-size:120%
+        }
+    </style>
+    </head>
+    <body>
+    <h1>Hi!</h1>
+    <p><strong>Yes!</strong></p>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body>
+    <h1 style="color:green">Hi!</h1>
+    <p style="font-size:120%"><strong style="text-decoration:none">Yes!</strong></p>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_ignore_style_elements_with_media_attribute():
+    """Asserts that style elements with media attributes are ignored."""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    h1, h2 { color:red; }
+    strong {
+        text-decoration:none
+        }
+    </style>
+    <style type="text/css" media="print">
+        h1, h2 { color:green; }
+        p {
+            font-size:120%
+            }
+    </style>
+    </head>
+    <body>
+    <h1>Hi!</h1>
+    <p><strong>Yes!</strong></p>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css" media="print">
+        h1, h2 { color:green; }
+        p {
+            font-size:120%
+            }
+    </style>
+    </head>
+    <body>
+    <h1 style="color:red">Hi!</h1>
+    <p><strong style="text-decoration:none">Yes!</strong></p>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<', )
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
