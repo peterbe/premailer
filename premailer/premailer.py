@@ -175,7 +175,8 @@ class Premailer(object):
         rules = []
 
         for index, style in enumerate(CSSSelector('style')(page)):
-            # If we have a media attribute whose value is anything other than 'screen', ignore the ruleset.
+            # If we have a media attribute whose value is anything other than
+            # 'screen', ignore the ruleset.
             media = style.attrib.get('media')
             if media and media != 'screen':
                 continue
