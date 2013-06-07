@@ -1024,7 +1024,7 @@ def test_multiple_style_elements():
 
 
 def test_ignore_style_elements_with_media_attribute():
-    """Asserts that style elements with media attributes are ignored."""
+    """Asserts that style elements with media attributes other than 'screen' are ignored."""
     if not etree:
         # can't test it
         return
@@ -1033,16 +1033,22 @@ def test_ignore_style_elements_with_media_attribute():
     <head>
     <title>Title</title>
     <style type="text/css">
-    h1, h2 { color:red; }
-    strong {
-        text-decoration:none
+        h1, h2 { color:red; }
+        strong {
+            text-decoration:none
         }
     </style>
-    <style type="text/css" media="print">
+    <style type="text/css" media="screen">
         h1, h2 { color:green; }
         p {
-            font-size:120%
+            font-size:16px;
             }
+    </style>
+    <style type="text/css" media="only screen and (max-width: 480px)">
+        h1, h2 { color:orange; }
+        p {
+            font-size:120%;
+        }
     </style>
     </head>
     <body>
@@ -1054,16 +1060,16 @@ def test_ignore_style_elements_with_media_attribute():
     expect_html = """<html>
     <head>
     <title>Title</title>
-    <style type="text/css" media="print">
-        h1, h2 { color:green; }
+    <style type="text/css" media="only screen and (max-width: 480px)">
+        h1, h2 { color:orange; }
         p {
-            font-size:120%
-            }
+            font-size:120%;
+        }
     </style>
     </head>
     <body>
-    <h1 style="color:red">Hi!</h1>
-    <p><strong style="text-decoration:none">Yes!</strong></p>
+    <h1 style="color:green">Hi!</h1>
+    <p style="font-size:16px"><strong style="text-decoration:none">Yes!</strong></p>
     </body>
     </html>"""
 
