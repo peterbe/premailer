@@ -7,3 +7,4 @@ premailer.egg-info
 NOTES.peter
 .venv
 premailer/gorunsettings.py
+.DS_Store
