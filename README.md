@@ -90,6 +90,8 @@ Into this:
         </body>
         </html>
 
+by using `transform('...', base_url='http://www.peterbe.com/')`.
+
 
 HTML attributes created additionally
 ------------------------------------
