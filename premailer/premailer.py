@@ -114,7 +114,8 @@ class Premailer(object):
     def _parse_style_rules(self, css_body, ruleset_index):
         leftover = []
         rules = []
-        css_body = _css_comments.sub('', css_body)
+
+        css_body = _css_comments.sub('', css_body or '')
         rule_index = 0
         for each in _regex.findall(css_body.strip()):
             __, selectors, bulk = each

@@ -79,6 +79,40 @@ def test_basic_html():
     eq_(expect_html, result_html)
 
 
+def test_empty_style_tag():
+    """empty style tag"""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title></title>
+    <style type="text/css"></style>
+    </head>
+    <body>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title></title>
+    </head>
+    <body>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
 def test_mixed_pseudo_selectors():
     """mixing pseudo selectors with straight forward selectors"""
     if not etree:
@@ -210,6 +244,7 @@ def test_parse_style_rules():
     k, v = leftover[0]
     assert (k, v) == ('a:hover', 'text-decoration:underline'), (k, v)
 
+
 def test_precedence_comparison():
     p = Premailer('html')  # won't need the html
     rules, leftover = p._parse_style_rules("""
@@ -233,11 +268,11 @@ def test_precedence_comparison():
     assert rules_specificity['strong'] < rules_specificity['ul li']
     # IDs trump everything
     assert (rules_specificity['div li.example p.sample'] <
-        rules_specificity['#identified'])
+            rules_specificity['#identified'])
 
     # Classes trump multiple elements
     assert (rules_specificity['ul li'] <
-        rules_specificity['li.example'])
+            rules_specificity['li.example'])
 
 
 def test_base_url_fixer():
@@ -335,7 +370,7 @@ def test_style_block_with_external_urls():
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
-    eq_(expect_html,result_html)
+    eq_(expect_html, result_html)
 
 
 def test_shortcut_function():
@@ -426,7 +461,7 @@ def test_css_with_pseudoclasses_included():
     assert 'style="{color:red; border:1px solid green}' in result_html
     assert ' :visited{border:1px solid green}' in result_html
     assert ' :hover{text-decoration:none; border:1px solid green}' in \
-      result_html
+        result_html
 
 
 def test_css_with_pseudoclasses_excluded():
@@ -806,6 +841,7 @@ def test_child_selector():
 
     eq_(expect_html, result_html)
 
+
 def test_doctype():
     html = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html>
@@ -832,6 +868,7 @@ def test_doctype():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
 
 def test_prefer_inline_to_class():
     html = """<html>
@@ -1082,4 +1119,3 @@ def test_ignore_style_elements_with_media_attribute():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
-
