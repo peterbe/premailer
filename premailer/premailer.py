@@ -115,11 +115,7 @@ class Premailer(object):
         leftover = []
         rules = []
 
-        # type check css_body
-        if type(css_body) is not str:
-            css_body = ''
-
-        css_body = _css_comments.sub('', css_body)
+        css_body = _css_comments.sub('', css_body or '')
         rule_index = 0
         for each in _regex.findall(css_body.strip()):
             __, selectors, bulk = each
