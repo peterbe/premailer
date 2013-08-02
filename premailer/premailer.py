@@ -169,7 +169,7 @@ class Premailer(object):
 
         return rules, leftover
 
-    def transform(self, pretty_print=True):
+    def transform(self, pretty_print=True, **kwargs):
         """change the self.html and return it with CSS turned into style
         attributes.
         """
@@ -314,7 +314,9 @@ class Premailer(object):
                     parent.attrib[attr] = urlparse.urljoin(self.base_url,
                         parent.attrib[attr].lstrip('/'))
 
-        out = etree.tostring(root, method=self.method, pretty_print=pretty_print)
+        kwargs.setdefault('method', self.method)
+        kwargs.setdefault('pretty_print', pretty_print)
+        out = etree.tostring(root, **kwargs)
         if self.method == 'xml':
             out = _cdata_regex.sub(lambda m: '/*<![CDATA[*/%s/*]]>*/' % m.group(1), out)
         if self.strip_important:
