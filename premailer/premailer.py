@@ -264,8 +264,10 @@ class Premailer(object):
                     if attr == 'href' and self.preserve_internal_links \
                            and parent.attrib[attr].startswith('#'):
                         continue
+                    if not self.base_url.endswith('/'):
+                        self.base_url += '/'
                     parent.attrib[attr] = urlparse.urljoin(self.base_url,
-                                                           parent.attrib[attr])
+                        parent.attrib[attr].strip('/'))
 
         out = etree.tostring(root, method="html", pretty_print=pretty_print)
         if self.strip_important:
