@@ -326,6 +326,57 @@ def test_base_url_fixer():
     eq_(expect_html, result_html)
 
 
+def test_base_url_with_path():
+    """if you leave some URLS as /foo and set base_url to
+    'http://www.google.com' the URLS become 'http://www.google.com/foo'
+    """
+    if not etree:
+        # can't test it
+        return
+
+    html = '''<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body>
+    <img src="/images/foo.jpg">
+    <img src="/images/bar.gif">
+    <img src="http://www.googe.com/photos/foo.jpg">
+    <a href="/home">Home</a>
+    <a href="http://www.peterbe.com">External</a>
+    <a href="subpage">Subpage</a>
+    <a href="#internal_link">Internal Link</a>
+    </body>
+    </html>
+    '''
+
+    expect_html = '''<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body>
+    <img src="http://kungfupeople.com/base/images/foo.jpg">
+    <img src="http://kungfupeople.com/base/images/bar.gif">
+    <img src="http://www.googe.com/photos/foo.jpg">
+    <a href="http://kungfupeople.com/base/home">Home</a>
+    <a href="http://www.peterbe.com">External</a>
+    <a href="http://kungfupeople.com/base/subpage">Subpage</a>
+    <a href="#internal_link">Internal Link</a>
+    </body>
+    </html>'''
+
+    p = Premailer(html, base_url='http://kungfupeople.com/base',
+                  preserve_internal_links=True)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
 def test_style_block_with_external_urls():
     """
     From http://github.com/peterbe/premailer/issues/#issue/2

@@ -264,6 +264,14 @@ class Premailer(object):
                     if attr == 'href' and self.preserve_internal_links \
                            and parent.attrib[attr].startswith('#'):
                         continue
+                        print
+                    parent.attrib[attr] = parent.attrib[attr].strip('/')
+                    print parent.attrib[attr]
+                    print self.base_url
+                    print urlparse.urljoin(self.base_url,
+                        parent.attrib[attr])
+                    if not self.base_url.endswith('/'):
+                        self.base_url += '/'
                     parent.attrib[attr] = urlparse.urljoin(self.base_url,
                         parent.attrib[attr].strip('/'))
 
