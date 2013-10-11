@@ -1170,3 +1170,41 @@ def test_ignore_style_elements_with_media_attribute():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
+
+def test_basic_xml():
+    """test the simplest case with xml"""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    img { border: none; }
+    </style>
+    </head>
+    <body>
+    <img src="test.png" alt="test">
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body>
+    <img src="test.png" alt="test" style="border:none"/>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform(method="xml")
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
