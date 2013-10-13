@@ -81,6 +81,13 @@ def make_important(bulk):
     return ';'.join('%s !important' % p if not p.endswith('!important') else p
                     for p in bulk.split(';'))
 
+def make_important(bulk):
+    """makes every property in a string !important.
+    """
+    return ';'.join('%s !important' % p if not p.endswith('!important') else p 
+                    for p in bulk.split(';'))
+
+
 _css_comments = re.compile(r'/\*.*?\*/', re.MULTILINE | re.DOTALL)
 _regex = re.compile('((.*?){(.*?)})', re.DOTALL | re.M)
 _semicolon_regex = re.compile(';(\s+)')
