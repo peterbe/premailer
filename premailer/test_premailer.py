@@ -1199,8 +1199,8 @@ def test_basic_xml():
     </body>
     </html>"""
 
-    p = Premailer(html)
-    result_html = p.transform(method="xml")
+    p = Premailer(html, method="xml")
+    result_html = p.transform()
 
     whitespace_between_tags = re.compile('>\s*<',)
 
