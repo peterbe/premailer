@@ -1172,6 +1172,50 @@ def test_ignore_style_elements_with_media_attribute():
     eq_(expect_html, result_html)
 
 
+def test_leftover_important():
+    """Asserts that leftover styles should be marked as !important."""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    a { color: red; }
+    a:hover { color: green; }
+    a:focus { color: blue !important; }
+    </style>
+    </head>
+    <body>
+    <a href="#">Hi!</a>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">a:hover {color:green !important}
+a:focus {color:blue !important}</style>
+    </head>
+    <body>
+    <a href="#" style="color:red">Hi!</a>
+    </body>
+    </html>"""
+
+    p = Premailer(html,
+        keep_style_tags=True,
+        strip_important=False)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
 def test_basic_xml():
     """Test the simplest case with xml"""
     if not etree:
