@@ -1173,7 +1173,7 @@ def test_ignore_style_elements_with_media_attribute():
 
 
 def test_basic_xml():
-    """test the simplest case with xml"""
+    """Test the simplest case with xml"""
     if not etree:
         # can't test it
         return
@@ -1196,6 +1196,45 @@ def test_basic_xml():
     </head>
     <body>
     <img src="test.png" alt="test" style="border:none"/>
+    </body>
+    </html>"""
+
+    p = Premailer(html, method="xml")
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_xml_cdata():
+    """Test that CDATA is set correctly on remaining styles"""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    span:hover > a { background: red; }
+    </style>
+    </head>
+    <body>
+    <span><a>Test</a></span>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">/*<![CDATA[*/span:hover > a {background:red}/*]]>*/</style>
+    </head>
+    <body>
+    <span><a>Test</a></span>
     </body>
     </html>"""
 
