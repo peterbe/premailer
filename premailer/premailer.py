@@ -1,9 +1,11 @@
+import cgi
 import codecs
 from lxml import etree
 from lxml.cssselect import CSSSelector
 import os
 import re
 import urllib
+import urllib2
 import urlparse
 import operator
 
@@ -75,11 +77,13 @@ def merge_styles(old, new, class_=''):
                                               in mergeable)))
         return ' '.join(x for x in all if x != '{}')
 
+
 def make_important(bulk):
     """makes every property in a string !important.
     """
     return ';'.join('%s !important' % p if not p.endswith('!important') else p
                     for p in bulk.split(';'))
+
 
 _css_comments = re.compile(r'/\*.*?\*/', re.MULTILINE | re.DOTALL)
 _regex = re.compile('((.*?){(.*?)})', re.DOTALL | re.M)
@@ -103,7 +107,8 @@ class Premailer(object):
                  remove_classes=True,
                  strip_important=True,
                  external_styles=None,
-                 method="html"):
+                 method="html",
+                 base_path=None):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
@@ -118,6 +123,7 @@ class Premailer(object):
         self.external_styles = external_styles
         self.strip_important = strip_important
         self.method = method
+        self.base_path = base_path
 
     def _parse_style_rules(self, css_body, ruleset_index):
         leftover = []
@@ -182,40 +188,53 @@ class Premailer(object):
         ##
 
         rules = []
-
-        for index, style in enumerate(CSSSelector('style')(page)):
+        index = 0
+                
+        for element in CSSSelector('style,link[rel~=stylesheet]')(page):
             # If we have a media attribute whose value is anything other than
             # 'screen', ignore the ruleset.
-            media = style.attrib.get('media')
+            media = element.attrib.get('media')
             if media and media != 'screen':
                 continue
-
-            these_rules, these_leftover = self._parse_style_rules(style.text, index)
+            
+            is_style = element.tag == 'style'
+            if is_style:
+                css_body = element.text
+            else:
+                href = element.attrib.get('href')
+                if not href:
+                    continue
+                css_body = self._load_external(href)
+            
+            these_rules, these_leftover = self._parse_style_rules(css_body, index)
+            index += 1
             rules.extend(these_rules)
-
-            parent_of_style = style.getparent()
+            
+            parent_of_element = element.getparent()
             if these_leftover:
+                if is_style:
+                    style = element
+                else:
+                    style = etree.Element('style')
+                    style.attrib['type'] = 'text/css'
+                
                 style.text = '\n'.join(['%s {%s}' % (k, make_important(v)) for
                                         (k, v) in these_leftover])
                 if self.method == 'xml':
                     style.text = etree.CDATA(style.text)
-            elif not self.keep_style_tags:
-                parent_of_style.remove(style)
+                
+                if not is_style:
+                    element.addprevious(style)
+                    parent_of_element.remove(element)
+                
+            elif not self.keep_style_tags or not is_style:
+                parent_of_element.remove(element)
 
         if self.external_styles:
             for stylefile in self.external_styles:
-                if stylefile.startswith('http://'):
-                    css_body = urllib.urlopen(stylefile).read()
-                elif os.path.exists(stylefile):
-                    try:
-                        f = codecs.open(stylefile)
-                        css_body = f.read()
-                    finally:
-                        f.close()
-                else:
-                    raise ValueError(u"Could not find external style: %s" %
-                                     stylefile)
-                these_rules, these_leftover = self._parse_style_rules(css_body, -1)
+                css_body = self._load_external(stylefile)
+                these_rules, these_leftover = self._parse_style_rules(css_body, index)
+                index += 1
                 rules.extend(these_rules)
 
         # rules is a tuple of (specificity, selector, styles), where specificity is a tuple
@@ -285,6 +304,27 @@ class Premailer(object):
         if self.strip_important:
             out = _importants.sub('', out)
         return out
+
+    def _load_external(self, url):
+        """loads an external stylesheet from a remote url or local path
+        """
+        if url.startswith('http://') or url.startswith('https://'):
+            r = urllib2.urlopen(url)
+            _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
+            encoding = params.get('charset', 'utf-8')
+            css_body = r.read().decode(encoding)
+        else:
+            stylefile = url
+            if not os.path.isabs(stylefile):
+                stylefile = os.path.join(self.base_path or '', stylefile)
+            if os.path.exists(stylefile):
+                with codecs.open(stylefile, encoding='utf-8') as f:
+                    css_body = f.read()
+            else:
+                raise ValueError(u"Could not find external style: %s" %
+                                 stylefile)
+        
+        return css_body
 
     def _style_to_basic_html_attributes(self, element, style_content,
                                         force=False):

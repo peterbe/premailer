@@ -1301,3 +1301,91 @@ def test_command_line_fileinput_from_argument():
         'type="text/css">\n'
         '* {line-height: normal !important; -webkit-text-size-adjust: 125%}\n'
         '</style>' in result_html)
+
+
+def test_external_links():
+    """Test loading stylesheets via link tags"""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    h1 { color:red; }
+    h3 { color:yellow; }
+    </style>
+    <link href="premailer/test-external-links.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+    h1 { color:orange; }
+    </style>
+    </head>
+    <body>
+    <h1>Hello</h1>
+    <h2>World</h2>
+    <h3>Test</h3>
+    <a href="#">Link</a>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">a:hover {color:purple !important}</style>
+    </head>
+    <body>
+    <h1 style="color:orange">Hello</h1>
+    <h2 style="color:green">World</h2>
+    <h3 style="color:yellow">Test</h3>
+    <a href="#" style="color:pink">Link</a>
+    </body>
+    </html>"""
+
+    p = Premailer(html,
+        strip_important=False)
+    result_html = p.transform()
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_external_styles_and_links():
+    """Test loading stylesheets via both the 'external_styles' argument and link tags"""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <link href="test-external-links.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+    h1 { color: red; }
+    </style>
+    </head>
+    <body>
+    <h1>Hello</h1>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <style type="text/css">a:hover {color:purple !important}</style>
+    </head>
+    <body>
+    <h1 style="color:brown">Hello</h1>
+    </body>
+    </html>"""
+
+    p = Premailer(html,
+        strip_important=False,
+        external_styles=['test-external-styles.css'],
+        base_path='premailer/')
+    result_html = p.transform()
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
