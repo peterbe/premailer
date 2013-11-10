@@ -58,12 +58,13 @@ def merge_styles(old, new, class_=''):
 
     # Perform the merge
     relevant_olds = groups.get(class_, {})
-    merged = [style for style in relevant_olds if style[0] not in new_keys] + news
+    merged = [style for style in relevant_olds if
+              style[0] not in new_keys] + news
     groups[class_] = merged
 
     if len(groups) == 1:
         return '; '.join('%s:%s' % (k, v) for
-                          (k, v) in groups.values()[0])
+                         (k, v) in groups.values()[0])
     else:
         all = []
         for class_, mergeable in sorted(groups.items(),
@@ -71,15 +72,17 @@ def merge_styles(old, new, class_=''):
                                                          y[0].count(':'))):
             all.append('%s{%s}' % (class_,
                                    '; '.join('%s:%s' % (k, v)
-                                              for (k, v)
-                                              in mergeable)))
+                                             for (k, v)
+                                             in mergeable)))
         return ' '.join(x for x in all if x != '{}')
+
 
 def make_important(bulk):
     """makes every property in a string !important.
     """
     return ';'.join('%s !important' % p if not p.endswith('!important') else p
                     for p in bulk.split(';'))
+
 
 _css_comments = re.compile(r'/\*.*?\*/', re.MULTILINE | re.DOTALL)
 _regex = re.compile('((.*?){(.*?)})', re.DOTALL | re.M)
@@ -94,14 +97,13 @@ FILTER_PSEUDOSELECTORS = [':last-child', ':first-child', 'nth-child']
 
 
 class Premailer(object):
-
     def __init__(self, html, base_url=None,
                  preserve_internal_links=False,
-                 exclude_pseudoclasses=True,
-                 keep_style_tags=False,
+                 exclude_pseudoclasses=False,
+                 keep_style_tags=True,
                  include_star_selectors=False,
-                 remove_classes=True,
-                 strip_important=True,
+                 remove_classes=False,
+                 strip_important=False,
                  external_styles=None,
                  method="html"):
         self.html = html
@@ -134,10 +136,10 @@ class Premailer(object):
                 bulk = bulk[:-1]
             for selector in (x.strip() for
                              x in selectors.split(',') if x.strip() and
-                             not x.strip().startswith('@')):
+                    not x.strip().startswith('@')):
 
                 if (':' in selector and self.exclude_pseudoclasses and
-                    ':' + selector.split(':', 1)[1]
+                                ':' + selector.split(':', 1)[1]
                         not in FILTER_PSEUDOSELECTORS):
                     # a pseudoclass
                     leftover.append((selector, bulk))
@@ -150,7 +152,9 @@ class Premailer(object):
                 class_count = selector.count('.')
                 element_count = len(_element_selector_regex.findall(selector))
 
-                specificity = (id_count, class_count, element_count, ruleset_index, rule_index)
+                specificity = (
+                    id_count, class_count, element_count, ruleset_index,
+                    rule_index)
 
                 rules.append((specificity, selector, bulk))
                 rule_index += 1
@@ -190,7 +194,8 @@ class Premailer(object):
             if media and media != 'screen':
                 continue
 
-            these_rules, these_leftover = self._parse_style_rules(style.text, index)
+            these_rules, these_leftover = self._parse_style_rules(style.text,
+                                                                  index)
             rules.extend(these_rules)
 
             parent_of_style = style.getparent()
@@ -215,7 +220,8 @@ class Premailer(object):
                 else:
                     raise ValueError(u"Could not find external style: %s" %
                                      stylefile)
-                these_rules, these_leftover = self._parse_style_rules(css_body, -1)
+                these_rules, these_leftover = self._parse_style_rules(css_body,
+                                                                      -1)
                 rules.extend(these_rules)
 
         # rules is a tuple of (specificity, selector, styles), where specificity is a tuple
@@ -230,7 +236,7 @@ class Premailer(object):
             if ':' in selector:
                 new_selector, class_ = re.split(':', selector, 1)
                 class_ = ':%s' % class_
-            # Keep filter-type selectors untouched.
+                # Keep filter-type selectors untouched.
             if class_ in FILTER_PSEUDOSELECTORS:
                 class_ = ''
             else:
@@ -272,16 +278,19 @@ class Premailer(object):
                 for item in page.xpath("//@%s" % attr):
                     parent = item.getparent()
                     if attr == 'href' and self.preserve_internal_links \
-                           and parent.attrib[attr].startswith('#'):
+                        and parent.attrib[attr].startswith('#'):
                         continue
                     if not self.base_url.endswith('/'):
                         self.base_url += '/'
                     parent.attrib[attr] = urlparse.urljoin(self.base_url,
-                        parent.attrib[attr].strip('/'))
+                                                           parent.attrib[
+                                                               attr].strip('/'))
 
-        out = etree.tostring(root, method=self.method, pretty_print=pretty_print)
+        out = etree.tostring(root, method=self.method,
+                             pretty_print=pretty_print)
         if self.method == 'xml':
-            out = _cdata_regex.sub(lambda m: '/*<![CDATA[*/%s/*]]>*/' % m.group(1), out)
+            out = _cdata_regex.sub(
+                lambda m: '/*<![CDATA[*/%s/*]]>*/' % m.group(1), out)
         if self.strip_important:
             out = _importants.sub('', out)
         return out
@@ -296,7 +305,7 @@ class Premailer(object):
         '{color:red; border:1px solid green} :visited{border:1px solid green}'
         """
         if style_content.count('}') and \
-          style_content.count('{') == style_content.count('{'):
+                        style_content.count('{') == style_content.count('{'):
             style_content = style_content.split('}')[0][1:]
 
         attributes = {}
@@ -313,9 +322,9 @@ class Premailer(object):
                 if value.endswith('px'):
                     value = value[:-2]
                 attributes[key] = value
-            #else:
-            #    print "key", repr(key)
-            #    print 'value', repr(value)
+                #else:
+                #    print "key", repr(key)
+                #    print 'value', repr(value)
 
         for key, value in attributes.items():
             if key in element.attrib and not force:
@@ -327,25 +336,3 @@ class Premailer(object):
 def transform(html, base_url=None):
     return Premailer(html, base_url=base_url).transform()
 
-
-if __name__ == '__main__':
-    html = """<html>
-        <head>
-        <title>Test</title>
-        <style>
-        h1, h2 { color:red; }
-        strong {
-          text-decoration:none
-          }
-        p { font-size:2px }
-        p.footer { font-size: 1px}
-        </style>
-        </head>
-        <body>
-        <h1>Hi!</h1>
-        <p><strong>Yes!</strong></p>
-        <p class="footer" style="color:red">Feetnuts</p>
-        </body>
-        </html>"""
-    p = Premailer(html)
-    print p.transform()
