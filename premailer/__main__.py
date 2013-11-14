@@ -13,7 +13,7 @@ def main():
     import sys
     from optparse import OptionParser
 
-    parser = OptionParser(usage='python -m premailer [options]')
+    parser = OptionParser()
 
     parser.add_option("-f", "--file", dest="infile",
                       help="Specifies the input file.  The default is stdin.",

@@ -6,7 +6,6 @@ import re
 import urllib
 import urlparse
 import operator
-import cssutils
 
 
 __all__ = ['PremailerError', 'Premailer', 'transform']
@@ -318,18 +317,6 @@ class Premailer(object):
                 attributes['align'] = value.strip()
             elif key == 'background-color':
                 attributes['bgcolor'] = value.strip()
-            elif key == 'background':
-
-                for pval in cssutils.css.PropertyValue(value):
-                    if isinstance(pval, cssutils.css.ColorValue):
-                        if pval._colorType == pval.IDENT:
-                            r, g, b, a = pval.COLORS[pval.name]
-                            attributes['bgcolor'] = '#%02x%02x%02x' % (r, g, b)
-                        elif pval._colorType == pval.HASH:
-                            attributes['bgcolor'] = pval.cssText
-
-                        break
-
             elif key == 'width' or key == 'height':
                 value = value.strip()
                 if value.endswith('px'):
