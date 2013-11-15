@@ -2,6 +2,7 @@ import codecs
 from lxml import etree
 from lxml.cssselect import CSSSelector
 import os
+import sys
 import re
 import urllib
 import urlparse
@@ -100,11 +101,11 @@ FILTER_PSEUDOSELECTORS = [':last-child', ':first-child', 'nth-child']
 class Premailer(object):
     def __init__(self, html, base_url=None,
                  preserve_internal_links=False,
-                 exclude_pseudoclasses=False,
-                 keep_style_tags=True,
+                 exclude_pseudoclasses=True,
+                 keep_style_tags=False,
                  include_star_selectors=False,
-                 remove_classes=False,
-                 strip_important=False,
+                 remove_classes=True,
+                 strip_important=True,
                  external_styles=None,
                  method="html"):
         self.html = html
@@ -133,10 +134,11 @@ class Premailer(object):
 
             bulk = _semicolon_regex.sub(';', bulk.strip())
             bulk = _colon_regex.sub(':', bulk.strip())
+
             if bulk.endswith(';'):
                 bulk = bulk[:-1]
-            for selector in (x.strip() for
-                             x in selectors.split(',') if x.strip() and
+
+            for selector in (x.strip() for x in selectors.split(',') if x.strip() and
                     not x.strip().startswith('@')):
 
                 if (':' in selector and self.exclude_pseudoclasses and
@@ -319,7 +321,6 @@ class Premailer(object):
             elif key == 'background-color':
                 attributes['bgcolor'] = value.strip()
             elif key == 'background':
-
                 for pval in cssutils.css.PropertyValue(value):
                     if isinstance(pval, cssutils.css.ColorValue):
                         if pval._colorType == pval.IDENT:

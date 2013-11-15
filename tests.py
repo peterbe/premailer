@@ -1,8 +1,34 @@
+import sys
 import re
 from nose.tools import eq_, ok_
 
-from premailer import Premailer, etree, merge_styles
+from premailer import Premailer
+from premailer.premailer import etree, merge_styles
+from premailer.__main__ import main
+from contextlib import contextmanager
+from StringIO import StringIO
 
+
+@contextmanager
+def captured_output():
+    new_out, new_err = StringIO(), StringIO()
+    old_out, old_err = sys.stdout, sys.stderr
+    try:
+        sys.stdout, sys.stderr = new_out, new_err
+        yield sys.stdout, sys.stderr
+    finally:
+        sys.stdout, sys.stderr = old_out, old_err
+
+@contextmanager
+def provide_input(content):
+    old_stdin = sys.stdin
+    sys.stdin = StringIO(content)
+    try:
+        with captured_output() as (out, err):
+            yield out, err
+    finally:
+        sys.stdin = old_stdin
+        sys.stdin = StringIO(content)
 
 def test_merge_styles_basic():
     old = 'font-size:1px; color: red'
@@ -1330,3 +1356,72 @@ def test_xml_cdata():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
+def test_background_shorthand_apply_bgcolor():
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    a {
+        background: #ccc url('../img/background.png') no-repeat center center;
+    }
+    </style>
+    </head>
+    <body>
+    <span><a>Test</a></span>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body>
+    <span><a style="background:#ccc url('../img/background.png') no-repeat center center" bgcolor="#ccc">Test</a></span>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_command_line_fileinput_from_stdin():
+    html = '<style>h1 { color:red; }</style><h1>Title</h1>'
+    expect_html = """
+    <html>
+    <head></head>
+    <body><h1 style="color:red">Title</h1></body>
+    </html>
+    """
+
+    with provide_input(html) as (out, err):
+        main([])
+    result_html = out.getvalue().strip()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_command_line_fileinput_from_argument():
+
+    with captured_output() as (out, err):
+        main(['-f', 'test-apple-newsletter.html'])
+
+    result_html = out.getvalue().strip()
+
+    ok_('<html>' in result_html)
+    ok_('<style media="only screen and (max-device-width: 480px)" '
+        'type="text/css">\n'
+        '* {line-height: normal !important; -webkit-text-size-adjust: 125%}\n'
+        '</style>' in result_html)

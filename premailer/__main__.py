@@ -1,7 +1,8 @@
+import sys
 from .premailer import Premailer, PremailerError
 
 
-def main():
+def main(args):
     """Command-line tool to transform html style to inline css
 
     Usage::
@@ -10,57 +11,51 @@ def main():
         <h1 style="color:red"></h1>
         $ cat newsletter.html | python -m premailer
     """
-    import sys
     from optparse import OptionParser
+    import argparse
 
-    parser = OptionParser(usage='python -m premailer [options]')
+    parser = argparse.ArgumentParser(usage='python -m premailer [options]')
 
-    parser.add_option("-f", "--file", dest="infile",
-                      help="Specifies the input file.  The default is stdin.",
-                      metavar="FILE")
 
-    parser.add_option("-o", "--output", dest="outfile",
-                      help="Specifies the output file.  The default is stdout.",
-                      metavar="FILE")
+    parser.add_argument("-f", "--file", nargs='?', type=argparse.FileType('r'),
+                        help="Specifies the input file.  The default is stdin.",
+                        default=sys.stdin, dest="infile")
 
-    parser.add_option("--base-url", default=None, type=str, dest="base_url")
+    parser.add_argument("-o", "--output", nargs='?', type=argparse.FileType('r'),
+                        help="Specifies the output file.  The default is stdout.",
+                        default=sys.stdout, dest="outfile")
 
-    parser.add_option("--remove-internal-links", default=True,
-                      action="store_false", dest="preserve_internal_links")
+    parser.add_argument("--base-url", default=None, type=str, dest="base_url")
 
-    parser.add_option("--exclude-pseudoclasses", default=False,
-                      action="store_true", dest="exclude_pseudoclasses")
+    parser.add_argument("--remove-internal-links", default=True,
+                        help="Remove links that start with a '#' like anchors.",
+                        dest="preserve_internal_links")
 
-    parser.add_option("--remove-style-tags", default=True,
-                      action="store_false", dest="keep_style_tags")
+    parser.add_argument("--exclude-pseudoclasses", default=False,
+                        help="Pseudo classes like p:last-child', p:first-child, etc",
+                        action="store_true", dest="exclude_pseudoclasses")
 
-    parser.add_option("--remove-star-selectors", default=True,
-                      action="store_false", dest="include_star_selectors")
+    parser.add_argument("--preserve-style-tags", default=False,
+                        help="Do not delete <style></style> tags from the html document.",
+                        action="store_false", dest="keep_style_tags")
 
-    parser.add_option("--remove-classes", default=False,
-                      action="store_true", dest="remove_classes")
+    parser.add_argument("--remove-star-selectors", default=True,
+                        help="All wildcard selectors like '* {color: black}' will be removed.",
+                        action="store_false", dest="include_star_selectors")
 
-    parser.add_option("--strip-important", default=False,
-                      action="store_true", dest="strip_important")
+    parser.add_argument("--remove-classes", default=False,
+                        help="Remove all class attributes from all elements",
+                        action="store_true", dest="remove_classes")
 
-    (options, args) = parser.parse_args()
+    parser.add_argument("--strip-important", default=False,
+                        help="Remove '!important' for all css declarations.",
+                        action="store_true", dest="strip_important")
 
-    if len(args) != 0:
-        raise SystemExit(sys.argv[0] + " -f infile [-o outfile]]")
-
-    if options.infile:
-        infile = open(options.filename, "rb").read()
-    else:
-        infile = sys.stdin.read()
-
-    if options.outfile:
-        outfile = open(options.output, "wb")
-    else:
-        outfile = sys.stdout
+    options = parser.parse_args(args)
 
     try:
         p = Premailer(
-            html=infile,
+            html=options.infile.read(),
             base_url=options.base_url,
             preserve_internal_links=options.preserve_internal_links,
             exclude_pseudoclasses=options.exclude_pseudoclasses,
@@ -72,8 +67,8 @@ def main():
     except PremailerError, e:
         raise SystemExit(e)
     else:
-        outfile.write(p.transform())
+        options.outfile.write(p.transform())
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
