@@ -58,6 +58,9 @@ Next, the most basic use is to use the shortcut function, like this:
                 </body>
         </html>
 
+For more advanced options, check out the code of the `Premailer` class
+and all its options in its constructor.
+
 You can also use premailer from the command line by using his main module.
 
     $ python -m premailer -h
@@ -91,17 +94,13 @@ A basic example:
     <body><h1 class="heading" style="color:red"><a href="http://google.com/">Title</a></h1></body>
     </html>
 
-The command line interface support has support for stdin.
+The command line interface supports standard input.
 
     $ echo '<style>.heading { color:red; }</style><h1 class="heading"><a href="/">Title</a></h1>' | python -m premailer --base-url=http://google.com/
     <html>
     <head><style>.heading { color:red; }</style></head>
     <body><h1 class="heading" style="color:red"><a href="http://google.com/">Title</a></h1></body>
     </html>
-
-For more advanced options, check out the code of the `Premailer` class
-and all its options in its constructor.
-
 
 Turning relative URLs into absolute URLs
 ----------------------------------------
