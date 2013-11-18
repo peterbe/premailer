@@ -1,7 +1,34 @@
+import sys
 import re
+from contextlib import contextmanager
+from StringIO import StringIO
 from nose.tools import eq_, ok_
 
 from premailer import Premailer, etree, merge_styles
+from .__main__ import main
+
+
+@contextmanager
+def captured_output():
+    new_out, new_err = StringIO(), StringIO()
+    old_out, old_err = sys.stdout, sys.stderr
+    try:
+        sys.stdout, sys.stderr = new_out, new_err
+        yield sys.stdout, sys.stderr
+    finally:
+        sys.stdout, sys.stderr = old_out, old_err
+
+
+@contextmanager
+def provide_input(content):
+    old_stdin = sys.stdin
+    sys.stdin = StringIO(content)
+    try:
+        with captured_output() as (out, err):
+            yield out, err
+    finally:
+        sys.stdin = old_stdin
+        sys.stdin = StringIO(content)
 
 
 def test_merge_styles_basic():
@@ -71,7 +98,7 @@ def test_basic_html():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -105,7 +132,7 @@ def test_empty_style_tag():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -148,7 +175,7 @@ def test_mixed_pseudo_selectors():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -187,7 +214,7 @@ def test_basic_html_with_pseudo_selector():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -318,7 +345,7 @@ def test_base_url_fixer():
                   preserve_internal_links=True)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -369,7 +396,7 @@ def test_base_url_with_path():
                   preserve_internal_links=True)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -417,7 +444,7 @@ def test_style_block_with_external_urls():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -456,7 +483,7 @@ def test_shortcut_function():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -506,13 +533,13 @@ def test_css_with_pseudoclasses_included():
     # because we're dealing with random dicts here we can't predict what
     # order the style attribute will be written in so we'll look for things
     # manually.
-    assert '<p style="::first-letter{float:left; font-size:300%}">'\
+    assert '<p style="::first-letter{float:left; font-size:300%}">' \
            'Paragraph</p>' in result_html
 
     assert 'style="{color:red; border:1px solid green}' in result_html
     assert ' :visited{border:1px solid green}' in result_html
     assert ' :hover{text-decoration:none; border:1px solid green}' in \
-        result_html
+           result_html
 
 
 def test_css_with_pseudoclasses_excluded():
@@ -553,7 +580,7 @@ def test_css_with_pseudoclasses_excluded():
     p = Premailer(html, exclude_pseudoclasses=True)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -608,7 +635,7 @@ def test_css_with_html_attributes():
     p = Premailer(html, exclude_pseudoclasses=True)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -622,6 +649,7 @@ def test_css_with_html_attributes():
 def test_apple_newsletter_example():
     # stupidity test
     import os
+
     html_file = os.path.join(os.path.dirname(__file__),
                              'test-apple-newsletter.html')
     html = open(html_file).read()
@@ -635,6 +663,7 @@ def test_apple_newsletter_example():
         'type="text/css">\n'
         '* {line-height: normal !important; -webkit-text-size-adjust: 125%}\n'
         '</style>' in result_html)
+
 
 def test_mailto_url():
     """if you use URL with mailto: protocol, they should stay as mailto:
@@ -665,7 +694,7 @@ def test_mailto_url():
     p = Premailer(html, base_url='http://kungfupeople.com')
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -700,7 +729,7 @@ def test_strip_important():
     p = Premailer(html, strip_important=True)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -738,7 +767,7 @@ def test_inline_wins_over_external():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -776,7 +805,7 @@ def test_last_child():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -814,7 +843,7 @@ def test_last_child_exclude_pseudo():
     p = Premailer(html, exclude_pseudoclasses=True)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -852,7 +881,7 @@ def test_mediaquery():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -885,7 +914,7 @@ def test_child_selector():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -913,7 +942,7 @@ def test_doctype():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -946,7 +975,7 @@ def test_prefer_inline_to_class():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -982,7 +1011,7 @@ def test_favour_rule_with_element_over_generic():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -1018,7 +1047,7 @@ def test_favour_rule_with_class_over_generic():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -1054,7 +1083,7 @@ def test_favour_rule_with_id_over_others():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -1103,7 +1132,7 @@ def test_multiple_style_elements():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -1204,11 +1233,11 @@ a:focus {color:blue !important}</style>
     </html>"""
 
     p = Premailer(html,
-        keep_style_tags=True,
-        strip_important=False)
+                  keep_style_tags=True,
+                  strip_important=False)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -1246,7 +1275,7 @@ img { border: none; }
     p = Premailer(html, method="xml")
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -1285,7 +1314,7 @@ span:hover > a { background: red; }
     p = Premailer(html, method="xml")
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -1293,40 +1322,35 @@ span:hover > a { background: red; }
     eq_(expect_html, result_html)
 
 
-def test_xml_cdata():
-    """Test that CDATA is set correctly on remaining styles"""
-    if not etree:
-        # can't test it
-        return
+def test_command_line_fileinput_from_stdin():
+    html = '<style>h1 { color:red; }</style><h1>Title</h1>'
+    expect_html = """
+    <html>
+    <head></head>
+    <body><h1 style="color:red">Title</h1></body>
+    </html>
+    """
 
-    html = """<html>
-    <head>
-    <title>Title</title>
-    <style type="text/css">
-    span:hover > a { background: red; }
-    </style>
-    </head>
-    <body>
-    <span><a>Test</a></span>
-    </body>
-    </html>"""
+    with provide_input(html) as (out, err):
+        main([])
+    result_html = out.getvalue().strip()
 
-    expect_html = """<html>
-    <head>
-    <title>Title</title>
-    <style type="text/css">/*<![CDATA[*/span:hover > a {background:red}/*]]>*/</style>
-    </head>
-    <body>
-    <span><a>Test</a></span>
-    </body>
-    </html>"""
-
-    p = Premailer(html, method="xml")
-    result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
+    whitespace_between_tags = re.compile('>\s*<', )
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
+
+def test_command_line_fileinput_from_argument():
+    with captured_output() as (out, err):
+        main(['-f', 'premailer/test-apple-newsletter.html'])
+
+    result_html = out.getvalue().strip()
+
+    ok_('<html>' in result_html)
+    ok_('<style media="only screen and (max-device-width: 480px)" '
+        'type="text/css">\n'
+        '* {line-height: normal !important; -webkit-text-size-adjust: 125%}\n'
+        '</style>' in result_html)
