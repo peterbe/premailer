@@ -1,7 +1,7 @@
 *.pyc
 *~
 dist
-build
+build/
 *.egg
 premailer.egg-info
 premailer/gorunsettings.py
