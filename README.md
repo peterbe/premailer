@@ -1,7 +1,7 @@
 premailer
 =========
 
-![Travis](https://travis-ci.org/peterbe/premailer.png)
+[![Travis](https://travis-ci.org/peterbe/premailer.png?branch=master)](https://travis-ci.org/peterbe/premailer)
 
 
 Turns CSS blocks into style attributes
