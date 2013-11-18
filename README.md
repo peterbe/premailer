@@ -58,6 +58,47 @@ Next, the most basic use is to use the shortcut function, like this:
                 </body>
         </html>
 
+You can also use premailer from the command line by using his main module.
+
+    $ python -m premailer -h
+    usage: python -m premailer [options]
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -f [INFILE], --file [INFILE]
+                            Specifies the input file. The default is stdin.
+      -o [OUTFILE], --output [OUTFILE]
+                            Specifies the output file. The default is stdout.
+      --base-url BASE_URL
+      --remove-internal-links PRESERVE_INTERNAL_LINKS
+                            Remove links that start with a '#' like anchors.
+      --exclude-pseudoclasses
+                            Pseudo classes like p:last-child', p:first-child, etc
+      --preserve-style-tags
+                            Do not delete <style></style> tags from the html
+                            document.
+      --remove-star-selectors
+                            All wildcard selectors like '* {color: black}' will be
+                            removed.
+      --remove-classes      Remove all class attributes from all elements
+      --strip-important     Remove '!important' for all css declarations.
+
+A basic example:
+
+    $ python -m premailer --base-url=http://google.com/ -f newsletter.html
+    <html>
+    <head><style>.heading { color:red; }</style></head>
+    <body><h1 class="heading" style="color:red"><a href="http://google.com/">Title</a></h1></body>
+    </html>
+
+The command line interface support has support for stdin.
+
+    $ echo '<style>.heading { color:red; }</style><h1 class="heading"><a href="/">Title</a></h1>' | python -m premailer --base-url=http://google.com/
+    <html>
+    <head><style>.heading { color:red; }</style></head>
+    <body><h1 class="heading" style="color:red"><a href="http://google.com/">Title</a></h1></body>
+    </html>
+
 For more advanced options, check out the code of the `Premailer` class
 and all its options in its constructor.
 
