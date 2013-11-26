@@ -2,39 +2,69 @@ import re
 import urlparse
 from nose.tools import eq_, ok_
 
-from premailer import Premailer, etree, _merge_styles
+from premailer import Premailer, etree
 
 
 def test_merge_styles_basic():
-    old = 'font-size:1px; color: red'
-    new = 'font-size:2px; font-weight: bold'
-    expect = 'color:red;', 'font-size:2px;', 'font-weight:bold'
-    result = _merge_styles(old, new)
-    for each in expect:
-        assert each in result
+    html = """<html>
+    <head>
+    <style type="text/css">
+    p { font-size:2px; font-weight: bold }
+    </style>
+    </head>
+    <body>
+    <p style="font-size:1px; color: red">hello</p>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <p style="color:red; font-size:1px; font-weight:bold">hello</p>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    assert expect_html == result_html
 
 
 def test_merge_styles_with_class():
-    old = 'color:red; font-size:1px;'
-    new, class_ = 'font-size:2px; font-weight: bold', ':hover'
+    html = """<html>
+    <head>
+    <style type="text/css">
+    p:hover{font-size:2px; font-weight:bold}
+    </style>
+    </head>
+    <body>
+    <p style="font-size:1px; color: red">hello</p>
+    </body>
+    </html>"""
 
-    # because we're dealing with dicts (random order) we have to
-    # test carefully.
-    # We expect something like this:
-    #  {color:red; font-size:1px} :hover{font-size:2px; font-weight:bold}
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <p style="{color:red; font-size:1px} :hover{font-size:2px; font-weight:bold}">hello</p>
+    </body>
+    </html>"""
 
-    result = _merge_styles(old, new, class_)
-    ok_(result.startswith('{'))
-    ok_(result.endswith('}'))
-    ok_(' :hover{' in result)
-    split_regex = re.compile('{([^}]+)}')
-    eq_(len(split_regex.findall(result)), 2)
-    expect_first = 'color:red', 'font-size:1px'
-    expect_second = 'font-weight:bold', 'font-size:2px'
-    for each in expect_first:
-        ok_(each in split_regex.findall(result)[0])
-    for each in expect_second:
-        ok_(each in split_regex.findall(result)[1])
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    assert expect_html == result_html
 
 
 def test_basic_html():
@@ -560,6 +590,7 @@ def test_apple_newsletter_example():
         '* {line-height: normal !important; -webkit-text-size-adjust: 125%}\n'
         '</style>' in result_html)
 
+
 def test_mailto_url():
     """if you use URL with mailto: protocol, they should stay as mailto:
     when baseurl is used
@@ -816,6 +847,7 @@ def test_child_selector():
 
     eq_(expect_html, result_html)
 
+
 def test_doctype():
     html = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html>
@@ -830,6 +862,135 @@ def test_doctype():
     <head>
     </head>
     <body>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_css_specificity():
+    html = """<html>
+    <head>
+    <style type="text/css">
+    td.content-inner p {padding-bottom:10px;}
+    p {padding-bottom:0;}
+    </style>
+    </head>
+    <body>
+    <p>text</p>
+    <table>
+    <tr>
+    <td class="content-inner">
+    <p>some text</p>
+    </td>
+    </tr>
+    </table>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <p style="padding-bottom:0">text</p>
+    <table>
+    <tr>
+    <td>
+    <p style="padding-bottom:10px">some text</p>
+    </td>
+    </tr>
+    </table>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_css_selector_grouping():
+    html = """<html>
+    <head>
+    <style type="text/css">
+    h1,h2,h3 {color: black}
+    h1 {font-size: 24px; color: red}
+    h1.major {font-size: 48px}
+    h1#title {font-weight: bold}
+    h2#subtitle {font-size: 12px}
+    </style>
+    </head>
+    <body>
+    <h1 id="title" class="major">h1 title text</h1>
+    <h1>h1 text</h1>
+    <h2 id="subtitle">h2 text</h2>
+    <h3>h3 text</h3>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <h1 id="title" style="color:red; font-size:48px; font-weight:bold">h1 title text</h1>
+    <h1 style="color:red; font-size:24px">h1 text</h1>
+    <h2 id="subtitle" style="color:black; font-size:12px">h2 text</h2>
+    <h3 style="color:black">h3 text</h3>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_general():
+    html = """<html>
+        <head>
+        <title>Test</title>
+        <style>
+        h1, h2 { color:red; }
+        strong {
+          text-decoration:none
+          }
+        p { font-size:2px }
+        p.footer { font-size: 1px}
+        </style>
+        </head>
+        <body>
+        <h1>Hi!</h1>
+        <p><strong>Yes!</strong></p>
+        <p class="footer" style="color:red">Feetnuts</p>
+        </body>
+        </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Test</title>
+    </head>
+    <body>
+    <h1 style="color:red">Hi!</h1>
+    <p style="font-size:2px"><strong style="text-decoration:none">Yes!</strong></p>
+    <p style="color:red; font-size:1px">Feetnuts</p>
     </body>
     </html>"""
 

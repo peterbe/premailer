@@ -1,13 +1,14 @@
 import codecs
 from lxml import etree
 from lxml.cssselect import CSSSelector
+import cssselect
 import os
 import re
 import urllib
 import urlparse
+import sys
 
 
-__version__ = '1.12-LL'
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
 
@@ -15,65 +16,105 @@ class PremailerError(Exception):
     pass
 
 
-grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
+def _parse_styles(style_text, specificity):
+    """Parse a style string into a dictionary {style_key: (style_value, specificity)}."""
+
+    return {k.strip(): (v.strip(), specificity)
+            for k, v in [x.strip().split(':', 1)
+                         for x in style_text.split(';') if x.strip()]}
 
 
-def _merge_styles(old, new, class_=''):
+def _inline_specificity():
+    """Specificity for inlined styles.
+    Inlined styles take precedence over selector styles.
     """
-    if ::
-      old = 'font-size:1px; color: red'
-    and ::
-      new = 'font-size:2px; font-weight: bold'
-    then ::
-      return 'color: red; font-size:2px; font-weight: bold'
 
-    In other words, the new style bits replace the old ones.
+    return (sys.maxint, sys.maxint, sys.maxint)
 
-    The @class_ parameter can be something like ':hover' and if that
-    is there, you split up the style with '{...} :hover{...}'
-    Note: old could be something like '{...} ::first-letter{...}'
 
+grouping_regex = re.compile('([:\-\w]*)\s*{([^}]+)}')
+
+
+def _parse_style_groups(style_text, specificity):
+    """Parse an html element style string into style groups.
+
+    given::
+        style_text = '{color:red; font-size:1px} :hover{font-weight:bold}'
+        specificity = (0, 1, 1)
+
+    return::
+        {
+            '' : { 'color': ('red', (0, 1, 1)), 'font-size': ('1px', (0, 1, 1)) }
+            'hover' : { 'font-weight': ('bold', (0, 1, 1)) }
+        }
     """
-    news = {}
-    for k, v in [x.strip().split(':', 1) for x in new.split(';') if x.strip()]:
-        news[k.strip()] = v.strip()
 
     groups = {}
-    grouped_split = grouping_regex.findall(old)
+
+    grouped_split = grouping_regex.findall(style_text)
     if grouped_split:
-        for old_class, old_content in grouped_split:
-            olds = {}
-            for k, v in [x.strip().split(':', 1) for
-                         x in old_content.split(';') if x.strip()]:
-                olds[k.strip()] = v.strip()
-            groups[old_class] = olds
+        for class_, content in grouped_split:
+            groups[class_] = _parse_styles(content, specificity)
     else:
-        olds = {}
-        for k, v in [x.strip().split(':', 1) for
-                     x in old.split(';') if x.strip()]:
-            olds[k.strip()] = v.strip()
-        groups[''] = olds
+        groups[''] = _parse_styles(style_text, specificity)
+
+    return groups
+
+
+def _merge_styles(item_styles, item, style, specificity, class_=''):
+    """Merge selector styles with current item styles.
+
+    :param item_styles: The current computed item styles for the html document
+    :param item: An html element who's style we want to merge with the given selector style
+    :param style: The selector style to apply
+    :param specificity: The selector specificity
+    :param class_: An optional selector class
+    """
+    new_styles = _parse_styles(style, specificity)
+
+    existing_styles = item_styles.get(item)
+    if not existing_styles:
+        # initialize styles for this item using the inlined style
+        existing_styles = _parse_style_groups(item.attrib.get('style', ''), _inline_specificity())
+        item_styles[item] = existing_styles
+
+    style_group = existing_styles.get(class_)
+    if not style_group:
+        style_group = {}
+        existing_styles[class_] = style_group
 
     # Perform the merge
-    merged = news
-    for k, v in groups.get(class_, {}).items():
-        if k not in merged:
-            merged[k] = v
-    groups[class_] = merged
+    for style_key, value_and_specificity in new_styles.iteritems():
+        old_style = style_group.get(style_key)
+        if not old_style:
+            style_group[style_key] = value_and_specificity
+        else:
+            # override if the new style is more specific
+            # or with the same specificity but defined later
+            old_value, old_specificity = old_style
+            if value_and_specificity[1] >= old_specificity:
+                style_group[style_key] = value_and_specificity
 
-    if len(groups) == 1:
-        return '; '.join(['%s:%s' % (k, v) for
-                          (k, v) in groups.values()[0].items()])
-    else:
-        all = []
-        for class_, mergeable in sorted(groups.items(),
-                                        lambda x, y: cmp(x[0].count(':'),
-                                                         y[0].count(':'))):
-            all.append('%s{%s}' % (class_,
-                                   '; '.join(['%s:%s' % (k, v)
-                                              for (k, v)
-                                              in mergeable.items()])))
-        return ' '.join([x for x in all if x != '{}'])
+
+def _apply_styles(item_styles):
+    """Apply the calculated styles in the item_styles dictionary to the html document."""
+
+    for item, style_groups in item_styles.iteritems():
+        if len(style_groups) == 1:
+            new_style = '; '.join(['%s:%s' % (k, v[0]) for
+                                  (k, v) in style_groups.values()[0].items()])
+        else:
+            all = []
+            for class_, mergeable in sorted(style_groups.items(),
+                                            lambda x, y: cmp(x[0].count(':'),
+                                                             y[0].count(':'))):
+                all.append('%s{%s}' % (class_,
+                                       '; '.join(['%s:%s' % (k, v[0])
+                                                  for (k, v) in mergeable.items()])))
+            new_style = ' '.join([x for x in all if x != '{}'])
+
+        item.attrib['style'] = new_style
+        _style_to_basic_html_attributes(item, new_style, force=True)
 
 
 _css_comments = re.compile(r'/\*.*?\*/', re.MULTILINE | re.DOTALL)
@@ -193,8 +234,10 @@ class Premailer(object):
                 these_rules, these_leftover = self._parse_style_rules(css_body)
                 rules.extend(these_rules)
 
-        first_time = []
-        first_time_styles = []
+        # calculated styles for html elements that are
+        # affected by css selector styles.
+        item_styles = {}
+
         for selector, style in rules:
             new_selector = selector
             class_ = ''
@@ -207,30 +250,14 @@ class Premailer(object):
             else:
                 selector = new_selector
 
+            # get the selector specificity
+            specificity = cssselect.parse(selector)[0].specificity()
+
             sel = CSSSelector(selector)
             for item in sel(page):
-                old_style = item.attrib.get('style', '')
-                if not item in first_time:
-                    if old_style:
-                        new_style = _merge_styles(style, old_style, class_)
-                    else:
-                        new_style = _merge_styles(old_style, style, class_)
-                    first_time.append(item)
-                    first_time_styles.append((item, old_style))
-                else:
-                    new_style = _merge_styles(old_style, style, class_)
-                item.attrib['style'] = new_style
-                self._style_to_basic_html_attributes(item, new_style,
-                                                     force=True)
+                _merge_styles(item_styles, item, style, specificity, class_)
 
-        # Re-apply initial inline styles.
-        for item, inline_style in first_time_styles:
-            old_style = item.attrib.get('style', '')
-            if not inline_style:
-                continue
-            new_style = _merge_styles(old_style, inline_style, class_)
-            item.attrib['style'] = new_style
-            self._style_to_basic_html_attributes(item, new_style, force=True)
+        _apply_styles(item_styles)
 
         if self.remove_classes:
             # now we can delete all 'class' attributes
@@ -246,7 +273,7 @@ class Premailer(object):
                 for item in page.xpath("//@%s" % attr):
                     parent = item.getparent()
                     if attr == 'href' and self.preserve_internal_links \
-                           and parent.attrib[attr].startswith('#'):
+                            and parent.attrib[attr].startswith('#'):
                         continue
                     if attr == 'style':
                         parent.attrib[attr] = _style_url_regex.sub(
@@ -271,66 +298,42 @@ class Premailer(object):
             url = urlparse.urljoin(self.base_url, url)
         return url
 
-    def _style_to_basic_html_attributes(self, element, style_content,
-                                        force=False):
-        """given an element and styles like
-        'background-color:red; font-family:Arial' turn some of that into HTML
-        attributes. like 'bgcolor', etc.
 
-        Note, the style_content can contain pseudoclasses like:
-        '{color:red; border:1px solid green} :visited{border:1px solid green}'
-        """
-        if style_content.count('}') and \
-          style_content.count('{') == style_content.count('{'):
-            style_content = style_content.split('}')[0][1:]
+def _style_to_basic_html_attributes(element, style_content, force=False):
+    """given an element and styles like
+    'background-color:red; font-family:Arial' turn some of that into HTML
+    attributes. like 'bgcolor', etc.
 
-        attributes = {}
-        for key, value in [x.split(':') for x in style_content.split(';')
-                           if len(x.split(':')) == 2]:
-            key = key.strip()
+    Note, the style_content can contain pseudoclasses like:
+    '{color:red; border:1px solid green} :visited{border:1px solid green}'
+    """
+    if style_content.count('}') and style_content.count('{') == style_content.count('{'):
+        style_content = style_content.split('}')[0][1:]
 
-            if key == 'text-align':
-                attributes['align'] = value.strip()
-            elif key == 'background-color':
-                attributes['bgcolor'] = value.strip()
-            elif key == 'width' or key == 'height':
-                value = value.strip()
-                if value.endswith('px'):
-                    value = value[:-2]
-                attributes[key] = value
-            #else:
-            #    print "key", repr(key)
-            #    print 'value', repr(value)
+    attributes = {}
+    for key, value in [x.split(':') for x in style_content.split(';')
+                       if len(x.split(':')) == 2]:
+        key = key.strip()
 
-        for key, value in attributes.items():
-            if key in element.attrib and not force:
-                # already set, don't dare to overwrite
-                continue
-            element.attrib[key] = value
+        if key == 'text-align':
+            attributes['align'] = value.strip()
+        elif key == 'background-color':
+            attributes['bgcolor'] = value.strip()
+        elif key == 'width' or key == 'height':
+            value = value.strip()
+            if value.endswith('px'):
+                value = value[:-2]
+            attributes[key] = value
+        #else:
+        #    print "key", repr(key)
+        #    print 'value', repr(value)
+
+    for key, value in attributes.items():
+        if key in element.attrib and not force:
+            # already set, don't dare to overwrite
+            continue
+        element.attrib[key] = value
 
 
 def transform(html, base_url=None):
     return Premailer(html, base_url=base_url).transform()
-
-
-if __name__ == '__main__':
-    html = """<html>
-        <head>
-        <title>Test</title>
-        <style>
-        h1, h2 { color:red; }
-        strong {
-          text-decoration:none
-          }
-        p { font-size:2px }
-        p.footer { font-size: 1px}
-        </style>
-        </head>
-        <body>
-        <h1>Hi!</h1>
-        <p><strong>Yes!</strong></p>
-        <p class="footer" style="color:red">Feetnuts</p>
-        </body>
-        </html>"""
-    p = Premailer(html)
-    print p.transform()

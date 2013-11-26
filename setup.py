@@ -1,7 +1,6 @@
 import os
 from setuptools import setup, find_packages
-
-version = '1.12-LL'
+from premailer import __version__, __build__
 
 README = os.path.join(os.path.dirname(__file__), 'README.md')
 long_description = open(README).read().strip() + "\n\n"
@@ -16,7 +15,7 @@ long_description = md2stx(long_description)
 
 
 setup(name='premailer',
-      version=version + os.environ.get('BUILD_SUFFIX', ''),
+      version=__version__ + __build__,
       description="Turns CSS blocks into style attributes",
       long_description=long_description,
       keywords='html lxml email mail style',
@@ -26,17 +25,17 @@ setup(name='premailer',
       download_url='http://github.com/peterbe/premailer',
       license='Python',
       classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Environment :: Other Environment",
-        "Environment :: Web Environment",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: Python Software Foundation License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python",
-        "Topic :: Communications",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Other/Nonlisted Topic",
-        "Topic :: Software Development :: Libraries :: Python Modules",
+          "Development Status :: 5 - Production/Stable",
+          "Environment :: Other Environment",
+          "Environment :: Web Environment",
+          "Intended Audience :: Developers",
+          "License :: OSI Approved :: Python Software Foundation License",
+          "Operating System :: OS Independent",
+          "Programming Language :: Python",
+          "Topic :: Communications",
+          "Topic :: Internet :: WWW/HTTP",
+          "Topic :: Other/Nonlisted Topic",
+          "Topic :: Software Development :: Libraries :: Python Modules",
       ],
       packages=find_packages(),
       include_package_data=True,
@@ -44,8 +43,8 @@ setup(name='premailer',
       tests_require=['Nose'],
       zip_safe=True,
       install_requires=[
-        'lxml',
-        'cssselect'
+          'lxml==3.0.2',
+          'cssselect==0.7.1'
       ],
       entry_points="""
       # -*- Entry points: -*-
