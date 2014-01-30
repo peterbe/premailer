@@ -308,31 +308,36 @@ class Premailer(object):
     def _load_external(self, url):
         """loads an external stylesheet from a remote url or local path
         """
-        try:
-            if url.startswith('http://') or url.startswith('https://'):
-                r = urllib2.urlopen(url)
-            else:
-                combined_url = self.base_url
-                if combined_url.endswith('/'):
-                    combined_url = combined_url[:-1]
-                if not url.startswith('/'):
-                    combined_url += '/'
-                combined_url += url
-                r = urllib2.urlopen(combined_url)
+        if url.startswith('http://') or url.startswith('https://'):
+            r = urllib2.urlopen(url)
             _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
             encoding = params.get('charset', 'utf-8')
             css_body = r.read().decode(encoding)
-        except:
+        else:
             stylefile = url
             if not os.path.isabs(stylefile):
                 stylefile = os.path.join(self.base_path or '', stylefile)
             if os.path.exists(stylefile):
                 with codecs.open(stylefile, encoding='utf-8') as f:
                     css_body = f.read()
+            elif self.base_url:
+                combined_url = self.base_url
+                if combined_url.endswith('/'):
+                    combined_url = combined_url[:-1]
+                if not url.startswith('/'):
+                    combined_url += '/'
+                combined_url += url
+                try:
+                    r = urllib2.urlopen(combined_url)
+                except URLError:
+                    raise ValueError(u"Could not find external style: %s" %
+                                 stylefile)
+                _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
+                encoding = params.get('charset', 'utf-8')
+                css_body = r.read().decode(encoding)
             else:
                 raise ValueError(u"Could not find external style: %s" %
                                  stylefile)
-        
         return css_body
 
     def _style_to_basic_html_attributes(self, element, style_content,
