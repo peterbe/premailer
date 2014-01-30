@@ -1,0 +1,12 @@
+h1 {
+  color: blue;
+}
+h2 {
+  color: green;
+}
+a {
+  color: pink;
+}
+a:hover {
+  color: purple;
+}

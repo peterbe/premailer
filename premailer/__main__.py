@@ -66,6 +66,21 @@ def main(args):
                         help="Remove '!important' for all css declarations.",
                         action="store_true", dest="strip_important")
 
+    parser.add_argument(
+        "--method", default="html", dest="method",
+        help="The type of html to output. 'html' for HTML, 'xml' for XHTML."
+    )
+
+    parser.add_argument(
+        "--base-path", default=None, dest="base_path",
+        help="The base path for all external stylsheets."
+    )
+    
+    parser.add_argument(
+        "--external-style", action="append", dest="external_styles",
+        help="The path to an external stylesheet to be loaded."
+    )
+
     options = parser.parse_args(args)
 
     p = Premailer(
@@ -76,7 +91,10 @@ def main(args):
         keep_style_tags=options.keep_style_tags,
         include_star_selectors=options.include_star_selectors,
         remove_classes=options.remove_classes,
-        strip_important=options.strip_important
+        strip_important=options.strip_important,
+        external_styles=options.external_styles,
+        method=options.method,
+        base_path=options.base_path,
     )
     options.outfile.write(p.transform())
     return 0
