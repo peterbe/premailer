@@ -308,12 +308,21 @@ class Premailer(object):
     def _load_external(self, url):
         """loads an external stylesheet from a remote url or local path
         """
-        if url.startswith('http://') or url.startswith('https://'):
-            r = urllib2.urlopen(url)
+        try:
+            if url.startswith('http://') or url.startswith('https://'):
+                r = urllib2.urlopen(url)
+            else:
+                combined_url = self.base_url
+                if combined_url.endswith('/'):
+                    combined_url = combined_url[:-1]
+                if not url.startswith('/'):
+                    combined_url += '/'
+                combined_url += url
+                r = urllib2.urlopen(combined_url)
             _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
             encoding = params.get('charset', 'utf-8')
             css_body = r.read().decode(encoding)
-        else:
+        except:
             stylefile = url
             if not os.path.isabs(stylefile):
                 stylefile = os.path.join(self.base_path or '', stylefile)
