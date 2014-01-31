@@ -305,14 +305,17 @@ class Premailer(object):
             out = _importants.sub('', out)
         return out
 
+    def _load_external_url(self, url):
+        r = urllib2.urlopen(url)
+        _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
+        encoding = params.get('charset', 'utf-8')
+        return r.read().decode(encoding)
+
     def _load_external(self, url):
         """loads an external stylesheet from a remote url or local path
         """
         if url.startswith('http://') or url.startswith('https://'):
-            r = urllib2.urlopen(url)
-            _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
-            encoding = params.get('charset', 'utf-8')
-            css_body = r.read().decode(encoding)
+            css_body = self._load_external_url(url)
         else:
             stylefile = url
             if not os.path.isabs(stylefile):
@@ -321,20 +324,11 @@ class Premailer(object):
                 with codecs.open(stylefile, encoding='utf-8') as f:
                     css_body = f.read()
             elif self.base_url:
-                combined_url = self.base_url
-                if combined_url.endswith('/'):
-                    combined_url = combined_url[:-1]
-                if not url.startswith('/'):
-                    combined_url += '/'
-                combined_url += url
                 try:
-                    r = urllib2.urlopen(combined_url)
-                except URLError:
+                    css_body = self._load_external_url(urlparse.urljoin(self.base_url, url))
+                except urllib2.URLError :
                     raise ValueError(u"Could not find external style: %s" %
                                  stylefile)
-                _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
-                encoding = params.get('charset', 'utf-8')
-                css_body = r.read().decode(encoding)
             else:
                 raise ValueError(u"Could not find external style: %s" %
                                  stylefile)
