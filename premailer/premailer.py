@@ -1,13 +1,13 @@
-import cgi
 import codecs
-from lxml import etree
-from lxml.cssselect import CSSSelector
+import operator
 import os
 import re
-import urllib
 import urllib2
 import urlparse
-import operator
+
+from lxml import etree
+from lxml.cssselect import CSSSelector
+import requests
 
 
 __all__ = ['PremailerError', 'Premailer', 'transform']
@@ -183,20 +183,20 @@ class Premailer(object):
             raise PremailerError("Could not parse the html")
         assert page is not None
 
-        ##
-        ## style selectors
-        ##
+        # #
+        # # style selectors
+        # #
 
         rules = []
         index = 0
-                
+
         for element in CSSSelector('style,link[rel~=stylesheet]')(page):
             # If we have a media attribute whose value is anything other than
             # 'screen', ignore the ruleset.
             media = element.attrib.get('media')
             if media and media != 'screen':
                 continue
-            
+
             is_style = element.tag == 'style'
             if is_style:
                 css_body = element.text
@@ -205,11 +205,11 @@ class Premailer(object):
                 if not href:
                     continue
                 css_body = self._load_external(href)
-            
+
             these_rules, these_leftover = self._parse_style_rules(css_body, index)
             index += 1
             rules.extend(these_rules)
-            
+
             parent_of_element = element.getparent()
             if these_leftover:
                 if is_style:
@@ -217,16 +217,16 @@ class Premailer(object):
                 else:
                     style = etree.Element('style')
                     style.attrib['type'] = 'text/css'
-                
+
                 style.text = '\n'.join(['%s {%s}' % (k, make_important(v)) for
                                         (k, v) in these_leftover])
                 if self.method == 'xml':
                     style.text = etree.CDATA(style.text)
-                
+
                 if not is_style:
                     element.addprevious(style)
                     parent_of_element.remove(element)
-                
+
             elif not self.keep_style_tags or not is_style:
                 parent_of_element.remove(element)
 
@@ -283,9 +283,9 @@ class Premailer(object):
                 parent = item.getparent()
                 del parent.attrib['class']
 
-        ##
-        ## URLs
-        ##
+        # #
+        # # URLs
+        # #
         if self.base_url:
             for attr in ('href', 'src'):
                 for item in page.xpath("//@%s" % attr):
@@ -306,10 +306,8 @@ class Premailer(object):
         return out
 
     def _load_external_url(self, url):
-        r = urllib2.urlopen(url)
-        _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
-        encoding = params.get('charset', 'utf-8')
-        return r.read().decode(encoding)
+        r = requests.get(url.strip())
+        return r.text
 
     def _load_external(self, url):
         """loads an external stylesheet from a remote url or local path
@@ -326,9 +324,9 @@ class Premailer(object):
             elif self.base_url:
                 try:
                     css_body = self._load_external_url(urlparse.urljoin(self.base_url, url))
-                except urllib2.URLError :
+                except urllib2.HTTPError :
                     raise ValueError(u"Could not find external style: %s" %
-                                 stylefile)
+                                 url)
             else:
                 raise ValueError(u"Could not find external style: %s" %
                                  stylefile)
@@ -361,7 +359,7 @@ class Premailer(object):
                 if value.endswith('px'):
                     value = value[:-2]
                 attributes[key] = value
-            #else:
+            # else:
             #    print "key", repr(key)
             #    print 'value', repr(value)
 
