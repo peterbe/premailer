@@ -2,7 +2,6 @@ import codecs
 import operator
 import os
 import re
-import urllib2
 import urlparse
 
 from lxml import etree
@@ -324,7 +323,7 @@ class Premailer(object):
             elif self.base_url:
                 try:
                     css_body = self._load_external_url(urlparse.urljoin(self.base_url, url))
-                except urllib2.HTTPError :
+                except requests.exceptions.HTTPError:
                     raise ValueError(u"Could not find external style: %s" %
                                  url)
             else:
