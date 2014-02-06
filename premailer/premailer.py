@@ -4,7 +4,6 @@ from lxml import etree
 from lxml.cssselect import CSSSelector
 import os
 import re
-import urllib
 import urllib2
 import urlparse
 import operator
@@ -81,8 +80,13 @@ def merge_styles(old, new, class_=''):
 def make_important(bulk):
     """makes every property in a string !important.
     """
-    return ';'.join('%s !important' % p if not p.endswith('!important') else p
-                    for p in bulk.split(';'))
+    nb = []
+    for item in bulk.split(';'):
+        if item.endswith('!important'):
+            nb.append(item)
+        else:
+            nb.append(item+' !important')
+    return ';'.join(nb)
 
 
 _css_comments = re.compile(r'/\*.*?\*/', re.MULTILINE | re.DOTALL)
@@ -176,7 +180,10 @@ class Premailer(object):
         page = tree.getroot()
         # lxml inserts a doctype if none exists, so only include it in
         # the root if it was in the original html.
-        root = tree if stripped.startswith(tree.docinfo.doctype) else page
+        if stripped.startswith(tree.docinfo.doctype):
+            root = tree
+        else:
+            root = page
 
         if page is None:
             print repr(self.html)
@@ -318,8 +325,7 @@ class Premailer(object):
             if not os.path.isabs(stylefile):
                 stylefile = os.path.join(self.base_path or '', stylefile)
             if os.path.exists(stylefile):
-                with codecs.open(stylefile, encoding='utf-8') as f:
-                    css_body = f.read()
+                css_body = codecs.open(stylefile, encoding='utf-8').read()
             else:
                 raise ValueError(u"Could not find external style: %s" %
                                  stylefile)
