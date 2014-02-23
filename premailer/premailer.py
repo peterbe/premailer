@@ -1,13 +1,14 @@
 import cgi
 import codecs
-from lxml import etree
-from lxml.cssselect import CSSSelector
 import os
 import re
-import urllib
 import urllib2
 import urlparse
 import operator
+
+import cssutils
+from lxml import etree
+from lxml.cssselect import CSSSelector
 
 
 __all__ = ['PremailerError', 'Premailer', 'transform']
@@ -128,20 +129,28 @@ class Premailer(object):
     def _parse_style_rules(self, css_body, ruleset_index):
         leftover = []
         rules = []
-
-        css_body = _css_comments.sub('', css_body or '')
         rule_index = 0
-        for each in _regex.findall(css_body.strip()):
-            __, selectors, bulk = each
-
-            bulk = _semicolon_regex.sub(';', bulk.strip())
-            bulk = _colon_regex.sub(':', bulk.strip())
-            if bulk.endswith(';'):
-                bulk = bulk[:-1]
-            for selector in (x.strip() for
-                             x in selectors.split(',') if x.strip() and
-                             not x.strip().startswith('@')):
-
+        # empty string
+        if not css_body:
+            return rules, leftover
+        sheet = cssutils.parseString(css_body)
+        for rule in sheet:
+            # ignore media rule
+            if rule.type == rule.MEDIA_RULE:
+                continue
+            # ignore comment
+            if rule.type == rule.COMMENT:
+                continue
+            bulk = ';'.join(
+                u'{0}:{1}'.format(key, rule.style[key]) 
+                for key in rule.style.keys()
+            )
+            selectors = (
+                x.strip() 
+                for x in rule.selectorText.split(',') 
+                if x.strip() and not x.strip().startswith('@')
+            )
+            for selector in selectors:
                 if (':' in selector and self.exclude_pseudoclasses and
                     ':' + selector.split(':', 1)[1]
                         not in FILTER_PSEUDOSELECTORS):
