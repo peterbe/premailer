@@ -86,10 +86,6 @@ def make_important(bulk):
                     for p in bulk.split(';'))
 
 
-_css_comments = re.compile(r'/\*.*?\*/', re.MULTILINE | re.DOTALL)
-_regex = re.compile('((.*?){(.*?)})', re.DOTALL | re.M)
-_semicolon_regex = re.compile(';(\s+)')
-_colon_regex = re.compile(':(\s+)')
 _element_selector_regex = re.compile(r'(^|\s)\w')
 _cdata_regex = re.compile(r'\<\!\[CDATA\[(.*?)\]\]\>', re.DOTALL)
 _importants = re.compile('\s*!important')
