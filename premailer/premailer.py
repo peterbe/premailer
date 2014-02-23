@@ -131,11 +131,12 @@ class Premailer(object):
             return rules, leftover
         sheet = cssutils.parseString(css_body)
         for rule in sheet:
-            # ignore media rule
-            if rule.type == rule.MEDIA_RULE:
-                continue
             # ignore comment
             if rule.type == rule.COMMENT:
+                continue
+            # handle media rule
+            if rule.type == rule.MEDIA_RULE:
+                leftover.append(rule)
                 continue
             bulk = ';'.join(
                 u'{0}:{1}'.format(key, rule.style[key]) 
@@ -223,8 +224,18 @@ class Premailer(object):
                     style = etree.Element('style')
                     style.attrib['type'] = 'text/css'
                 
-                style.text = '\n'.join(['%s {%s}' % (k, make_important(v)) for
-                                        (k, v) in these_leftover])
+                lines = []
+                for item in these_leftover:
+                    if isinstance(item, tuple):
+                        k, v = item
+                        lines.append('%s {%s}' % (k, make_important(v)))
+                    # media rule
+                    else:
+                        for rule in item.cssRules:
+                            for key in rule.style.keys():
+                                rule.style[key] = (rule.style.getPropertyValue(key, False), '!important')
+                        lines.append(item.cssText)
+                style.text = '\n'.join(lines)
                 if self.method == 'xml':
                     style.text = etree.CDATA(style.text)
                 
