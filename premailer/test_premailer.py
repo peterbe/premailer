@@ -835,6 +835,9 @@ def test_mediaquery():
         div {
             text-align: center;
         }
+        div {
+            font-size: 999px;
+        }
     }
     </style>
     </head>
