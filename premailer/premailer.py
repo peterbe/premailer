@@ -316,7 +316,8 @@ class Premailer(object):
         else:
             stylefile = url
             if not os.path.isabs(stylefile):
-                stylefile = os.path.join(self.base_path or '', stylefile)
+                stylefile = os.path.abspath(os.path.join(self.base_path or '',
+                                                         stylefile))
             if os.path.exists(stylefile):
                 with codecs.open(stylefile, encoding='utf-8') as f:
                     css_body = f.read()
