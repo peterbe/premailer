@@ -139,12 +139,12 @@ class Premailer(object):
                 leftover.append(rule)
                 continue
             bulk = ';'.join(
-                u'{0}:{1}'.format(key, rule.style[key]) 
+                u'{0}:{1}'.format(key, rule.style[key])
                 for key in rule.style.keys()
             )
             selectors = (
-                x.strip() 
-                for x in rule.selectorText.split(',') 
+                x.strip()
+                for x in rule.selectorText.split(',')
                 if x.strip() and not x.strip().startswith('@')
             )
             for selector in selectors:
@@ -195,14 +195,14 @@ class Premailer(object):
 
         rules = []
         index = 0
-                
+
         for element in CSSSelector('style,link[rel~=stylesheet]')(page):
             # If we have a media attribute whose value is anything other than
             # 'screen', ignore the ruleset.
             media = element.attrib.get('media')
             if media and media != 'screen':
                 continue
-            
+
             is_style = element.tag == 'style'
             if is_style:
                 css_body = element.text
@@ -211,11 +211,11 @@ class Premailer(object):
                 if not href:
                     continue
                 css_body = self._load_external(href)
-            
+
             these_rules, these_leftover = self._parse_style_rules(css_body, index)
             index += 1
             rules.extend(these_rules)
-            
+
             parent_of_element = element.getparent()
             if these_leftover:
                 if is_style:
@@ -223,7 +223,7 @@ class Premailer(object):
                 else:
                     style = etree.Element('style')
                     style.attrib['type'] = 'text/css'
-                
+
                 lines = []
                 for item in these_leftover:
                     if isinstance(item, tuple):
@@ -238,11 +238,11 @@ class Premailer(object):
                 style.text = '\n'.join(lines)
                 if self.method == 'xml':
                     style.text = etree.CDATA(style.text)
-                
+
                 if not is_style:
                     element.addprevious(style)
                     parent_of_element.remove(element)
-                
+
             elif not self.keep_style_tags or not is_style:
                 parent_of_element.remove(element)
 
@@ -332,14 +332,16 @@ class Premailer(object):
         else:
             stylefile = url
             if not os.path.isabs(stylefile):
-                stylefile = os.path.join(self.base_path or '', stylefile)
+                stylefile = os.path.abspath(
+                    os.path.join(self.base_path or '', stylefile)
+                )
             if os.path.exists(stylefile):
                 with codecs.open(stylefile, encoding='utf-8') as f:
                     css_body = f.read()
             else:
                 raise ValueError(u"Could not find external style: %s" %
                                  stylefile)
-        
+
         return css_body
 
     def _style_to_basic_html_attributes(self, element, style_content,
