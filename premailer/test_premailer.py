@@ -364,6 +364,7 @@ def test_base_url_with_path():
     <img src="http://www.googe.com/photos/foo.jpg">
     <a href="/home">Home</a>
     <a href="http://www.peterbe.com">External</a>
+    <a href="http://www.peterbe.com/base/">External 2</a>
     <a href="subpage">Subpage</a>
     <a href="#internal_link">Internal Link</a>
     </body>
@@ -380,6 +381,7 @@ def test_base_url_with_path():
     <img src="http://www.googe.com/photos/foo.jpg">
     <a href="http://kungfupeople.com/base/home">Home</a>
     <a href="http://www.peterbe.com">External</a>
+    <a href="http://www.peterbe.com/base/">External 2</a>
     <a href="http://kungfupeople.com/base/subpage">Subpage</a>
     <a href="#internal_link">Internal Link</a>
     </body>
