@@ -296,7 +296,7 @@ class Premailer(object):
                     if not self.base_url.endswith('/'):
                         self.base_url += '/'
                     parent.attrib[attr] = urlparse.urljoin(self.base_url,
-                        parent.attrib[attr].strip('/'))
+                        parent.attrib[attr].lstrip('/'))
 
         out = etree.tostring(root, method=self.method, pretty_print=pretty_print)
         if self.method == 'xml':
