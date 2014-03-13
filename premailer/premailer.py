@@ -189,14 +189,14 @@ class Premailer(object):
 
         rules = []
         index = 0
-                
+
         for element in CSSSelector('style,link[rel~=stylesheet]')(page):
             # If we have a media attribute whose value is anything other than
             # 'screen', ignore the ruleset.
             media = element.attrib.get('media')
             if media and media != 'screen':
                 continue
-            
+
             is_style = element.tag == 'style'
             if is_style:
                 css_body = element.text
@@ -204,12 +204,17 @@ class Premailer(object):
                 href = element.attrib.get('href')
                 if not href:
                     continue
-                css_body = self._load_external(href)
-            
+
+                # Try loading external style sheets and continue if not found
+                try:
+                    css_body = self._load_external(href)
+                except ValueError:
+                    continue
+
             these_rules, these_leftover = self._parse_style_rules(css_body, index)
             index += 1
             rules.extend(these_rules)
-            
+
             parent_of_element = element.getparent()
             if these_leftover:
                 if is_style:
@@ -217,16 +222,16 @@ class Premailer(object):
                 else:
                     style = etree.Element('style')
                     style.attrib['type'] = 'text/css'
-                
+
                 style.text = '\n'.join(['%s {%s}' % (k, make_important(v)) for
                                         (k, v) in these_leftover])
                 if self.method == 'xml':
                     style.text = etree.CDATA(style.text)
-                
+
                 if not is_style:
                     element.addprevious(style)
                     parent_of_element.remove(element)
-                
+
             elif not self.keep_style_tags or not is_style:
                 parent_of_element.remove(element)
 
@@ -323,7 +328,7 @@ class Premailer(object):
             else:
                 raise ValueError(u"Could not find external style: %s" %
                                  stylefile)
-        
+
         return css_body
 
     def _style_to_basic_html_attributes(self, element, style_content,
