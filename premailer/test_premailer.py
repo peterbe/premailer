@@ -836,6 +836,10 @@ def test_mediaquery():
     @media print{
         div {
             text-align: center;
+            color: white;
+        }
+        div {
+            font-size: 999px;
         }
     }
     </style>
@@ -847,13 +851,22 @@ def test_mediaquery():
 
     expect_html = """<html>
     <head>
+    <style type="text/css">@media print {
+    div {
+        text-align: center !important;
+        color: white !important
+        }
+    div {
+        font-size: 999px !important
+        }
+    }</style>
     </head>
     <body>
     <div style="text-align:right" align="right">First div</div>
     </body>
     </html>"""
 
-    p = Premailer(html)
+    p = Premailer(html, strip_important=False)
     result_html = p.transform()
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()

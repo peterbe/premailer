@@ -66,6 +66,7 @@ setup(
     install_requires=[
         'lxml',
         'cssselect',
+        'cssutils',
     ],
     entry_points="""
     # -*- Entry points: -*-
