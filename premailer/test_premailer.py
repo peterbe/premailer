@@ -1112,6 +1112,43 @@ def test_multiple_style_elements():
     eq_(expect_html, result_html)
 
 
+def test_style_attribute_specificity():
+    """Stuff already in style attributes beats style tags."""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    h1 { color: pink }
+    h1.foo { color: blue }
+    </style>
+    </head>
+    <body>
+    <h1 class="foo" style="color: green">Hi!</h1>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body>
+    <h1 style="color:green">Hi!</h1>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
 def test_ignore_style_elements_with_media_attribute():
     """Asserts that style elements with media attributes other than 'screen' are ignored."""
     if not etree:
