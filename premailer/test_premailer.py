@@ -464,9 +464,8 @@ def test_css_with_pseudoclasses_included():
     assert 'style="{color:red; border:1px solid green}' in result_html
     assert ' :visited{border:1px solid green}' in result_html
     assert ' :hover{border:1px solid green; text-decoration:none}' in \
-      result_html
+        result_html
     print result_html
-    # assert 0
 
 
 def test_css_with_pseudoclasses_excluded():

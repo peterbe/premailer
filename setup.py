@@ -40,11 +40,11 @@ setup(name='premailer',
       packages=find_packages(),
       include_package_data=True,
       test_suite='nose.collector',
-      tests_require=['Nose'],
+      tests_require=['nose'],
       zip_safe=True,
       install_requires=[
-          'lxml==3.0.2',
-          'cssselect==0.7.1'
+          'lxml',
+          'cssselect'
       ],
       entry_points="""
       # -*- Entry points: -*-

@@ -19,9 +19,9 @@ class PremailerError(Exception):
 def _parse_styles(style_text, specificity):
     """Parse a style string into a dictionary {style_key: (style_value, specificity)}."""
 
-    return {k.strip(): (v.strip(), specificity)
-            for k, v in [x.strip().split(':', 1)
-                         for x in style_text.split(';') if x.strip()]}
+    return dict([(k.strip(), (v.strip(), specificity))
+                 for k, v in [x.strip().split(':', 1)
+                              for x in style_text.split(';') if x.strip()]])
 
 
 def _inline_specificity():
@@ -324,9 +324,6 @@ def _style_to_basic_html_attributes(element, style_content, force=False):
             if value.endswith('px'):
                 value = value[:-2]
             attributes[key] = value
-        #else:
-        #    print "key", repr(key)
-        #    print 'value', repr(value)
 
     for key, value in attributes.items():
         if key in element.attrib and not force:
