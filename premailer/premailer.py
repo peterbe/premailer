@@ -8,7 +8,7 @@ import operator
 
 import cssutils
 from lxml import etree
-from lxml.cssselect import CSSSelector
+from lxml.cssselect import CSSSelector, SelectorError
 
 
 __all__ = ['PremailerError', 'Premailer', 'transform']
@@ -86,6 +86,14 @@ def make_important(bulk):
                     for p in bulk.split(';'))
 
 
+def is_valid_selector(selector):
+    try:
+        CSSSelector(selector)
+        return True
+    except SelectorError:
+        return False
+
+
 _element_selector_regex = re.compile(r'(^|\s)\w')
 _cdata_regex = re.compile(r'\<\!\[CDATA\[(.*?)\]\]\>', re.DOTALL)
 _importants = re.compile('\s*!important')
@@ -105,11 +113,13 @@ class Premailer(object):
                  strip_important=True,
                  external_styles=None,
                  method="html",
-                 base_path=None):
+                 base_path=None,
+                 trust_pseudoclasses=False):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
         self.exclude_pseudoclasses = exclude_pseudoclasses
+        self.trust_pseudoclasses = trust_pseudoclasses
         # whether to delete the <style> tag once it's been processed
         self.keep_style_tags = keep_style_tags
         self.remove_classes = remove_classes
@@ -148,7 +158,10 @@ class Premailer(object):
                 if x.strip() and not x.strip().startswith('@')
             )
             for selector in selectors:
-                if (':' in selector and self.exclude_pseudoclasses and
+                trust_pseudo = (self.trust_pseudoclasses and
+                                is_valid_selector(selector))
+                if (':' in selector and not trust_pseudo and
+                    self.exclude_pseudoclasses and
                     ':' + selector.split(':', 1)[1]
                         not in FILTER_PSEUDOSELECTORS):
                     # a pseudoclass
@@ -266,7 +279,8 @@ class Premailer(object):
                 new_selector, class_ = re.split(':', selector, 1)
                 class_ = ':%s' % class_
             # Keep filter-type selectors untouched.
-            if class_ in FILTER_PSEUDOSELECTORS:
+            if (self.trust_pseudoclasses or
+                class_ in FILTER_PSEUDOSELECTORS):
                 class_ = ''
             else:
                 selector = new_selector
