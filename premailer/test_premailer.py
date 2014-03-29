@@ -1441,3 +1441,84 @@ def test_external_styles_and_links():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
+
+def test_trusted_pseudo():
+    html = """<html>
+    <head>
+    <style type="text/css">
+    div {
+        color: red;
+    }
+    div:not(:nth-child(1)) {
+        color: blue;
+    }
+    p:hover {
+        color: green;
+    }
+    </style>
+    </head>
+    <body>
+    <div>First child</div>
+    <p>Middle child</p>
+    <div>Last child</div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <div style="color:red">First child</div>
+    <p>Middle child</p>
+    <div style="color:blue">Last child</div>
+    </body>
+    </html>"""
+
+    p = Premailer(html, trust_pseudoclasses=True)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+def test_trusted_pseudo_bad_selector():
+    html = """<html>
+    <head>
+    <style type="text/css">
+    div {
+        color: red;
+    }
+    div:not(:not(:first-child)) {
+        color: blue
+    }
+    </style>
+    </head>
+    <body>
+    <div>First child</div>
+    <div>Last child</div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <style type="text/css">div:not(:not(:first-child)) {color:blue}</style>
+    </head>
+    <body>
+    <div style="color:red">First child</div>
+    <div style="color:red">Last child</div>
+    </body>
+    </html>"""
+
+    p = Premailer(html, trust_pseudoclasses=True)
+    result_html = p.transform()
+
+    whitespace_between_tags = re.compile('>\s*<',)
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
