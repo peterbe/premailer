@@ -4,6 +4,7 @@ import operator
 import os
 import re
 import urlparse
+import urllib2
 
 import cssutils
 from lxml import etree
