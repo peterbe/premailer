@@ -2,7 +2,9 @@ import sys
 import re
 from contextlib import contextmanager
 from StringIO import StringIO
+
 from nose.tools import eq_, ok_
+import mock
 
 from premailer import Premailer, etree, merge_styles
 from .__main__ import main
@@ -1435,6 +1437,102 @@ def test_external_styles_and_links():
         strip_important=False,
         external_styles=['test-external-styles.css'],
         base_path='premailer/')
+    result_html = p.transform()
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+class MockResponse:
+
+    def __init__(self, content):
+        self.content = content
+        self.headers = {}
+
+    def read(self):
+        return self.content
+
+@mock.patch('premailer.premailer.urllib2')
+def test_external_styles_on_http(urllib2):
+    """Test loading styles that are genuinely external"""
+
+    html = """<html>
+    <head>
+    <link href="https://www.peterbe.com/style1.css" rel="stylesheet" type="text/css">
+    <link href="//www.peterbe.com/style2.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+    <h1>Hello</h1>
+    <h2>World</h2>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <h1 style="color:brown">Hello</h1>
+    <h2 style="color:pink">World</h2>
+    </body>
+    </html>"""
+
+    def mocked_urlopen(url):
+        if 'style1.css' in url:
+            return MockResponse(
+                "h1 { color: brown }"
+            )
+        if 'style2.css' in url:
+            return MockResponse(
+                "h2 { color: pink }"
+            )
+    urllib2.urlopen = mocked_urlopen
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+@mock.patch('premailer.premailer.urllib2')
+def test_external_styles_with_base_url(urllib2):
+    """Test loading styles that are genuinely external if you use
+    the base_url"""
+
+    html = """<html>
+    <head>
+    <link href="style.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+    <h1>Hello</h1>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <h1 style="color:brown">Hello</h1>
+    </body>
+    </html>"""
+
+    def mocked_urlopen(url):
+        if url == 'http://www.peterbe.com/style.css':
+            return MockResponse(
+                "h1 { color: brown }"
+            )
+        raise NotImplementedError(url)
+
+    urllib2.urlopen = mocked_urlopen
+
+    p = Premailer(
+        html,
+        base_url='http://www.peterbe.com/'
+    )
     result_html = p.transform()
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()

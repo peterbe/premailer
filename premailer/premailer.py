@@ -1,12 +1,9 @@
+import cgi
 import codecs
 import operator
 import os
 import re
 import urlparse
-
-from lxml import etree
-from lxml.cssselect import CSSSelector
-import requests
 
 import cssutils
 from lxml import etree
@@ -191,9 +188,9 @@ class Premailer(object):
             raise PremailerError("Could not parse the html")
         assert page is not None
 
-        # #
-        # # style selectors
-        # #
+        ##
+        ## style selectors
+        ##
 
         rules = []
         index = 0
@@ -301,9 +298,9 @@ class Premailer(object):
                 parent = item.getparent()
                 del parent.attrib['class']
 
-        # #
-        # # URLs
-        # #
+        ##
+        ## URLs
+        ##
         if self.base_url:
             for attr in ('href', 'src'):
                 for item in page.xpath("//@%s" % attr):
@@ -326,12 +323,21 @@ class Premailer(object):
         return out
 
     def _load_external_url(self, url):
-        r = requests.get(url.strip())
-        return r.text
+        r = urllib2.urlopen(url)
+        _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
+        encoding = params.get('charset', 'utf-8')
+        return r.read().decode(encoding)
 
     def _load_external(self, url):
         """loads an external stylesheet from a remote url or local path
         """
+        if url.startswith('//'):
+            # then we have to rely on the base_url
+            if self.base_url and 'https://' in self.base_url:
+                url = 'https:' + url
+            else:
+                url = 'http:' + url
+
         if url.startswith('http://') or url.startswith('https://'):
             css_body = self._load_external_url(url)
         else:
@@ -344,11 +350,8 @@ class Premailer(object):
                 with codecs.open(stylefile, encoding='utf-8') as f:
                     css_body = f.read()
             elif self.base_url:
-                try:
-                    css_body = self._load_external_url(urlparse.urljoin(self.base_url, url))
-                except requests.exceptions.HTTPError:
-                    raise ValueError(u"Could not find external style: %s" %
-                                 url)
+                url = urlparse.urljoin(self.base_url, url)
+                return self._load_external(url)
             else:
                 raise ValueError(u"Could not find external style: %s" %
                                  stylefile)
@@ -381,7 +384,7 @@ class Premailer(object):
                 if value.endswith('px'):
                     value = value[:-2]
                 attributes[key] = value
-            # else:
+            #else:
             #    print "key", repr(key)
             #    print 'value', repr(value)
 

@@ -61,7 +61,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     test_suite='nose.collector',
-    tests_require=['Nose'],
+    tests_require=['nose', 'mock'],
     zip_safe=True,
     install_requires=[
         'lxml',
