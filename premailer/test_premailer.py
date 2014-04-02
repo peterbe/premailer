@@ -506,18 +506,6 @@ def test_css_with_pseudoclasses_included():
     </body>
     </html>'''
 
-    ''' Unused, for reading purposes.
-    expect_html = """<html>
-    <head>
-    </head>
-    <body>
-    <a href="#" style="color:red;text-decoration:none">Special!</a>
-    <a href="#" style="{color:red; border:1px solid green} :hover{text-decoration:none; border:1px solid green} :visited{border:1px solid green}">Page</a>
-    <p style="::first-letter{float: left; font-size: 300%}">Paragraph</p>
-    </body>
-    </html>"""
-    '''
-
     p = Premailer(html, exclude_pseudoclasses=False)
     result_html = p.transform()
 
@@ -909,21 +897,27 @@ def test_child_selector():
 
 
 def test_doctype():
-    html = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-    <html>
-    <head>
-    </head>
-    <body>
-    </body>
-    </html>"""
+    html = (
+        '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" '
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+        """<html>
+        <head>
+        </head>
+        <body>
+        </body>
+        </html>"""
+    )
 
-    expect_html = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-    <html>
-    <head>
-    </head>
-    <body>
-    </body>
-    </html>"""
+    expect_html = (
+        '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" '
+        '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+        """<html>
+        <head>
+        </head>
+        <body>
+        </body>
+        </html>"""
+    )
 
     p = Premailer(html)
     result_html = p.transform()
@@ -1152,7 +1146,8 @@ def test_style_attribute_specificity():
 
 
 def test_ignore_style_elements_with_media_attribute():
-    """Asserts that style elements with media attributes other than 'screen' are ignored."""
+    """Asserts that style elements with media attributes other than
+    'screen' are ignored."""
     if not etree:
         # can't test it
         return
@@ -1460,8 +1455,8 @@ def test_external_styles_on_http(urllib2):
 
     html = """<html>
     <head>
-    <link href="https://www.peterbe.com/style1.css" rel="stylesheet" type="text/css">
-    <link href="//www.peterbe.com/style2.css" rel="stylesheet" type="text/css">
+    <link href="https://www.com/style1.css" rel="stylesheet" type="text/css">
+    <link href="//www.com/style2.css" rel="stylesheet" type="text/css">
     </head>
     <body>
     <h1>Hello</h1>
