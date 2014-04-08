@@ -37,9 +37,15 @@ def merge_styles(old, new, class_=''):
     Note: old could be something like '{...} ::first-letter{...}'
 
     """
+
+    def csstext_to_pairs(csstext):
+        parsed = cssutils.css.CSSVariablesDeclaration(csstext)
+        for key in parsed:
+            yield (key, parsed.getVariableValue(key))
+
     new_keys = set()
     news = []
-    for k, v in [x.strip().split(':', 1) for x in new.split(';') if x.strip()]:
+    for k, v in csstext_to_pairs(new):
         news.append((k.strip(), v.strip()))
         new_keys.add(k.strip())
 
@@ -48,14 +54,12 @@ def merge_styles(old, new, class_=''):
     if grouped_split:
         for old_class, old_content in grouped_split:
             olds = []
-            for k, v in [x.strip().split(':', 1) for
-                         x in old_content.split(';') if x.strip()]:
+            for k, v in csstext_to_pairs(old_content):
                 olds.append((k.strip(), v.strip()))
             groups[old_class] = olds
     else:
         olds = []
-        for k, v in [x.strip().split(':', 1) for
-                     x in old.split(';') if x.strip()]:
+        for k, v in csstext_to_pairs(old):
             olds.append((k.strip(), v.strip()))
         groups[''] = olds
 
@@ -66,7 +70,7 @@ def merge_styles(old, new, class_=''):
 
     if len(groups) == 1:
         return '; '.join('%s:%s' % (k, v) for
-                          (k, v) in groups.values()[0])
+                          (k, v) in sorted(groups.values()[0]))
     else:
         all = []
         for class_, mergeable in sorted(groups.items(),

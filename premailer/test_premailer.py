@@ -68,6 +68,19 @@ def test_merge_styles_with_class():
         ok_(each in split_regex.findall(result)[1])
 
 
+def test_merge_styles_non_trivial():
+    old = 'background-image:url("data:image/png;base64,iVBORw0KGg")'
+    new = 'font-size:2px; font-weight: bold'
+    expect = (
+        'background-image:url("data:image/png;base64,iVBORw0KGg")',
+        'font-size:2px;',
+        'font-weight:bold'
+    )
+    result = merge_styles(old, new)
+    for each in expect:
+       assert each in result
+
+
 def test_basic_html():
     """test the simplest case"""
     if not etree:
@@ -431,7 +444,7 @@ def test_style_block_with_external_urls():
     <head>
     <title>Title</title>
     </head>
-    <body style="color:#123; background:url(http://example.com/bg.png); font-family:Omerta">
+    <body style="background:url(http://example.com/bg.png); color:#123; font-family:Omerta">
     <h1>Hi!</h1>
     </body>
     </html>'''
@@ -512,12 +525,12 @@ def test_css_with_pseudoclasses_included():
     # because we're dealing with random dicts here we can't predict what
     # order the style attribute will be written in so we'll look for things
     # manually.
-    assert '<p style="::first-letter{float:left; font-size:300%}">' \
+    assert '<p style="::first-letter{font-size:300%; float:left}">' \
            'Paragraph</p>' in result_html
 
     assert 'style="{color:red; border:1px solid green}' in result_html
     assert ' :visited{border:1px solid green}' in result_html
-    assert ' :hover{text-decoration:none; border:1px solid green}' in \
+    assert ' :hover{border:1px solid green; text-decoration:none}' in \
            result_html
 
 
@@ -551,7 +564,7 @@ def test_css_with_pseudoclasses_excluded():
     </style>
     </head>
     <body>
-    <a href="#" style="color:red; border:1px solid green">Page</a>
+    <a href="#" style="border:1px solid green; color:red">Page</a>
     <p>Paragraph</p>
     </body>
     </html>'''
