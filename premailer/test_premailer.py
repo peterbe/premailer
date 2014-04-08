@@ -233,12 +233,13 @@ def test_parse_style_rules():
     a:hover { text-decoration: underline }
     """, 0)
 
+    ser_rule = lambda v: ';'.join(u"{0}:{1}".format(*i) for i in v)
     # 'rules' is a list, turn it into a dict for
     # easier assertion testing
     rules_dict = {}
     rules_specificity = {}
     for specificity, k, v in rules:
-        rules_dict[k] = v
+        rules_dict[k] = ser_rule(v)
         rules_specificity[k] = specificity
 
     assert 'h1' in rules_dict
@@ -262,11 +263,11 @@ def test_parse_style_rules():
     assert len(rules) == 1
     specificity, k, v = rules[0]
     assert k == 'ul li'
-    assert v == 'list-style:2px'
+    assert ser_rule(v) == 'list-style:2px'
 
     assert len(leftover) == 1
     k, v = leftover[0]
-    assert (k, v) == ('a:hover', 'text-decoration:underline'), (k, v)
+    assert (k, ser_rule(v)) == ('a:hover', 'text-decoration:underline'), (k, v)
 
 
 def test_precedence_comparison():
@@ -432,6 +433,51 @@ def test_style_block_with_external_urls():
     <title>Title</title>
     </head>
     <body style="color:#123; background:url(http://example.com/bg.png); font-family:Omerta">
+    <h1>Hi!</h1>
+    </body>
+    </html>'''
+
+    p = Premailer(html)
+    result_html = p.transform()
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+    eq_(expect_html, result_html)
+
+
+def test_style_block_with_inline_data():
+    """
+    From http://github.com/peterbe/premailer/issues/#issue/2
+
+    If you have
+      body { background:url(data:image/png;base64,iVBORw0KGgoAA...); }
+    the ':' inside '://' is causing a problem
+    """
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    body {
+      color:#123;
+      background: white url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC) top left no-repeat;
+      font-family: Omerta;
+    }
+    </style>
+    </head>
+    <body>
+    <h1>Hi!</h1>
+    </body>
+    </html>"""
+
+    expect_html = '''<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body style='color:#123; background:white url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC") top left no-repeat; font-family:Omerta'>
     <h1>Hi!</h1>
     </body>
     </html>'''
