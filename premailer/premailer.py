@@ -37,11 +37,15 @@ def merge_styles(old, new, class_=''):
     Note: old could be something like '{...} ::first-letter{...}'
 
     """
-    new_keys = set()
-    news = []
-    for k, v in [x.strip().split(':', 1) for x in new.split(';') if x.strip()]:
-        news.append((k.strip(), v.strip()))
-        new_keys.add(k.strip())
+    if isinstance(new, list):
+        news = new
+        new_keys = set(zip(*new)[0] if new else [])
+    else:
+        new_keys = set()
+        news = []
+        for k, v in [x.strip().split(':', 1) for x in new.split(';') if x.strip()]:
+            news.append((k.strip(), v.strip()))
+            new_keys.add(k.strip())
 
     groups = {}
     grouped_split = grouping_regex.findall(old)
@@ -82,8 +86,7 @@ def merge_styles(old, new, class_=''):
 def make_important(bulk):
     """makes every property in a string !important.
     """
-    return ';'.join('%s !important' % p if not p.endswith('!important') else p
-                    for p in bulk.split(';'))
+    return ';'.join( ('%s:%s !important' if not v.endswith('!important') else '%s:%s') % (k,v) for k,v in bulk)
 
 
 _element_selector_regex = re.compile(r'(^|\s)\w')
@@ -138,10 +141,10 @@ class Premailer(object):
             if rule.type == rule.MEDIA_RULE:
                 leftover.append(rule)
                 continue
-            bulk = ';'.join(
-                u'{0}:{1}'.format(key, rule.style[key])
+            bulk = [
+                (key, rule.style[key])
                 for key in rule.style.keys()
-            )
+            ]
             selectors = (
                 x.strip()
                 for x in rule.selectorText.split(',')
