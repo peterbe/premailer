@@ -62,7 +62,7 @@ setup(
     include_package_data=True,
     test_suite='nose.collector',
     tests_require=['nose', 'mock'],
-    zip_safe=True,
+    zip_safe=False,
     install_requires=[
         'lxml',
         'cssselect',
