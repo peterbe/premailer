@@ -23,7 +23,7 @@ def main(args):
     )
 
     parser.add_argument(
-        "-o", "--output", nargs='?', type=argparse.FileType('r'),
+        "-o", "--output", nargs='?', type=argparse.FileType('w'),
         help="Specifies the output file.  The default is stdout.",
         default=sys.stdout, dest="outfile"
     )
