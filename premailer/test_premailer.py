@@ -2,6 +2,7 @@ import sys
 import re
 from contextlib import contextmanager
 from StringIO import StringIO
+import gzip
 
 from nose.tools import eq_, ok_
 import mock
@@ -1455,13 +1456,24 @@ def test_external_styles_and_links():
 
 class MockResponse:
 
-    def __init__(self, content):
+    def __init__(self, content, gzip=False):
         self.content = content
         self.headers = {}
-        self.info = {}
+        self.gzip = gzip
 
+    def info(self):
+        if self.gzip:
+            return {'Content-Encoding': 'gzip'}
+        else:
+            return {}
     def read(self):
-        return self.content
+        if self.gzip:
+            out = StringIO()
+            with gzip.GzipFile(fileobj=out, mode="w") as f:
+                f.write(self.content)
+            return out.getvalue()
+        else:
+            return self.content
 
 @mock.patch('premailer.premailer.urllib2')
 def test_external_styles_on_http(urllib2):
@@ -1471,10 +1483,12 @@ def test_external_styles_on_http(urllib2):
     <head>
     <link href="https://www.com/style1.css" rel="stylesheet" type="text/css">
     <link href="//www.com/style2.css" rel="stylesheet" type="text/css">
+    <link href="//www.com/style3.css" rel="stylesheet" type="text/css">
     </head>
     <body>
     <h1>Hello</h1>
     <h2>World</h2>
+    <h3>World</h3>
     </body>
     </html>"""
 
@@ -1484,6 +1498,7 @@ def test_external_styles_on_http(urllib2):
     <body>
     <h1 style="color:brown">Hello</h1>
     <h2 style="color:pink">World</h2>
+    <h3 style="color:red">World</h3>
     </body>
     </html>"""
 
@@ -1495,6 +1510,10 @@ def test_external_styles_on_http(urllib2):
         if 'style2.css' in url:
             return MockResponse(
                 "h2 { color: pink }"
+            )
+        if 'style3.css' in url:
+            return MockResponse(
+                "h3 { color: red }", gzip=True
             )
     urllib2.urlopen = mocked_urlopen
 
