@@ -43,7 +43,6 @@ setup(
     author='Peter Bengtsson',
     author_email='mail@peterbe.com',
     url='http://github.com/peterbe/premailer',
-    download_url='http://github.com/peterbe/premailer',
     license='Python',
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -68,7 +67,4 @@ setup(
         'cssselect',
         'cssutils',
     ],
-    entry_points="""
-    # -*- Entry points: -*-
-    """,
 )
