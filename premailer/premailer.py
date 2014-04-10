@@ -1,10 +1,15 @@
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
 import cgi
 import codecs
+import gzip
 import operator
 import os
 import re
-import urlparse
 import urllib2
+import urlparse
 
 import cssutils
 from lxml import etree
@@ -193,9 +198,9 @@ class Premailer(object):
             raise PremailerError("Could not parse the html")
         assert page is not None
 
-        ##
-        ## style selectors
-        ##
+        # #
+        # # style selectors
+        # #
 
         rules = []
         index = 0
@@ -303,9 +308,9 @@ class Premailer(object):
                 parent = item.getparent()
                 del parent.attrib['class']
 
-        ##
-        ## URLs
-        ##
+        # #
+        # # URLs
+        # #
         if self.base_url:
             for attr in ('href', 'src'):
                 for item in page.xpath("//@%s" % attr):
@@ -331,7 +336,13 @@ class Premailer(object):
         r = urllib2.urlopen(url)
         _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
         encoding = params.get('charset', 'utf-8')
-        return r.read().decode(encoding)
+        if r.info().get('Content-Encoding', '') == 'gzip':
+            buf = StringIO.StringIO(r.read())
+            f = gzip.GzipFile(fileobj=buf)
+            out = f.read().decode(encoding)
+        else:
+            out = r.read().decode(encoding)
+        return out
 
     def _load_external(self, url):
         """loads an external stylesheet from a remote url or local path
@@ -389,7 +400,7 @@ class Premailer(object):
                 if value.endswith('px'):
                     value = value[:-2]
                 attributes[key] = value
-            #else:
+            # else:
             #    print "key", repr(key)
             #    print 'value', repr(value)
 
