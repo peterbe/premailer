@@ -198,9 +198,9 @@ class Premailer(object):
             raise PremailerError("Could not parse the html")
         assert page is not None
 
-        # #
-        # # style selectors
-        # #
+        ##
+        ## style selectors
+        ##
 
         rules = []
         index = 0
@@ -308,9 +308,9 @@ class Premailer(object):
                 parent = item.getparent()
                 del parent.attrib['class']
 
-        # #
-        # # URLs
-        # #
+        ##
+        ## URLs
+        ##
         if self.base_url:
             for attr in ('href', 'src'):
                 for item in page.xpath("//@%s" % attr):
@@ -336,7 +336,7 @@ class Premailer(object):
         r = urllib2.urlopen(url)
         _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
         encoding = params.get('charset', 'utf-8')
-        if r.info().get('Content-Encoding', '') == 'gzip':
+        if 'gzip' in r.info().get('Content-Encoding', ''):
             buf = StringIO.StringIO(r.read())
             f = gzip.GzipFile(fileobj=buf)
             out = f.read().decode(encoding)
@@ -400,7 +400,7 @@ class Premailer(object):
                 if value.endswith('px'):
                     value = value[:-2]
                 attributes[key] = value
-            # else:
+            #else:
             #    print "key", repr(key)
             #    print 'value', repr(value)
 

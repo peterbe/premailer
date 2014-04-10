@@ -1458,6 +1458,7 @@ class MockResponse:
     def __init__(self, content):
         self.content = content
         self.headers = {}
+        self.info = {}
 
     def read(self):
         return self.content
