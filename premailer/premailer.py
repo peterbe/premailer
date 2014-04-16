@@ -8,6 +8,9 @@ import urllib
 import urlparse
 import sys
 
+from tinycss import make_parser
+from tinycss.css21 import MediaRule
+
 
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
@@ -117,6 +120,13 @@ def _apply_styles(item_styles):
         _style_to_basic_html_attributes(item, new_style, force=True)
 
 
+def make_important(bulk):
+    """makes every property in a string !important."""
+
+    return ';'.join('%s !important' % p if not p.endswith('!important') else p
+                    for p in bulk.split(';'))
+
+
 _css_comments = re.compile(r'/\*.*?\*/', re.MULTILINE | re.DOTALL)
 _regex = re.compile('((.*?){(.*?)})', re.DOTALL | re.M)
 _semicolon_regex = re.compile(';(\s+)')
@@ -153,10 +163,57 @@ class Premailer(object):
         self.external_styles = external_styles
         self.strip_important = strip_important
         self.url_transform = url_transform
+        self.css_parser = make_parser('page3')
 
     def _parse_style_rules(self, css_body):
         leftover = []
         rules = []
+
+        # empty string
+        if not css_body:
+            return rules, leftover
+        """
+        sheet = cssutils.parseString(css_body)
+        for rule in sheet:
+            # ignore comment
+            if rule.type == rule.COMMENT:
+                continue
+            # handle media rule
+            if rule.type == rule.MEDIA_RULE:
+                leftover.append(rule)
+                continue
+            bulk = ';'.join(
+                u'{0}:{1}'.format(key, rule.style[key])
+                for key in rule.style.keys()
+            )
+            selectors = (
+                x.strip()
+                for x in rule.selectorText.split(',')
+                if x.strip() and not x.strip().startswith('@')
+            )
+            for selector in selectors:
+                if (':' in selector and self.exclude_pseudoclasses and
+                    ':' + selector.split(':', 1)[1]
+                        not in FILTER_PSEUDOSELECTORS):
+                    # a pseudoclass
+                    leftover.append((selector, bulk))
+                    continue
+                elif selector == '*' and not self.include_star_selectors:
+                    continue
+
+                # get the selector specificity
+                specificity = cssselect.parse(selector)[0].specificity()
+
+                rules.append((selector, bulk, specificity))
+
+        return rules, leftover
+        """
+
+        stylesheet = self.css_parser.parse_stylesheet(css_body)
+        for rule in stylesheet.rules:
+            if isinstance(rule, MediaRule):
+                leftover.append(rule)
+
         css_body = _css_comments.sub('', css_body)
         for each in _regex.findall(css_body.strip()):
             __, selectors, bulk = each
@@ -177,7 +234,10 @@ class Premailer(object):
                 elif selector == '*' and not self.include_star_selectors:
                     continue
 
-                rules.append((selector, bulk))
+                # get the selector specificity
+                specificity = cssselect.parse(selector)[0].specificity()
+
+                rules.append((selector, bulk, specificity))
 
         return rules, leftover
 
@@ -206,15 +266,33 @@ class Premailer(object):
         ##
 
         rules = []
-
         for style in CSSSelector('style')(page):
+            # If we have a media attribute whose value is anything other than
+            # 'screen', ignore the ruleset.
+            media = style.attrib.get('media')
+            if media and media != 'screen':
+                continue
+
             these_rules, these_leftover = self._parse_style_rules(style.text)
             rules.extend(these_rules)
 
             parent_of_style = style.getparent()
             if these_leftover:
-                style.text = '\n'.join(['%s {%s}' % (k, v) for
-                                        (k, v) in these_leftover])
+                lines = []
+                for item in these_leftover:
+                    if isinstance(item, tuple):
+                        k, v = item
+                        lines.append('%s {%s}' % (k, make_important(v)))
+                    # media rule
+                    else:
+                        for rule in item.rules:
+                            # XXX - ATTCNI-6032 - makeg each media rule !important.
+                            #for key in rule.style.keys():
+                            #    rule.style[key] = (rule.style.getPropertyValue(key, False),
+                            #                       '!important')
+                            pass
+                        #lines.append(item.cssText)
+                style.text = '\n'.join(lines)
             elif not self.keep_style_tags:
                 parent_of_style.remove(style)
 
@@ -238,7 +316,7 @@ class Premailer(object):
         # affected by css selector styles.
         item_styles = {}
 
-        for selector, style in rules:
+        for selector, style, specificity in rules:
             new_selector = selector
             class_ = ''
             if ':' in selector:
@@ -249,9 +327,6 @@ class Premailer(object):
                 class_ = ''
             else:
                 selector = new_selector
-
-            # get the selector specificity
-            specificity = cssselect.parse(selector)[0].specificity()
 
             sel = CSSSelector(selector)
             for item in sel(page):

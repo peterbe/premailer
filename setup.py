@@ -44,7 +44,8 @@ setup(name='premailer',
       zip_safe=True,
       install_requires=[
           'lxml',
-          'cssselect'
+          'cssselect',
+          'tinycss'
       ],
       entry_points="""
       # -*- Entry points: -*-

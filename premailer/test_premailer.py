@@ -5,6 +5,9 @@ from nose.tools import eq_, ok_
 from premailer import Premailer, etree
 
 
+whitespace_between_tags = re.compile('>\s*<')
+
+
 def test_merge_styles_basic():
     html = """<html>
     <head>
@@ -27,8 +30,6 @@ def test_merge_styles_basic():
 
     p = Premailer(html)
     result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -58,8 +59,6 @@ def test_merge_styles_with_class():
 
     p = Premailer(html)
     result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -101,8 +100,6 @@ def test_basic_html():
 
     p = Premailer(html)
     result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -207,8 +204,6 @@ def test_base_url_fixer():
                   preserve_internal_links=True)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
-
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
@@ -254,8 +249,6 @@ def test_style_block_with_external_urls():
 
     p = Premailer(html)
     result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -305,8 +298,6 @@ def test_base_url_for_style_block_urls():
 
     p = Premailer(html, base_url='http://example.com')
     result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -368,8 +359,6 @@ def test_url_transform():
                   url_transform=url_transform)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
-
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
     assert expect_html == result_html
@@ -406,8 +395,6 @@ def test_shortcut_function():
 
     p = Premailer(html)
     result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -506,8 +493,6 @@ def test_css_with_pseudoclasses_excluded():
     p = Premailer(html, exclude_pseudoclasses=True)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
-
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
@@ -560,8 +545,6 @@ def test_css_with_html_attributes():
 
     p = Premailer(html, exclude_pseudoclasses=True)
     result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -619,8 +602,6 @@ def test_mailto_url():
     p = Premailer(html, base_url='http://kungfupeople.com')
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
-
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
@@ -653,8 +634,6 @@ def test_strip_important():
 
     p = Premailer(html, strip_important=True)
     result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -692,8 +671,6 @@ def test_inline_wins_over_external():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
-
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
@@ -729,8 +706,6 @@ def test_last_child():
 
     p = Premailer(html)
     result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -768,8 +743,6 @@ def test_last_child_exclude_pseudo():
     p = Premailer(html, exclude_pseudoclasses=True)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
-
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
@@ -786,6 +759,10 @@ def test_mediaquery():
     @media print{
         div {
             text-align: center;
+            color: white;
+        }
+        div {
+            font-size: 999px;
         }
     }
     </style>
@@ -797,16 +774,23 @@ def test_mediaquery():
 
     expect_html = """<html>
     <head>
+    <style type="text/css">@media print {
+    div {
+        text-align: center !important;
+        color: white !important
+        }
+    div {
+        font-size: 999px !important
+        }
+    }</style>
     </head>
     <body>
     <div style="text-align:right" align="right">First div</div>
     </body>
     </html>"""
 
-    p = Premailer(html)
+    p = Premailer(html, strip_important=False)
     result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -839,8 +823,6 @@ def test_child_selector():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
-
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
@@ -866,8 +848,6 @@ def test_doctype():
 
     p = Premailer(html)
     result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -913,8 +893,6 @@ def test_css_specificity():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
-
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
@@ -953,8 +931,6 @@ def test_css_selector_grouping():
 
     p = Premailer(html)
     result_html = p.transform()
-
-    whitespace_between_tags = re.compile('>\s*<',)
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
@@ -996,7 +972,65 @@ def test_general():
     p = Premailer(html)
     result_html = p.transform()
 
-    whitespace_between_tags = re.compile('>\s*<',)
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_ignore_style_elements_with_media_attribute():
+    """Asserts that style elements with media attributes other than
+    'screen' are ignored."""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+        h1, h2 { color:red; }
+        strong {
+            text-decoration:none
+        }
+    </style>
+    <style type="text/css" media="screen">
+        h1, h2 { color:green; }
+        p {
+            font-size:16px;
+            }
+    </style>
+    <style type="text/css" media="only screen and (max-width: 480px)">
+        h1, h2 { color:orange; }
+        p {
+            font-size:120%;
+        }
+    </style>
+    </head>
+    <body>
+    <h1>Hi!</h1>
+    <p><strong>Yes!</strong></p>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css" media="only screen and (max-width: 480px)">
+        h1, h2 { color:orange; }
+        p {
+            font-size:120%;
+        }
+    </style>
+    </head>
+    <body>
+    <h1 style="color:green">Hi!</h1>
+    <p style="font-size:16px"><strong style="text-decoration:none">Yes!</strong></p>
+    </body>
+    </html>"""
+
+    p = Premailer(html)
+    result_html = p.transform()
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
