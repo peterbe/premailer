@@ -75,13 +75,20 @@ def main(args):
         "--base-path", default=None, dest="base_path",
         help="The base path for all external stylsheets."
     )
-    
+
     parser.add_argument(
         "--external-style", action="append", dest="external_styles",
         help="The path to an external stylesheet to be loaded."
     )
+    parser.add_argument(
+        "--disable-basic-attributes", dest="disable_basic_attributes",
+        help="Disable provided basic attributes (comma separated)", default=[]
+    )
 
     options = parser.parse_args(args)
+
+    if options.disable_basic_attributes:
+        options.disable_basic_attributes = options.disable_basic_attributes.split()
 
     p = Premailer(
         html=options.infile.read(),
@@ -95,6 +102,7 @@ def main(args):
         external_styles=options.external_styles,
         method=options.method,
         base_path=options.base_path,
+        disable_basic_attributes=options.disable_basic_attributes
     )
     options.outfile.write(p.transform())
     return 0

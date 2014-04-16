@@ -109,7 +109,8 @@ class Premailer(object):
                  strip_important=True,
                  external_styles=None,
                  method="html",
-                 base_path=None):
+                 base_path=None,
+                 disable_basic_attributes=[]):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
@@ -125,6 +126,7 @@ class Premailer(object):
         self.strip_important = strip_important
         self.method = method
         self.base_path = base_path
+        self.disable_basic_attributes = disable_basic_attributes
 
     def _parse_style_rules(self, css_body, ruleset_index):
         leftover = []
@@ -394,7 +396,7 @@ class Premailer(object):
             #    print 'value', repr(value)
 
         for key, value in attributes.items():
-            if key in element.attrib and not force:
+            if key in element.attrib and not force or key in self.disable_basic_attributes:
                 # already set, don't dare to overwrite
                 continue
             element.attrib[key] = value
