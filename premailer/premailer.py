@@ -110,7 +110,7 @@ class Premailer(object):
                  external_styles=None,
                  method="html",
                  base_path=None,
-                 disable_basic_attributes=[]):
+                 disable_basic_attributes=None):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
@@ -126,6 +126,8 @@ class Premailer(object):
         self.strip_important = strip_important
         self.method = method
         self.base_path = base_path
+        if disable_basic_attributes is None:
+            disable_basic_attributes = []
         self.disable_basic_attributes = disable_basic_attributes
 
     def _parse_style_rules(self, css_body, ruleset_index):
