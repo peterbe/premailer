@@ -125,7 +125,7 @@ def test_parse_style_rules():
     # 'rules' is a list, turn it into a dict for
     # easier assertion testing
     rules_dict = {}
-    for k, v in rules:
+    for k, v, s in rules:
         rules_dict[k] = v
 
     assert 'h1' in rules_dict
@@ -138,11 +138,11 @@ def test_parse_style_rules():
     assert rules_keys.index('h1') < rules_keys.index('h2')
     assert rules_keys.index('strong') < rules_keys.index('ul li')
 
-    assert rules_dict['h1'] == 'color:red'
-    assert rules_dict['h2'] == 'color:red'
+    assert rules_dict['h1'] == 'color:red;'
+    assert rules_dict['h2'] == 'color:red;'
     assert rules_dict['strong'] == 'text-decoration:none'
-    assert rules_dict['ul li'] == 'list-style:2px'
-    assert rules_dict['a:hover'] == 'text-decoration:underline'
+    assert rules_dict['ul li'] == 'list-style: 2px;'
+    assert rules_dict['a:hover'] == 'text-decoration: underline'
 
     p = Premailer('html', exclude_pseudoclasses=True)  # won't need the html
     func = p._parse_style_rules
@@ -152,13 +152,13 @@ def test_parse_style_rules():
     """)
 
     assert len(rules) == 1
-    k, v = rules[0]
+    k, v, s = rules[0]
     assert k == 'ul li'
-    assert v == 'list-style:2px'
+    assert v == 'list-style: 2px;'
 
-    assert len(leftover) == 1
+    print leftover
     k, v = leftover[0]
-    assert (k, v) == ('a:hover', 'text-decoration:underline'), (k, v)
+    assert (k, v) == ('a:hover', 'text-decoration: underline'), (k, v)
 
 
 def test_base_url_fixer():
@@ -242,7 +242,7 @@ def test_style_block_with_external_urls():
     <head>
     <title>Title</title>
     </head>
-    <body style="color:#123; font-family:Omerta; background:url(http://example.com/bg.png)">
+    <body style='color:#123; font-family:Omerta; background:url("http://example.com/bg.png")'>
     <h1>Hi!</h1>
     </body>
     </html>'''
@@ -361,6 +361,7 @@ def test_url_transform():
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
     result_html = whitespace_between_tags.sub('><', result_html).strip()
+
     assert expect_html == result_html
 
 
@@ -444,7 +445,10 @@ def test_css_with_pseudoclasses_included():
     # because we're dealing with random dicts here we can't predict what
     # order the style attribute will be written in so we'll look for things
     # manually.
-    assert '<head></head>' in result_html
+    assert '''<head>
+    </head>
+    ''' in result_html
+
     assert '<p style="::first-letter{font-size:300%; float:left}">'\
            'Paragraph</p>' in result_html
 
@@ -468,7 +472,7 @@ def test_css_with_pseudoclasses_excluded():
     a:hover { text-decoration:none; }
     a,a:hover,
     a:visited { border:1px solid green; }
-    p::first-letter {float: left; font-size: 300%}
+    p::first-letter {float: left; font-size: 300%;}
     </style>
     </head>
     <body>
@@ -476,12 +480,11 @@ def test_css_with_pseudoclasses_excluded():
     <p>Paragraph</p>
     </body>
     </html>'''
-
     expect_html = '''<html>
     <head>
-    <style type="text/css">a:hover {text-decoration:none}
-    a:hover {border:1px solid green}
-    a:visited {border:1px solid green}p::first-letter {float:left;font-size:300%}
+    <style type="text/css">a:hover {text-decoration:none !important;}
+    a:hover {border:1px solid green !important;}
+    a:visited {border:1px solid green !important;}p::first-letter {float: left !important;font-size: 300% !important;}
     </style>
     </head>
     <body>
@@ -490,7 +493,7 @@ def test_css_with_pseudoclasses_excluded():
     </body>
     </html>'''
 
-    p = Premailer(html, exclude_pseudoclasses=True)
+    p = Premailer(html, exclude_pseudoclasses=True, strip_important=False)
     result_html = p.transform()
 
     expect_html = whitespace_between_tags.sub('><', expect_html).strip()
@@ -749,7 +752,7 @@ def test_last_child_exclude_pseudo():
     eq_(expect_html, result_html)
 
 
-def test_mediaquery():
+def test_mediatype():
     html = """<html>
     <head>
     <style type="text/css">
@@ -774,15 +777,45 @@ def test_mediaquery():
 
     expect_html = """<html>
     <head>
-    <style type="text/css">@media print {
+    <style type="text/css">@media print{ div { text-align: center !important;color: white !important;} div { font-size: 999px !important;} }</style>
+    </head>
+    <body>
+    <div style="text-align:right" align="right">First div</div>
+    </body>
+    </html>"""
+
+    p = Premailer(html, strip_important=False)
+    result_html = p.transform()
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
+
+
+def test_mediaquery():
+    html = """<html>
+    <head>
+    <style type="text/css">
     div {
-        text-align: center !important;
-        color: white !important
+        text-align: right;
+    }
+    @media all and (max-width: 699px) and (min-width: 520px), (min-width: 1151px) {
+        #sidebar ul li a {
+            padding-left: 21px;
+            background: url(../images/email.png) left center no-repeat;
         }
-    div {
-        font-size: 999px !important
-        }
-    }</style>
+    }
+    </style>
+    </head>
+    <body>
+    <div>First div</div>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <style type="text/css">@media all and (max-width: 699px) and (min-width: 520px), (min-width: 1151px) { #sidebar ul li a { padding-left: 21px !important;background: url("../images/email.png") left center no-repeat !important;} }</style>
     </head>
     <body>
     <div style="text-align:right" align="right">First div</div>

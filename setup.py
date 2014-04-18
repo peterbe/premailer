@@ -45,7 +45,7 @@ setup(name='premailer',
       install_requires=[
           'lxml',
           'cssselect',
-          'tinycss'
+          'tinycss2'
       ],
       entry_points="""
       # -*- Entry points: -*-

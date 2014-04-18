@@ -8,9 +8,9 @@ import urllib
 import urlparse
 import sys
 
-from tinycss import make_parser
-from tinycss.css21 import MediaRule
-
+from tinycss2 import parser
+from tinycss2 import serializer
+from tinycss2 import ast
 
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
@@ -120,22 +120,18 @@ def _apply_styles(item_styles):
         _style_to_basic_html_attributes(item, new_style, force=True)
 
 
-def make_important(bulk):
-    """makes every property in a string !important."""
-
-    return ';'.join('%s !important' % p if not p.endswith('!important') else p
-                    for p in bulk.split(';'))
-
-
-_css_comments = re.compile(r'/\*.*?\*/', re.MULTILINE | re.DOTALL)
-_regex = re.compile('((.*?){(.*?)})', re.DOTALL | re.M)
-_semicolon_regex = re.compile(';(\s+)')
-_colon_regex = re.compile(':(\s+)')
+_semicolon_regex = re.compile(';(\s*)')
 _importants = re.compile('\s*!important')
 _style_url_regex = re.compile('url\(\s*[\'"]?(?P<url>.*?)[\'"]?\s*\)')
 # These selectors don't apply to all elements. Rather, they specify
 # which elements to apply to.
 FILTER_PSEUDOSELECTORS = [':last-child', ':first-child', 'nth-child']
+
+
+def make_important(bulk):
+    """makes every property in a string !important."""
+
+    return _semicolon_regex.sub(' !important;', bulk)
 
 
 class Premailer(object):
@@ -163,7 +159,6 @@ class Premailer(object):
         self.external_styles = external_styles
         self.strip_important = strip_important
         self.url_transform = url_transform
-        self.css_parser = make_parser('page3')
 
     def _parse_style_rules(self, css_body):
         leftover = []
@@ -172,72 +167,34 @@ class Premailer(object):
         # empty string
         if not css_body:
             return rules, leftover
-        """
-        sheet = cssutils.parseString(css_body)
-        for rule in sheet:
-            # ignore comment
-            if rule.type == rule.COMMENT:
-                continue
-            # handle media rule
-            if rule.type == rule.MEDIA_RULE:
-                leftover.append(rule)
-                continue
-            bulk = ';'.join(
-                u'{0}:{1}'.format(key, rule.style[key])
-                for key in rule.style.keys()
-            )
-            selectors = (
-                x.strip()
-                for x in rule.selectorText.split(',')
-                if x.strip() and not x.strip().startswith('@')
-            )
-            for selector in selectors:
-                if (':' in selector and self.exclude_pseudoclasses and
-                    ':' + selector.split(':', 1)[1]
-                        not in FILTER_PSEUDOSELECTORS):
-                    # a pseudoclass
-                    leftover.append((selector, bulk))
-                    continue
-                elif selector == '*' and not self.include_star_selectors:
-                    continue
 
-                # get the selector specificity
-                specificity = cssselect.parse(selector)[0].specificity()
+        # Parse stylesheet with tinycss2
+        stylesheet = parser.parse_stylesheet(css_body)
+        for node in stylesheet:
+            if isinstance(node, ast.AtRule) and node.at_keyword == 'media':
+                leftover.append(node)
+            elif isinstance(node, ast.QualifiedRule):
+                declarations = serializer.serialize(node.content)
+                strip_declarations = (decl.strip() for decl in declarations.split(';'))
+                bulk = ';'.join(strip_declarations)
 
-                rules.append((selector, bulk, specificity))
+                all_selectors = serializer.serialize(node.prelude)
+                split_selectors = (selector.strip() for selector in all_selectors.split(','))
 
-        return rules, leftover
-        """
+                for selector in split_selectors:
+                    if (':' in selector and self.exclude_pseudoclasses and
+                        ':' + selector.split(':', 1)[1]
+                            not in FILTER_PSEUDOSELECTORS):
+                        # a pseudoclass
+                        leftover.append((selector, bulk))
+                        continue
+                    elif selector == '*' and not self.include_star_selectors:
+                        continue
 
-        stylesheet = self.css_parser.parse_stylesheet(css_body)
-        for rule in stylesheet.rules:
-            if isinstance(rule, MediaRule):
-                leftover.append(rule)
+                    # get the selector specificity
+                    specificity = cssselect.parse(selector)[0].specificity()
 
-        css_body = _css_comments.sub('', css_body)
-        for each in _regex.findall(css_body.strip()):
-            __, selectors, bulk = each
-
-            bulk = _semicolon_regex.sub(';', bulk.strip())
-            bulk = _colon_regex.sub(':', bulk.strip())
-            if bulk.endswith(';'):
-                bulk = bulk[:-1]
-            for selector in [x.strip() for
-                             x in selectors.split(',') if x.strip() and
-                             not x.strip().startswith('@')]:
-                if (':' in selector and self.exclude_pseudoclasses and
-                    ':' + selector.split(':', 1)[1]
-                        not in FILTER_PSEUDOSELECTORS):
-                    # a pseudoclass
-                    leftover.append((selector, bulk))
-                    continue
-                elif selector == '*' and not self.include_star_selectors:
-                    continue
-
-                # get the selector specificity
-                specificity = cssselect.parse(selector)[0].specificity()
-
-                rules.append((selector, bulk, specificity))
+                    rules.append((selector, bulk, specificity))
 
         return rules, leftover
 
@@ -248,9 +205,9 @@ class Premailer(object):
         if etree is None:
             return self.html
 
-        parser = etree.HTMLParser()
+        html_parser = etree.HTMLParser()
         stripped = self.html.strip()
-        tree = etree.fromstring(stripped, parser).getroottree()
+        tree = etree.fromstring(stripped, html_parser).getroottree()
         page = tree.getroot()
         # lxml inserts a doctype if none exists, so only include it in
         # the root if it was in the original html.
@@ -285,13 +242,9 @@ class Premailer(object):
                         lines.append('%s {%s}' % (k, make_important(v)))
                     # media rule
                     else:
-                        for rule in item.rules:
-                            # XXX - ATTCNI-6032 - makeg each media rule !important.
-                            #for key in rule.style.keys():
-                            #    rule.style[key] = (rule.style.getPropertyValue(key, False),
-                            #                       '!important')
-                            pass
-                        #lines.append(item.cssText)
+                        media_query = item.serialize()
+                        lines.append(make_important(media_query))
+
                 style.text = '\n'.join(lines)
             elif not self.keep_style_tags:
                 parent_of_style.remove(style)
