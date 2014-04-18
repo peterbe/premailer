@@ -634,6 +634,59 @@ def test_css_with_html_attributes():
     eq_(expect_html, result_html)
 
 
+def test_css_disable_basic_html_attributes():
+    """Some CSS styles can be applied as normal HTML attribute like
+    'background-color' can be turned into 'bgcolor'
+    """
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <style type="text/css">
+    td { background-color:red; }
+    p { text-align:center; }
+    table { width:200px; height: 300px; }
+    </style>
+    </head>
+    <body>
+    <p>Text</p>
+    <table>
+      <tr>
+        <td>Cell 1</td>
+        <td>Cell 2</td>
+      </tr>
+    </table>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    </head>
+    <body>
+    <p style="text-align:center">Text</p>
+    <table style="height:300px; width:200px">
+      <tr>
+        <td style="background-color:red" bgcolor="red">Cell 1</td>
+        <td style="background-color:red" bgcolor="red">Cell 2</td>
+      </tr>
+    </table>
+    </body>
+    </html>"""
+
+    p = Premailer(html, exclude_pseudoclasses=True, disable_basic_attributes=['align', 'width', 'height'])
+    result_html = p.transform()
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    expect_html = re.sub('}\s+', '}', expect_html)
+    result_html = result_html.replace('}\n', '}')
+
+    eq_(expect_html, result_html)
+
+
 def test_apple_newsletter_example():
     # stupidity test
     import os

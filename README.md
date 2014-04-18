@@ -87,6 +87,7 @@ You can also use premailer from the command line by using his main module.
                             removed.
       --remove-classes      Remove all class attributes from all elements
       --strip-important     Remove '!important' for all css declarations.
+      --disable-basic-attributes Disable provided basic attributes (comma separated)
 
 A basic example:
 
@@ -147,3 +148,4 @@ HTML attribute `bgcolor="#eee"`.
 Having these extra attributes basically as a "back up" for really shit
 email clients that can't even take the style attributes. A lot of
 professional HTML newsletters such as Amazon's use this.
+You can disable some attributes in `disable_basic_attributes`
