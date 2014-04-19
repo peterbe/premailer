@@ -1328,7 +1328,7 @@ img { border: none; }
 </style>
 </head>
 <body>
-<img src="test.png" alt="test">
+<img src="test.png" alt="test"/>
 </body>
 </html>"""
 
