@@ -185,9 +185,9 @@ class Premailer(object):
             return self.html
 
         if self.method == 'xml':
-          parser = etree.XMLParser(ns_clean=False, resolve_entities=False)
+            parser = etree.XMLParser(ns_clean=False, resolve_entities=False)
         else:
-          parser = etree.HTMLParser()
+            parser = etree.HTMLParser()
         stripped = self.html.strip()
         tree = etree.fromstring(stripped, parser).getroottree()
         page = tree.getroot()
@@ -328,6 +328,7 @@ class Premailer(object):
         kwargs.setdefault('method', self.method)
         kwargs.setdefault('pretty_print', pretty_print)
         out = etree.tostring(root, **kwargs)
+        print "Made out (" + out + ")"
         if self.method == 'xml':
             out = _cdata_regex.sub(lambda m: '/*<![CDATA[*/%s/*]]>*/' % m.group(1), out)
         if self.strip_important:
