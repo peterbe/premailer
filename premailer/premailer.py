@@ -328,7 +328,6 @@ class Premailer(object):
         kwargs.setdefault('method', self.method)
         kwargs.setdefault('pretty_print', pretty_print)
         out = etree.tostring(root, **kwargs)
-        print "Made out (" + out + ")"
         if self.method == 'xml':
             out = _cdata_regex.sub(lambda m: '/*<![CDATA[*/%s/*]]>*/' % m.group(1), out)
         if self.strip_important:
