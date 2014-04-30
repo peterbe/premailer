@@ -445,9 +445,7 @@ def test_css_with_pseudoclasses_included():
     # because we're dealing with random dicts here we can't predict what
     # order the style attribute will be written in so we'll look for things
     # manually.
-    assert '''<head>
-    </head>
-    ''' in result_html
+    assert '<head></head>' in result_html
 
     assert '<p style="::first-letter{font-size:300%; float:left}">'\
            'Paragraph</p>' in result_html
