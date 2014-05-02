@@ -1419,6 +1419,41 @@ def test_command_line_fileinput_from_argument():
         '</style>' in result_html)
 
 
+def test_multithreading():
+    import threading
+    import logging
+    THREADS = 30
+    REPEATS = 100
+    
+    
+    class RepeatMergeStylesThread(threading.Thread):
+        exc = None
+        def __init__(self, old, new, class_):
+            super(RepeatMergeStylesThread, self).__init__()
+            self.old, self.new, self.class_ = old, new, class_
+        
+        def run(self):
+            for i in range(0, REPEATS):
+                try:
+                    merge_styles(self.old, self.new, self.class_)
+                except Exception, e:
+                    logging.exception("Exception in thread %s", self.name)
+                    self.exc = e
+
+    old = 'background-color:#ffffff;'
+    new = 'background-color:#dddddd;'
+    class_ = ''
+                
+    threads = [RepeatMergeStylesThread(old, new, class_) for i in range(0, THREADS)]
+    for t in threads: 
+        t.start()
+    
+    for t in threads: 
+        t.join()
+    
+    exceptions = [t.exc for t in threads if t.exc is not None]
+    eq_(exceptions, [])
+
 def test_external_links():
     """Test loading stylesheets via link tags"""
     if not etree:

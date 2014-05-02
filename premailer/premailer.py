@@ -1,3 +1,4 @@
+import threading
 try:
     import cStringIO as StringIO
 except ImportError:
@@ -50,23 +51,24 @@ def merge_styles(old, new, class_=''):
 
     new_keys = set()
     news = []
-    for k, v in csstext_to_pairs(new):
-        news.append((k.strip(), v.strip()))
-        new_keys.add(k.strip())
+    with merge_styles._lock:
+        for k, v in csstext_to_pairs(new):
+            news.append((k.strip(), v.strip()))
+            new_keys.add(k.strip())
 
-    groups = {}
-    grouped_split = grouping_regex.findall(old)
-    if grouped_split:
-        for old_class, old_content in grouped_split:
+        groups = {}
+        grouped_split = grouping_regex.findall(old)
+        if grouped_split:
+            for old_class, old_content in grouped_split:
+                olds = []
+                for k, v in csstext_to_pairs(old_content):
+                    olds.append((k.strip(), v.strip()))
+                groups[old_class] = olds
+        else:
             olds = []
-            for k, v in csstext_to_pairs(old_content):
+            for k, v in csstext_to_pairs(old):
                 olds.append((k.strip(), v.strip()))
-            groups[old_class] = olds
-    else:
-        olds = []
-        for k, v in csstext_to_pairs(old):
-            olds.append((k.strip(), v.strip()))
-        groups[''] = olds
+            groups[''] = olds
 
     # Perform the merge
     relevant_olds = groups.get(class_, {})
@@ -87,6 +89,7 @@ def merge_styles(old, new, class_=''):
                                               in mergeable)))
         return ' '.join(x for x in all if x != '{}')
 
+merge_styles._lock = threading.RLock()
 
 def make_important(bulk):
     """makes every property in a string !important.
