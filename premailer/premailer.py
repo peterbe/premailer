@@ -120,6 +120,7 @@ class Premailer(object):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
+        self.preserve_inline_attachments = preserve_inline_attachments
         self.exclude_pseudoclasses = exclude_pseudoclasses
         # whether to delete the <style> tag once it's been processed
         self.keep_style_tags = keep_style_tags
