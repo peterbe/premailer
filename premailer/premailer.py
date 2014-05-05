@@ -107,6 +107,7 @@ class Premailer(object):
 
     def __init__(self, html, base_url=None,
                  preserve_internal_links=False,
+                 preserve_inline_attachments=True,
                  exclude_pseudoclasses=True,
                  keep_style_tags=False,
                  include_star_selectors=False,
@@ -119,6 +120,7 @@ class Premailer(object):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
+        self.preserve_inline_attachments = preserve_inline_attachments
         self.exclude_pseudoclasses = exclude_pseudoclasses
         # whether to delete the <style> tag once it's been processed
         self.keep_style_tags = keep_style_tags
@@ -324,6 +326,9 @@ class Premailer(object):
                     parent = item.getparent()
                     if attr == 'href' and self.preserve_internal_links \
                            and parent.attrib[attr].startswith('#'):
+                        continue
+                    if attr == 'src' and self.preserve_inline_attachments \
+                           and parent.attrib[attr].startswith('cid:'):
                         continue
                     if not self.base_url.endswith('/'):
                         self.base_url += '/'
