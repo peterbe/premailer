@@ -107,6 +107,7 @@ class Premailer(object):
 
     def __init__(self, html, base_url=None,
                  preserve_internal_links=False,
+                 preserve_inline_attachments=True,
                  exclude_pseudoclasses=True,
                  keep_style_tags=False,
                  include_star_selectors=False,
@@ -324,6 +325,9 @@ class Premailer(object):
                     parent = item.getparent()
                     if attr == 'href' and self.preserve_internal_links \
                            and parent.attrib[attr].startswith('#'):
+                        continue
+                    if attr == 'src' and self.preserve_inline_attachments \
+                           and parent.attrib[attr].startswith('cid:'):
                         continue
                     if not self.base_url.endswith('/'):
                         self.base_url += '/'
