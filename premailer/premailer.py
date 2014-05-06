@@ -51,6 +51,9 @@ def merge_styles(old, new, class_=''):
 
     new_keys = set()
     news = []
+    
+    # The code below is wrapped in a critical section implemented via ``RLock``-class lock. 
+    # The lock is required to avoid ``cssutils`` concurrency issues documented in issue #65
     with merge_styles._lock:
         for k, v in csstext_to_pairs(new):
             news.append((k.strip(), v.strip()))
@@ -89,6 +92,8 @@ def merge_styles(old, new, class_=''):
                                               in mergeable)))
         return ' '.join(x for x in all if x != '{}')
 
+# The lock is used in merge_styles function to work around threading concurrency bug of cssutils library.
+# The bug is documented in issue #65. The bug's reproduction test in test_premailer.test_multithreading. 
 merge_styles._lock = threading.RLock()
 
 def make_important(bulk):

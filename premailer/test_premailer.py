@@ -1420,6 +1420,9 @@ def test_command_line_fileinput_from_argument():
 
 
 def test_multithreading():
+    """The test tests thread safety of merge_styles function which employs thread non-safe cssutils calls.
+        The test would fail if merge_styles would have not been thread-safe """
+        
     import threading
     import logging
     THREADS = 30
@@ -1427,12 +1430,15 @@ def test_multithreading():
     
     
     class RepeatMergeStylesThread(threading.Thread):
+        """The thread is instantiated by test and run multiple times in parallel."""
         exc = None
         def __init__(self, old, new, class_):
+            """The constructor just stores merge_styles parameters"""
             super(RepeatMergeStylesThread, self).__init__()
             self.old, self.new, self.class_ = old, new, class_
         
         def run(self):
+            """Calls merge_styles in a loop and sets exc attribute if merge_styles raises an exception."""
             for i in range(0, REPEATS):
                 try:
                     merge_styles(self.old, self.new, self.class_)
@@ -1443,14 +1449,17 @@ def test_multithreading():
     old = 'background-color:#ffffff;'
     new = 'background-color:#dddddd;'
     class_ = ''
-                
+    
+    # start multiple threads concurrently; each calls merge_styles many times
     threads = [RepeatMergeStylesThread(old, new, class_) for i in range(0, THREADS)]
     for t in threads: 
         t.start()
     
+    # wait until all threads are done
     for t in threads: 
         t.join()
     
+    # check if any thread raised exception while in merge_styles call
     exceptions = [t.exc for t in threads if t.exc is not None]
     eq_(exceptions, [])
 
