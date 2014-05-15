@@ -124,7 +124,8 @@ class Premailer(object):
                  external_styles=None,
                  method="html",
                  base_path=None,
-                 disable_basic_attributes=None):
+                 disable_basic_attributes=None,
+                 disable_validation=False):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
@@ -144,6 +145,7 @@ class Premailer(object):
         if disable_basic_attributes is None:
             disable_basic_attributes = []
         self.disable_basic_attributes = disable_basic_attributes
+        self.disable_validation = disable_validation
 
     def _parse_style_rules(self, css_body, ruleset_index):
         leftover = []
@@ -152,7 +154,7 @@ class Premailer(object):
         # empty string
         if not css_body:
             return rules, leftover
-        sheet = cssutils.parseString(css_body)
+        sheet = cssutils.parseString(css_body, validate=not self.disable_validation)
         for rule in sheet:
             # ignore comment
             if rule.type == rule.COMMENT:

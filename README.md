@@ -88,6 +88,7 @@ You can also use premailer from the command line by using his main module.
       --remove-classes      Remove all class attributes from all elements
       --strip-important     Remove '!important' for all css declarations.
       --disable-basic-attributes Disable provided basic attributes (comma separated)
+      --disable-validation  Disable CSSParser validation of attributes and values
 
 A basic example:
 
