@@ -85,6 +85,12 @@ def main(args):
         help="Disable provided basic attributes (comma separated)", default=[]
     )
 
+    parser.add_argument(
+        "--disable-validation", default=False,
+        action="store_true", dest="disable_validation",
+        help="Disable CSSParser validation of attributes and values",
+    )
+
     options = parser.parse_args(args)
 
     if options.disable_basic_attributes:
@@ -102,7 +108,8 @@ def main(args):
         external_styles=options.external_styles,
         method=options.method,
         base_path=options.base_path,
-        disable_basic_attributes=options.disable_basic_attributes
+        disable_basic_attributes=options.disable_basic_attributes,
+        disable_validation=options.disable_validation
     )
     options.outfile.write(p.transform())
     return 0

@@ -1664,3 +1664,44 @@ def test_external_styles_with_base_url(urllib2):
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
+def test_disabled_validator():
+    """test disabled_validator"""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    h1, h2 { fo:bar; }
+    strong {
+        color:baz;
+        text-decoration:none;
+        }
+    </style>
+    </head>
+    <body>
+    <h1>Hi!</h1>
+    <p><strong>Yes!</strong></p>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    </head>
+    <body>
+    <h1 style="fo:bar">Hi!</h1>
+    <p><strong style="color:baz; text-decoration:none">Yes!</strong></p>
+    </body>
+    </html>"""
+
+    p = Premailer(html, disable_validation=True)
+    result_html = p.transform()
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)
