@@ -97,7 +97,7 @@ def main(args):
         options.disable_basic_attributes = options.disable_basic_attributes.split()
 
     p = Premailer(
-        html=options.infile.read(),
+        html=options.infile.read().decode('utf-8'),
         base_url=options.base_url,
         preserve_internal_links=options.preserve_internal_links,
         exclude_pseudoclasses=options.exclude_pseudoclasses,
