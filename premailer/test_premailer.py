@@ -1422,13 +1422,13 @@ def test_command_line_fileinput_from_argument():
 def test_multithreading():
     """The test tests thread safety of merge_styles function which employs thread non-safe cssutils calls.
         The test would fail if merge_styles would have not been thread-safe """
-        
+
     import threading
     import logging
     THREADS = 30
     REPEATS = 100
-    
-    
+
+
     class RepeatMergeStylesThread(threading.Thread):
         """The thread is instantiated by test and run multiple times in parallel."""
         exc = None
@@ -1436,7 +1436,7 @@ def test_multithreading():
             """The constructor just stores merge_styles parameters"""
             super(RepeatMergeStylesThread, self).__init__()
             self.old, self.new, self.class_ = old, new, class_
-        
+
         def run(self):
             """Calls merge_styles in a loop and sets exc attribute if merge_styles raises an exception."""
             for i in range(0, REPEATS):
@@ -1449,16 +1449,16 @@ def test_multithreading():
     old = 'background-color:#ffffff;'
     new = 'background-color:#dddddd;'
     class_ = ''
-    
+
     # start multiple threads concurrently; each calls merge_styles many times
     threads = [RepeatMergeStylesThread(old, new, class_) for i in range(0, THREADS)]
-    for t in threads: 
+    for t in threads:
         t.start()
-    
+
     # wait until all threads are done
-    for t in threads: 
+    for t in threads:
         t.join()
-    
+
     # check if any thread raised exception while in merge_styles call
     exceptions = [t.exc for t in threads if t.exc is not None]
     eq_(exceptions, [])
@@ -1705,3 +1705,24 @@ def test_disabled_validator():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
+
+def test_comments_in_media_queries():
+    """CSS comments inside a media query block should not be a problem"""
+    html = """<!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Document</title>
+        <style>
+        @media screen {
+            /* comment */
+        }
+        </style>
+    </head>
+    <body></body>
+    </html>"""
+
+    p = Premailer(html, disable_validation=True)
+    result_html = p.transform()
+    print result_html
