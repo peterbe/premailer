@@ -1726,3 +1726,32 @@ def test_comments_in_media_queries():
     p = Premailer(html, disable_validation=True)
     result_html = p.transform()
     ok_('/* comment */' in result_html)
+
+
+def test_fontface_selectors_with_no_selectortext():
+    """
+    @font-face selectors are weird.
+    This is a fix for https://github.com/peterbe/premailer/issues/71
+    """
+    html = """<!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Document</title>
+        <style>
+        @font-face {
+            font-family: 'Garamond';
+            src:
+                local('Garamond'),
+                local('Garamond-Regular'),
+                url('Garamond.ttf') format('truetype'); /* Safari, Android, iOS */
+                font-weight: normal;
+                font-style: normal;
+        }
+        </style>
+    </head>
+    <body></body>
+    </html>"""
+
+    p = Premailer(html, disable_validation=True)
+    p.transform()  # it should just work

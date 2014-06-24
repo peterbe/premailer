@@ -157,7 +157,7 @@ class Premailer(object):
         sheet = cssutils.parseString(css_body, validate=not self.disable_validation)
         for rule in sheet:
             # ignore comment
-            if rule.type == rule.COMMENT:
+            if rule.type in (rule.COMMENT, rule.FONT_FACE_RULE):
                 continue
             # handle media rule
             if rule.type == rule.MEDIA_RULE:
