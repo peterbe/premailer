@@ -1725,4 +1725,4 @@ def test_comments_in_media_queries():
 
     p = Premailer(html, disable_validation=True)
     result_html = p.transform()
-    print result_html
+    ok_('/* comment */' in result_html)
