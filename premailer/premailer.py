@@ -156,12 +156,12 @@ class Premailer(object):
             return rules, leftover
         sheet = cssutils.parseString(css_body, validate=not self.disable_validation)
         for rule in sheet:
-            # ignore comment
-            if rule.type in (rule.COMMENT, rule.FONT_FACE_RULE):
-                continue
             # handle media rule
             if rule.type == rule.MEDIA_RULE:
                 leftover.append(rule)
+                continue
+            # only proceed for things we recognize
+            if rule.type != rule.STYLE_RULE:
                 continue
             bulk = ';'.join(
                 u'{0}:{1}'.format(key, rule.style[key])

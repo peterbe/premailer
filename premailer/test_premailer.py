@@ -1755,3 +1755,50 @@ def test_fontface_selectors_with_no_selectortext():
 
     p = Premailer(html, disable_validation=True)
     p.transform()  # it should just work
+
+
+def test_keyframe_selectors():
+    """
+    keyframes shouldn't be a problem.
+    """
+    html = """<!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Document</title>
+        <style>
+        @keyframes fadein {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        /* Firefox */
+        @-moz-keyframes fadein {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        /* Safari and Chrome */
+        @-webkit-keyframes fadein {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        /* Internet Explorer */
+        @-ms-keyframes fadein {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        /* Opera */
+        @-o-keyframes fadein {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        </style>
+    </head>
+    <body></body>
+    </html>"""
+
+    p = Premailer(html, disable_validation=True)
+    p.transform()  # it should just work
