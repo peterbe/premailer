@@ -251,24 +251,7 @@ class Premailer(object):
                 else:
                     style = etree.Element('style')
                     style.attrib['type'] = 'text/css'
-
-                lines = []
-                for item in these_leftover:
-                    if isinstance(item, tuple):
-                        k, v = item
-                        lines.append('%s {%s}' % (k, make_important(v)))
-                    # media rule
-                    else:
-                        for rule in item.cssRules:
-                            if isinstance(rule, cssutils.css.csscomment.CSSComment):
-                                continue
-                            for key in rule.style.keys():
-                                rule.style[key] = (
-                                    rule.style.getPropertyValue(key, False),
-                                    '!important'
-                                )
-                        lines.append(item.cssText)
-                style.text = '\n'.join(lines)
+                style.text = self._css_rules_to_string(these_leftover)
                 if self.method == 'xml':
                     style.text = etree.CDATA(style.text)
 
@@ -285,6 +268,13 @@ class Premailer(object):
                 these_rules, these_leftover = self._parse_style_rules(css_body, index)
                 index += 1
                 rules.extend(these_rules)
+                if these_leftover:
+                    style = etree.Element('style')
+                    style.attrib['type'] = 'text/css'
+                    style.text = self._css_rules_to_string(these_leftover)
+                    head = CSSSelector('head')(page)
+                    if head:
+                        head[0].append(style)
 
         # rules is a tuple of (specificity, selector, styles), where specificity is a tuple
         # ordered such that more specific rules sort larger.
@@ -436,6 +426,27 @@ class Premailer(object):
                 # already set, don't dare to overwrite
                 continue
             element.attrib[key] = value
+
+    def _css_rules_to_string(self, rules):
+        """given a list of css rules returns a css string
+        """
+        lines = []
+        for item in rules:
+            if isinstance(item, tuple):
+                k, v = item
+                lines.append('%s {%s}' % (k, make_important(v)))
+            # media rule
+            else:
+                for rule in item.cssRules:
+                    if isinstance(rule, cssutils.css.csscomment.CSSComment):
+                        continue
+                    for key in rule.style.keys():
+                        rule.style[key] = (
+                            rule.style.getPropertyValue(key, False),
+                            '!important'
+                        )
+                lines.append(item.cssText)
+        return '\n'.join(lines)
 
 
 def transform(html, base_url=None):
