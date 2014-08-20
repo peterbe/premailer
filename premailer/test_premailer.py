@@ -442,6 +442,8 @@ def test_css_with_pseudoclasses_included():
     p = Premailer(html)
     result_html = p.transform()
 
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
     # because we're dealing with random dicts here we can't predict what
     # order the style attribute will be written in so we'll look for things
     # manually.
