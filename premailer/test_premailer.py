@@ -5,10 +5,16 @@ from contextlib import contextmanager
 from StringIO import StringIO
 import gzip
 
-from nose.tools import eq_, ok_
+from nose.tools import eq_, ok_, assert_raises
 import mock
+from lxml.etree import XMLSyntaxError
 
-from premailer import Premailer, etree, merge_styles
+from premailer import (
+    transform,
+    Premailer,
+    merge_styles,
+    ExternalNotFoundError
+)
 from .__main__ import main
 
 
@@ -67,12 +73,6 @@ def compare_html(one, two):
     two = whitespace_between_tags.sub('>\n<', two)
     one = one.replace('><', '>\n<')
     two = two.replace('><', '>\n<')
-    print "ONE"
-    print one
-    print
-    print "TWO"
-    print two
-    print
     for i, line in enumerate(one.splitlines()):
         other = two.splitlines()[i]
         if line.lstrip() != other.lstrip():
@@ -159,10 +159,37 @@ class Tests(unittest.TestCase):
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
-        # expect_html = whitespace_between_tags.sub('><', expect_html).strip()
-        # result_html = whitespace_between_tags.sub('><', result_html).strip()
-        #
-        # eq_(expect_html, result_html)
+
+    def test_basic_html_shortcut_function(self):
+        """test the plain transform function"""
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1, h2 { color:red; }
+        strong {
+            text-decoration:none
+            }
+        </style>
+        </head>
+        <body>
+        <h1>Hi!</h1>
+        <p><strong>Yes!</strong></p>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        <title>Title</title>
+        </head>
+        <body>
+        <h1 style="color:red">Hi!</h1>
+        <p><strong style="text-decoration:none">Yes!</strong></p>
+        </body>
+        </html>"""
+
+        result_html = transform(html)
+        compare_html(expect_html, result_html)
 
     def test_empty_style_tag(self):
         """empty style tag"""
@@ -188,6 +215,52 @@ class Tests(unittest.TestCase):
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
+
+    def test_include_star_selector(self):
+        """test the simplest case"""
+
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        p * { color: red }
+        </style>
+        </head>
+        <body>
+        <h1>Hi!</h1>
+        <p><strong>Yes!</strong></p>
+        </body>
+        </html>"""
+
+        expect_html_not_included = """<html>
+        <head>
+        <title>Title</title>
+        </head>
+        <body>
+        <h1>Hi!</h1>
+        <p><strong>Yes!</strong></p>
+        </body>
+        </html>"""
+
+        p = Premailer(html)
+        result_html = p.transform()
+
+        compare_html(expect_html_not_included, result_html)
+
+        expect_html_star_included = """<html>
+        <head>
+        <title>Title</title>
+        </head>
+        <body>
+        <h1>Hi!</h1>
+        <p><strong style="color:red">Yes!</strong></p>
+        </body>
+        </html>"""
+
+        p = Premailer(html, include_star_selectors=True)
+        result_html = p.transform()
+
+        compare_html(expect_html_star_included, result_html)
 
     def test_mixed_pseudo_selectors(self):
         """mixing pseudo selectors with straight forward selectors"""
@@ -342,6 +415,7 @@ class Tests(unittest.TestCase):
         <body>
         <img src="/images/foo.jpg">
         <img src="/images/bar.gif">
+        <img src="cid:images/baz.gif">
         <img src="http://www.googe.com/photos/foo.jpg">
         <a href="/home">Home</a>
         <a href="http://www.peterbe.com">External</a>
@@ -358,6 +432,7 @@ class Tests(unittest.TestCase):
         <body>
         <img src="http://kungfupeople.com/images/foo.jpg">
         <img src="http://kungfupeople.com/images/bar.gif">
+        <img src="cid:images/baz.gif">
         <img src="http://www.googe.com/photos/foo.jpg">
         <a href="http://kungfupeople.com/home">Home</a>
         <a href="http://www.peterbe.com">External</a>
@@ -366,8 +441,11 @@ class Tests(unittest.TestCase):
         </body>
         </html>'''
 
-        p = Premailer(html, base_url='http://kungfupeople.com',
-                      preserve_internal_links=True)
+        p = Premailer(
+            html,
+            base_url='http://kungfupeople.com',
+            preserve_internal_links=True
+        )
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
@@ -1238,6 +1316,27 @@ class Tests(unittest.TestCase):
 
         compare_html(expect_html, result_html)
 
+    def test_broken_xml(self):
+        """Test the simplest case with xml"""
+
+        html = """<html>
+        <head>
+        <title>Title
+        <style type="text/css">
+        img { border: none; }
+        </style>
+        </head>
+        <body>
+        <img src="test.png" alt="test"/>
+        </body>
+        """
+
+        p = Premailer(html, method="xml")
+        assert_raises(
+            XMLSyntaxError,
+            p.transform,
+        )
+
     def test_xml_cdata(self):
         """Test that CDATA is set correctly on remaining styles"""
 
@@ -1287,7 +1386,11 @@ class Tests(unittest.TestCase):
 
     def test_command_line_fileinput_from_argument(self):
         with captured_output() as (out, err):
-            main(['-f', 'premailer/test-apple-newsletter.html'])
+            main([
+                '-f',
+                'premailer/test-apple-newsletter.html',
+                '--disable-basic-attributes=bgcolor'
+            ])
 
         result_html = out.getvalue().strip()
 
@@ -1353,6 +1456,7 @@ class Tests(unittest.TestCase):
         h3 { color:yellow; }
         </style>
         <link href="premailer/test-external-links.css" rel="stylesheet" type="text/css">
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
         <style type="text/css">
         h1 { color:orange; }
         </style>
@@ -1369,6 +1473,7 @@ class Tests(unittest.TestCase):
         <head>
         <title>Title</title>
         <style type="text/css">a:hover {color:purple !important}</style>
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
         </head>
         <body>
         <h1 style="color:orange">Hello</h1>
@@ -1378,11 +1483,45 @@ class Tests(unittest.TestCase):
         </body>
         </html>"""
 
-        p = Premailer(html,
-            strip_important=False)
+        p = Premailer(
+            html,
+            strip_important=False
+        )
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
+
+    def test_external_links_unfindable(self):
+        """Test loading stylesheets that can't be found"""
+
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1 { color:red; }
+        h3 { color:yellow; }
+        </style>
+        <link href="premailer/xxxx.css" rel="stylesheet" type="text/css">
+        <style type="text/css">
+        h1 { color:orange; }
+        </style>
+        </head>
+        <body>
+        <h1>Hello</h1>
+        <h2>World</h2>
+        <h3>Test</h3>
+        <a href="#">Link</a>
+        </body>
+        </html>"""
+
+        p = Premailer(
+            html,
+            strip_important=False
+        )
+        assert_raises(
+            ExternalNotFoundError,
+            p.transform,
+        )
 
     def test_external_styles_and_links(self):
         """Test loading stylesheets via both the 'external_styles' argument and link tags"""
@@ -1420,7 +1559,7 @@ class Tests(unittest.TestCase):
 
         p = Premailer(html,
             strip_important=False,
-            external_styles=['test-external-styles.css'],
+            external_styles='test-external-styles.css',
             base_path='premailer/')
         result_html = p.transform()
 
@@ -1469,6 +1608,57 @@ class Tests(unittest.TestCase):
         urllib2.urlopen = mocked_urlopen
 
         p = Premailer(html)
+        result_html = p.transform()
+
+        compare_html(expect_html, result_html)
+
+    @mock.patch('premailer.premailer.urllib2')
+    def test_external_styles_on_https(self, urllib2):
+        """Test loading styles that are genuinely external"""
+
+        html = """<html>
+        <head>
+        <link href="https://www.com/style1.css" rel="stylesheet" type="text/css">
+        <link href="//www.com/style2.css" rel="stylesheet" type="text/css">
+        <link href="/style3.css" rel="stylesheet" type="text/css">
+        </head>
+        <body>
+        <h1>Hello</h1>
+        <h2>World</h2>
+        <h3>World</h3>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        </head>
+        <body>
+        <h1 style="color:brown">Hello</h1>
+        <h2 style="color:pink">World</h2>
+        <h3 style="color:red">World</h3>
+        </body>
+        </html>"""
+
+        def mocked_urlopen(url):
+            ok_(url.startswith('https://'))
+            if 'style1.css' in url:
+                return MockResponse(
+                    "h1 { color: brown }"
+                )
+            if 'style2.css' in url:
+                return MockResponse(
+                    "h2 { color: pink }"
+                )
+            if 'style3.css' in url:
+                return MockResponse(
+                    "h3 { color: red }", gzip=True
+                )
+        urllib2.urlopen = mocked_urlopen
+
+        p = Premailer(
+            html,
+            base_url='https://www.peterbe.com'
+        )
         result_html = p.transform()
 
         compare_html(expect_html, result_html)

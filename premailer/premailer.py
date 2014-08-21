@@ -1,7 +1,7 @@
 import threading
 try:
     import cStringIO as StringIO
-except ImportError:
+except ImportError:  # pragma: no cover
     import StringIO
 import cgi
 import codecs
@@ -21,6 +21,10 @@ __all__ = ['PremailerError', 'Premailer', 'transform']
 
 
 class PremailerError(Exception):
+    pass
+
+
+class ExternalNotFoundError(ValueError):
     pass
 
 
@@ -179,7 +183,7 @@ class Premailer(object):
                     # a pseudoclass
                     leftover.append((selector, bulk))
                     continue
-                elif selector == '*' and not self.include_star_selectors:
+                elif '*' in selector and not self.include_star_selectors:
                     continue
 
                 # Crudely calculate specificity
@@ -198,9 +202,6 @@ class Premailer(object):
         """change the self.html and return it with CSS turned into style
         attributes.
         """
-        if etree is None:
-            return self.html
-
         if self.method == 'xml':
             parser = etree.XMLParser(ns_clean=False, resolve_entities=False)
         else:
@@ -212,9 +213,6 @@ class Premailer(object):
         # the root if it was in the original html.
         root = tree if stripped.startswith(tree.docinfo.doctype) else page
 
-        if page is None:
-            print repr(self.html)
-            raise PremailerError("Could not parse the html")
         assert page is not None
 
         ##
@@ -236,8 +234,6 @@ class Premailer(object):
                 css_body = element.text
             else:
                 href = element.attrib.get('href')
-                if not href:
-                    continue
                 css_body = self._load_external(href)
 
             these_rules, these_leftover = self._parse_style_rules(css_body, index)
@@ -386,8 +382,8 @@ class Premailer(object):
                 url = urlparse.urljoin(self.base_url, url)
                 return self._load_external(url)
             else:
-                raise ValueError(u"Could not find external style: %s" %
-                                 stylefile)
+                raise ExternalNotFoundError(stylefile)
+
         return css_body
 
     def _style_to_basic_html_attributes(self, element, style_content,
@@ -453,7 +449,7 @@ def transform(html, base_url=None):
     return Premailer(html, base_url=base_url).transform()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     html = """<html>
         <head>
         <title>Test</title>
