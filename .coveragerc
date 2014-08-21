@@ -2,4 +2,4 @@
 source = premailer
 
 [report]
-omit = premailer/tests*
+omit = premailer/test*
