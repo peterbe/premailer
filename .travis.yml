@@ -1,10 +1,20 @@
+# https://travis-ci.org/peterbe/premailer
+
 language: python
 
 python:
   - "2.7"
 
+before_install:
+    - pip install coverage
+
 install:
   - python setup.py install
 
 script:
-  - python setup.py test
+  - python setup.py test --with-cover --cover-erase --cover-package=premailer
+
+after_success:
+    # Report coverage results to coveralls.io
+    - pip install coveralls --use-mirrors
+    - coveralls
