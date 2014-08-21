@@ -3,6 +3,7 @@ premailer
 
 [![Travis](https://travis-ci.org/peterbe/premailer.png?branch=master)](https://travis-ci.org/peterbe/premailer)
 
+[![Coverage Status](https://coveralls.io/repos/peterbe/premailer/badge.png?branch=master)](https://coveralls.io/r/peterbe/premailer?branch=master)
 
 Turns CSS blocks into style attributes
 --------------------------------------
