@@ -1396,15 +1396,25 @@ class Tests(unittest.TestCase):
         </head>
         <body>
         <h1>Hello</h1>
+        <h2>Hello</h2>
+        <a href="">Hello</a>
         </body>
         </html>"""
 
         expect_html = """<html>
         <head>
         <style type="text/css">a:hover {color:purple !important}</style>
+        <style type="text/css">h2::after {content:"" !important;display:block !important}
+        @media all and (max-width: 320px) {
+            h1 {
+                font-size: 12px !important
+                }
+            }</style>
         </head>
         <body>
         <h1 style="color:brown">Hello</h1>
+        <h2 style="color:green">Hello</h2>
+        <a href="" style="color:pink">Hello</a>
         </body>
         </html>"""
 

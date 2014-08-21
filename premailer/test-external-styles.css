@@ -2,5 +2,11 @@ h1 {
   color: brown;
 }
 h2::after {
-  content: "↗";
+  content: "";
+  display: block;
+}
+@media all and (max-width: 320px) {
+    h1 {
+        font-size: 12px;
+    }
 }
