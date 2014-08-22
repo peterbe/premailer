@@ -35,7 +35,7 @@ DOM tree of the page accordingly.
 Getting started
 ---------------
 
-If you havena't already done so, install `premailer` first:
+If you haven't already done so, install `premailer` first:
 
         $ pip install premailer
 
