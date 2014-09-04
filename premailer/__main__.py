@@ -47,7 +47,7 @@ def main(args):
     parser.add_argument(
         "--preserve-style-tags", default=False,
         help="Do not delete <style></style> tags from the html document.",
-        action="store_false", dest="keep_style_tags"
+        action="store_true", dest="keep_style_tags"
     )
 
     parser.add_argument(
@@ -62,9 +62,11 @@ def main(args):
         action="store_true", dest="remove_classes"
     )
 
-    parser.add_argument("--strip-important", default=False,
-                        help="Remove '!important' for all css declarations.",
-                        action="store_true", dest="strip_important")
+    parser.add_argument(
+        "--strip-important", default=False,
+        help="Remove '!important' for all css declarations.",
+        action="store_true", dest="strip_important"
+    )
 
     parser.add_argument(
         "--method", default="html", dest="method",
