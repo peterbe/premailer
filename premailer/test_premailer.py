@@ -1400,6 +1400,50 @@ class Tests(unittest.TestCase):
             '* {line-height: normal !important; -webkit-text-size-adjust: 125%}\n'
             '</style>' in result_html)
 
+    def test_command_line_preserve_style_tags(self):
+        with captured_output() as (out, err):
+            main([
+                '-f',
+                'premailer/test-issue78.html',
+                '--preserve-style-tags'
+            ])
+
+        result_html = out.getvalue().strip()
+
+        expect_html = """
+        <html>
+        <head>
+        <style type="text/css">
+        p {font-size:12px;}
+        </style>
+        </head>
+        <body>
+        <p style="font-size:12px">html</p>
+        </body>
+        </html>
+        """
+
+        compare_html(expect_html, result_html)
+
+        # for completeness, test it once without
+        with captured_output() as (out, err):
+            main([
+                '-f',
+                'premailer/test-issue78.html',
+            ])
+
+        result_html = out.getvalue().strip()
+        expect_html = """
+        <html>
+        <head>
+        </head>
+        <body>
+        <p style="font-size:12px">html</p>
+        </body>
+        </html>
+        """
+
+        compare_html(expect_html, result_html)
 
     def test_multithreading(self):
         """The test tests thread safety of merge_styles function which employs
