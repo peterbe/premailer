@@ -1,7 +1,8 @@
+from __future__ import absolute_import, unicode_literals
 import sys
 import argparse
 
-from premailer import Premailer
+from .premailer import Premailer
 
 
 def main(args):
@@ -98,8 +99,12 @@ def main(args):
     if options.disable_basic_attributes:
         options.disable_basic_attributes = options.disable_basic_attributes.split()
 
+    html = options.infile.read()
+    if hasattr(html, 'decode'):  # Forgive me: Python 2 compatability
+        html = html.decode('utf-8')
+
     p = Premailer(
-        html=options.infile.read().decode('utf-8'),
+        html=html,
         base_url=options.base_url,
         preserve_internal_links=options.preserve_internal_links,
         exclude_pseudoclasses=options.exclude_pseudoclasses,
