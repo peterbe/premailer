@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 import sys
 import re
 import unittest
@@ -9,7 +10,7 @@ from nose.tools import eq_, ok_, assert_raises
 import mock
 from lxml.etree import XMLSyntaxError
 
-from premailer import (
+from .premailer import (
     transform,
     Premailer,
     merge_styles,
