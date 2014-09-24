@@ -10,10 +10,11 @@ else:  # Python 2
     try:
         from cStringIO import StringIO
     except ImportError:  # pragma: no cover
-        from StringIO import StringIO
+        from StringIO import StringIO  # lint:ok
     from urllib2 import urlopen
     from urlparse import urljoin
     STR_TYPE = basestring
+from io import BytesIO  # Yes, there is an io module in Python 2
 import cgi
 import codecs
 import gzip
@@ -359,7 +360,7 @@ class Premailer(object):
         _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
         encoding = params.get('charset', 'utf-8')
         if 'gzip' in r.info().get('Content-Encoding', ''):
-            buf = StringIO(r.read())
+            buf = BytesIO(r.read())
             f = gzip.GzipFile(fileobj=buf)
             out = f.read().decode(encoding)
         else:
