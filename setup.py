@@ -25,9 +25,9 @@ long_description = md2stx(long_description)
 
 
 def find_version(*file_paths):
-    version_file_path = os.path.join(os.path.dirname(__file__), 
+    version_file_path = os.path.join(os.path.dirname(__file__),
                                      *file_paths)
-    version_file = codecs.open(version_file_path, 
+    version_file = codecs.open(version_file_path,
                                encoding='utf-8').read()
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
                               version_file, re.M)
@@ -54,6 +54,13 @@ setup(
         "License :: OSI Approved :: Python Software Foundation License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Communications",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Other/Nonlisted Topic",
