@@ -1674,7 +1674,8 @@ class Tests(unittest.TestCase):
             retval = "h3 { color: red }"
         return retval
 
-    def test_external_styles_on_http(self):
+    @mock.patch.object(Premailer, '_load_external_url')
+    def test_external_styles_on_http(self, mocked_pleu):
         """Test loading styles that are genuinely external"""
 
         html = """<html>
@@ -1689,21 +1690,17 @@ class Tests(unittest.TestCase):
         <h3>World</h3>
         </body>
         </html>"""
+        mocked_pleu.side_effect = self.mocked_urlopen
+        p = Premailer(html)
+        result_html = p.transform()
 
-        with mock.patch.object(Premailer,
-                               '_load_external_url') as mocked_pleu:
-            mocked_pleu.side_effect = self.mocked_urlopen
-            p = Premailer(html)
-            result_html = p.transform()
-
-            # Expected values are tuples of the positional values (as
-            # another tuple) and the ketword arguments (which are all null),
-            # hence the following Lisp-like explosion of brackets and
-            # commas.
-            expectedArgs = [(('https://www.com/style1.css',),),
-                            (('http://www.com/style2.css',),),
-                            (('http://www.com/style3.css',),)]
-            self.assertEqual(expectedArgs, mocked_pleu.call_args_list)
+        # Expected values are tuples of the positional values (as another
+        # tuple) and the ketword arguments (which are all null), hence the
+        # following Lisp-like explosion of brackets and commas.
+        expectedArgs = [(('https://www.com/style1.css',),),
+                        (('http://www.com/style2.css',),),
+                        (('http://www.com/style3.css',),)]
+        self.assertEqual(expectedArgs, mocked_pleu.call_args_list)
 
         expect_html = """<html>
         <head>
@@ -1716,7 +1713,8 @@ class Tests(unittest.TestCase):
         </html>"""
         compare_html(expect_html, result_html)
 
-    def test_external_styles_on_https(self):
+    @mock.patch.object(Premailer, '_load_external_url')
+    def test_external_styles_on_https(self, mocked_pleu):
         """Test loading styles that are genuinely external"""
 
         html = """<html>
@@ -1731,16 +1729,15 @@ class Tests(unittest.TestCase):
         <h3>World</h3>
         </body>
         </html>"""
-        with mock.patch.object(Premailer,
-                               '_load_external_url') as mocked_pleu:
-            mocked_pleu.side_effect = self.mocked_urlopen
-            p = Premailer(html, base_url='https://www.peterbe.com')
-            result_html = p.transform()
-            expectedArgs = [(('https://www.com/style1.css',),),
-                            (('https://www.com/style2.css',),),
-                            (('https://www.peterbe.com/style3.css',),)]
-            self.assertEqual(expectedArgs, mocked_pleu.call_args_list)
 
+        mocked_pleu.side_effect = self.mocked_urlopen
+        p = Premailer(html, base_url='https://www.peterbe.com')
+        result_html = p.transform()
+
+        expectedArgs = [(('https://www.com/style1.css',),),
+                        (('https://www.com/style2.css',),),
+                        (('https://www.peterbe.com/style3.css',),)]
+        self.assertEqual(expectedArgs, mocked_pleu.call_args_list)
         expect_html = """<html>
         <head>
         </head>
@@ -1752,7 +1749,8 @@ class Tests(unittest.TestCase):
         </html>"""
         compare_html(expect_html, result_html)
 
-    def test_external_styles_with_base_url(self):
+    @mock.patch.object(Premailer, '_load_external_url')
+    def test_external_styles_with_base_url(self, mocked_pleu):
         """Test loading styles that are genuinely external if you use
         the base_url"""
 
@@ -1764,14 +1762,11 @@ class Tests(unittest.TestCase):
         <h1>Hello</h1>
         </body>
         </html>"""
-
-        with mock.patch.object(Premailer,
-                               '_load_external_url') as mocked_pleu:
-            mocked_pleu.return_value = "h1 { color: brown }"
-            p = Premailer(html, base_url='http://www.peterbe.com/')
-            result_html = p.transform()
-            expectedArgs = [(('http://www.peterbe.com/style.css',),), ]
-            self.assertEqual(expectedArgs, mocked_pleu.call_args_list)
+        mocked_pleu.return_value = "h1 { color: brown }"
+        p = Premailer(html, base_url='http://www.peterbe.com/')
+        result_html = p.transform()
+        expectedArgs = [(('http://www.peterbe.com/style.css',),), ]
+        self.assertEqual(expectedArgs, mocked_pleu.call_args_list)
 
         expect_html = """<html>
         <head>
