@@ -8,9 +8,9 @@ if sys.version_info >= (3, ):  # As in, Python 3
     STR_TYPE = str
 else:  # Python 2
     try:
-        import cStringIO as StringIO
+        from cStringIO import StringIO
     except ImportError:  # pragma: no cover
-        import StringIO
+        from StringIO import StringIO
     from urllib2 import urlopen
     from urlparse import urljoin
     STR_TYPE = basestring
@@ -359,7 +359,7 @@ class Premailer(object):
         _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
         encoding = params.get('charset', 'utf-8')
         if 'gzip' in r.info().get('Content-Encoding', ''):
-            buf = StringIO.StringIO(r.read())
+            buf = StringIO(r.read())
             f = gzip.GzipFile(fileobj=buf)
             out = f.read().decode(encoding)
         else:
