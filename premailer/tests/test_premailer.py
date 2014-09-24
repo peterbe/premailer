@@ -4,13 +4,12 @@ import re
 import unittest
 from contextlib import contextmanager
 if sys.version_info >= (3, ):  # As in, Python 3
-    from io import StringIO
     from urllib.request import urlopen
 else:  # Python 2
     #lint:disable
-    from StringIO import StringIO
     from urllib2 import urlopen
     #lint:enable
+from io import BytesIO, StringIO  # Yes, the is an io lib in py2.x
 import gzip
 
 from nose.tools import eq_, ok_, assert_raises
@@ -22,7 +21,6 @@ from premailer.premailer import (
     Premailer,
     merge_styles,
     ExternalNotFoundError,
-    urlopen as puo
 )
 from premailer.__main__ import main
 
@@ -68,7 +66,7 @@ class MockResponse:
 
     def read(self):
         if self.gzip:
-            out = StringIO()
+            out = BytesIO()
             with gzip.GzipFile(fileobj=out, mode="w") as f:
                 f.write(self.content)
             return out.getvalue()
@@ -1637,6 +1635,32 @@ class Tests(unittest.TestCase):
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
+
+    def test_load_external_url(self):
+        'Test premailer.premailer.Premailer._load_external_url'
+        import premailer.premailer  # lint:ok
+        with mock.patch('premailer.premailer.urlopen') as mockedUrlOpen:
+            fauxResponse = b'This is not a response'
+            fauxUri = 'https://example.com/site.css'
+            mockedUrlOpen.return_value = MockResponse(fauxResponse)
+            p = premailer.premailer.Premailer('<p>A paragraph</p>')
+            r = p._load_external_url(fauxUri)
+
+            mockedUrlOpen.assert_called_once_with(fauxUri)
+            self.assertEqual(fauxResponse.decode('utf-8'), r)
+
+    def test_load_external_url_gzip(self):
+        'Test premailer.premailer.Premailer._load_external_url with gzip'
+        import premailer.premailer  # lint:ok
+        with mock.patch('premailer.premailer.urlopen') as mockedUrlOpen:
+            fauxResponse = b'This is not a response'
+            fauxUri = 'https://example.com/site.css'
+            mockedUrlOpen.return_value = MockResponse(fauxResponse, True)
+            p = premailer.premailer.Premailer('<p>A paragraph</p>')
+            r = p._load_external_url(fauxUri)
+
+            mockedUrlOpen.assert_called_once_with(fauxUri)
+            self.assertEqual(fauxResponse.decode('utf-8'), r)
 
     def _test_external_styles_on_http(self):
         """Test loading styles that are genuinely external"""
