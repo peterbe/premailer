@@ -139,8 +139,7 @@ class Premailer(object):
         # whether to delete the <style> tag once it's been processed
         self.keep_style_tags = keep_style_tags
         self.remove_classes = remove_classes
-        # always keep the original css in order to preserve non found
-        # classes like '.yshortcuts a {border-bottom: none !important;}'
+        # always keep the original css in its original form found in head styles
         self.keep_original_css = keep_original_css
         # whether to process or ignore selectors like '* { foo:bar; }'
         self.include_star_selectors = include_star_selectors

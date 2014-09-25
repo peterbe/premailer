@@ -51,6 +51,12 @@ def main(args):
     )
 
     parser.add_argument(
+        "--keep-original-css", default=False,
+        help="Never remove or strip any of the original css found in the original head of the document.",
+        action="store_true", dest="keep_original_css"
+    )
+
+    parser.add_argument(
         "--remove-star-selectors", default=True,
         help="All wildcard selectors like '* {color: black}' will be removed.",
         action="store_false", dest="include_star_selectors"
@@ -104,6 +110,7 @@ def main(args):
         preserve_internal_links=options.preserve_internal_links,
         exclude_pseudoclasses=options.exclude_pseudoclasses,
         keep_style_tags=options.keep_style_tags,
+        keep_original_css=options.keep_original_css,
         include_star_selectors=options.include_star_selectors,
         remove_classes=options.remove_classes,
         strip_important=options.strip_important,

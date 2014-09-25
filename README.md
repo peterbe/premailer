@@ -83,6 +83,10 @@ You can also use premailer from the command line by using his main module.
       --preserve-style-tags
                             Do not delete <style></style> tags from the html
                             document.
+      --keep-original-css
+                            Never remove or strip any of the original css found in
+                            the original head of the document. This will produce duplicate
+                            declarations.
       --remove-star-selectors
                             All wildcard selectors like '* {color: black}' will be
                             removed.
