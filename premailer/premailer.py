@@ -122,6 +122,7 @@ class Premailer(object):
                  preserve_inline_attachments=True,
                  exclude_pseudoclasses=True,
                  keep_style_tags=False,
+                 keep_original_css=False,
                  include_star_selectors=False,
                  remove_classes=True,
                  strip_important=True,
@@ -138,6 +139,8 @@ class Premailer(object):
         # whether to delete the <style> tag once it's been processed
         self.keep_style_tags = keep_style_tags
         self.remove_classes = remove_classes
+        # always keep the original css in its original form found in head styles
+        self.keep_original_css = keep_original_css
         # whether to process or ignore selectors like '* { foo:bar; }'
         self.include_star_selectors = include_star_selectors
         if isinstance(external_styles, basestring):
@@ -241,17 +244,20 @@ class Premailer(object):
             rules.extend(these_rules)
 
             parent_of_element = element.getparent()
-            if these_leftover:
+            if these_leftover or self.keep_original_css:
                 if is_style:
                     style = element
                 else:
                     style = etree.Element('style')
                     style.attrib['type'] = 'text/css'
-                style.text = self._css_rules_to_string(these_leftover)
+                if self.keep_original_css:
+                    style.text = css_body
+                else:
+                    style.text = self._css_rules_to_string(these_leftover)
                 if self.method == 'xml':
                     style.text = etree.CDATA(style.text)
 
-                if not is_style:
+                if not is_style and not self.keep_original_css:
                     element.addprevious(style)
                     parent_of_element.remove(element)
 

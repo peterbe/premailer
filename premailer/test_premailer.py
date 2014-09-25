@@ -1445,6 +1445,51 @@ class Tests(unittest.TestCase):
 
         compare_html(expect_html, result_html)
 
+    def test_command_line_keep_original_css(self):
+        with captured_output() as (out, err):
+            main([
+                '-f',
+                'premailer/test-issue50.html',
+                '--keep-original-css'
+            ])
+
+        result_html = out.getvalue().strip()
+
+        expect_html = """
+        <html>
+        <head>
+        <style type="text/css">
+        .yshortcuts a {border-bottom: none !important;}
+        @media screen and (max-width: 600px) {
+            table[class="container"] {
+                width: 100% !important;
+            }
+        }
+        /* Also comments should be preserved when the --keep-original-css flag is set */
+        p {font-size:12px;}
+        </style>
+        </head>
+        <body>
+        <p style="font-size:12px">html</p>
+        </body>
+        </html>
+        """
+        # print result_html
+        compare_html(expect_html, result_html)
+
+        # also test together with --preserve-style-tags
+        with captured_output() as (out, err):
+            main([
+                '-f',
+                'premailer/test-issue50.html',
+                '--preserve-style-tags',
+                '--keep-original-css'
+            ])
+        print result_html
+        result_html = out.getvalue().strip()
+
+        compare_html(expect_html, result_html)
+
     def test_multithreading(self):
         """The test tests thread safety of merge_styles function which employs
         thread non-safe cssutils calls.
@@ -1876,3 +1921,25 @@ class Tests(unittest.TestCase):
 
         p = Premailer(html, disable_validation=True)
         p.transform()  # it should just work
+
+
+    def test_keep_original_css(self):
+        """
+        Something one might want to always keep the original css, for example for classes which aren't 
+        used in the html but added later by client like: '.yshortcuts a {border-bottom: none !important;}'
+        """
+        html = """<!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Document</title>
+            <style>
+            .yshortcuts a {border-bottom: none !important;}
+            </style>
+        </head>
+        <body></body>
+        </html>"""
+
+        p = Premailer(html, keep_original_css=True)
+        result_html = p.transform()
+        ok_('.yshortcuts' in result_html)
