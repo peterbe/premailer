@@ -1876,3 +1876,25 @@ class Tests(unittest.TestCase):
 
         p = Premailer(html, disable_validation=True)
         p.transform()  # it should just work
+
+
+    def test_keep_original_css(self):
+        """
+        Something one might want to always keep the original css, for example for classes which aren't 
+        used in the html but added later by client like: '.yshortcuts a {border-bottom: none !important;}'
+        """
+        html = """<!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Document</title>
+            <style>
+            .yshortcuts a {border-bottom: none !important;}
+            </style>
+        </head>
+        <body></body>
+        </html>"""
+
+        p = Premailer(html, keep_original_css=True)
+        result_html = p.transform()
+        ok_('.yshortcuts' in result_html)
