@@ -406,6 +406,8 @@ class Premailer(object):
 
             if key == 'text-align':
                 attributes['align'] = value.strip()
+            elif key == 'vertical-align':
+                attributes['valign'] = value.strip()
             elif key == 'background-color':
                 attributes['bgcolor'] = value.strip()
             elif key == 'width' or key == 'height':
