@@ -136,6 +136,7 @@ class Premailer(object):
         self.preserve_inline_attachments = preserve_inline_attachments
         self.exclude_pseudoclasses = exclude_pseudoclasses
         # whether to delete the <style> tag once it's been processed
+        # this will always preserve the original css
         self.keep_style_tags = keep_style_tags
         self.remove_classes = remove_classes
         # whether to process or ignore selectors like '* { foo:bar; }'
@@ -241,13 +242,16 @@ class Premailer(object):
             rules.extend(these_rules)
 
             parent_of_element = element.getparent()
-            if these_leftover:
+            if these_leftover or self.keep_style_tags:
                 if is_style:
                     style = element
                 else:
                     style = etree.Element('style')
                     style.attrib['type'] = 'text/css'
-                style.text = self._css_rules_to_string(these_leftover)
+                if self.keep_style_tags:
+                    style.text = css_body
+                else:
+                    style.text = self._css_rules_to_string(these_leftover)
                 if self.method == 'xml':
                     style.text = etree.CDATA(style.text)
 
