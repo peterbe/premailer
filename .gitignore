@@ -6,3 +6,4 @@ build/
 premailer.egg-info
 premailer/gorunsettings.py
 .DS_Store
+.coverage
