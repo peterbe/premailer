@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import sys
 import re
 import unittest
@@ -9,13 +10,13 @@ from nose.tools import eq_, ok_, assert_raises
 import mock
 from lxml.etree import XMLSyntaxError
 
-from premailer import (
+from premailer.premailer import (
     transform,
     Premailer,
     merge_styles,
     ExternalNotFoundError
 )
-from .__main__ import main
+from premailer.__main__ import main
 
 
 whitespace_between_tags = re.compile('>\s*<')
@@ -1391,7 +1392,7 @@ class Tests(unittest.TestCase):
         with captured_output() as (out, err):
             main([
                 '-f',
-                'premailer/test-apple-newsletter.html',
+                'premailer/tests/test-apple-newsletter.html',
                 '--disable-basic-attributes=bgcolor'
             ])
 
@@ -1407,7 +1408,7 @@ class Tests(unittest.TestCase):
         with captured_output() as (out, err):
             main([
                 '-f',
-                'premailer/test-issue78.html',
+                'premailer/tests/test-issue78.html',
                 '--preserve-style-tags'
             ])
 
@@ -1439,7 +1440,7 @@ class Tests(unittest.TestCase):
         with captured_output() as (out, err):
             main([
                 '-f',
-                'premailer/test-issue78.html',
+                'premailer/tests/test-issue78.html',
             ])
 
         result_html = out.getvalue().strip()
@@ -1514,7 +1515,7 @@ class Tests(unittest.TestCase):
         h1 { color:red; }
         h3 { color:yellow; }
         </style>
-        <link href="premailer/test-external-links.css" rel="stylesheet" type="text/css">
+        <link href="premailer/tests/test-external-links.css" rel="stylesheet" type="text/css">
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
         <style type="text/css">
         h1 { color:orange; }
@@ -1587,7 +1588,7 @@ class Tests(unittest.TestCase):
 
         html = """<html>
         <head>
-        <link href="test-external-links.css" rel="stylesheet" type="text/css">
+        <link href="tests/test-external-links.css" rel="stylesheet" type="text/css">
         <style type="text/css">
         h1 { color: red; }
         </style>
@@ -1618,7 +1619,7 @@ class Tests(unittest.TestCase):
 
         p = Premailer(html,
             strip_important=False,
-            external_styles='test-external-styles.css',
+            external_styles='tests/test-external-styles.css',
             base_path='premailer/')
         result_html = p.transform()
 
