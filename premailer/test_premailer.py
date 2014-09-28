@@ -1270,8 +1270,11 @@ class Tests(unittest.TestCase):
         expect_html = """<html>
         <head>
         <title>Title</title>
-        <style type="text/css">a:hover {color:green !important}
-        a:focus {color:blue !important}</style>
+        <style type="text/css">
+        a { color: red; }
+        a:hover { color: green; }
+        a:focus { color: blue !important; }
+        </style>
         </head>
         <body>
         <a href="#" style="color:red">Hi!</a>
@@ -1414,6 +1417,13 @@ class Tests(unittest.TestCase):
         <html>
         <head>
         <style type="text/css">
+        .yshortcuts a {border-bottom: none !important;}
+        @media screen and (max-width: 600px) {
+            table[class="container"] {
+                width: 100% !important;
+            }
+        }
+        /* Even comments should be preserved when the keep_style_tags flag is set */
         p {font-size:12px;}
         </style>
         </head>
@@ -1436,6 +1446,11 @@ class Tests(unittest.TestCase):
         expect_html = """
         <html>
         <head>
+        <style type="text/css">@media screen and (max-width: 600px) {
+            table[class="container"] {
+                width: 100% !important
+                }
+            }</style>
         </head>
         <body>
         <p style="font-size:12px">html</p>

@@ -82,7 +82,7 @@ You can also use premailer from the command line by using his main module.
                             Pseudo classes like p:last-child', p:first-child, etc
       --preserve-style-tags
                             Do not delete <style></style> tags from the html
-                            document.
+                            document and preserve the original css.
       --remove-star-selectors
                             All wildcard selectors like '* {color: black}' will be
                             removed.
