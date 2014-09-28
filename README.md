@@ -70,26 +70,33 @@ You can also use premailer from the command line by using his main module.
     usage: python -m premailer [options]
 
     optional arguments:
-      -h, --help            show this help message and exit
-      -f [INFILE], --file [INFILE]
-                            Specifies the input file. The default is stdin.
-      -o [OUTFILE], --output [OUTFILE]
-                            Specifies the output file. The default is stdout.
-      --base-url BASE_URL
-      --remove-internal-links PRESERVE_INTERNAL_LINKS
-                            Remove links that start with a '#' like anchors.
-      --exclude-pseudoclasses
-                            Pseudo classes like p:last-child', p:first-child, etc
-      --preserve-style-tags
-                            Do not delete <style></style> tags from the html
-                            document and preserve the original css.
-      --remove-star-selectors
-                            All wildcard selectors like '* {color: black}' will be
-                            removed.
-      --remove-classes      Remove all class attributes from all elements
-      --strip-important     Remove '!important' for all css declarations.
-      --disable-basic-attributes Disable provided basic attributes (comma separated)
-      --disable-validation  Disable CSSParser validation of attributes and values
+    -h, --help            show this help message and exit
+    -f [INFILE], --file [INFILE]
+                          Specifies the input file. The default is stdin.
+    -o [OUTFILE], --output [OUTFILE]
+                          Specifies the output file. The default is stdout.
+    --base-url BASE_URL
+    --remove-internal-links PRESERVE_INTERNAL_LINKS
+                          Remove links that start with a '#' like anchors.
+    --exclude-pseudoclasses
+                          Pseudo classes like p:last-child', p:first-child, etc
+    --preserve-style-tags
+                          Do not delete <style></style> tags from the html
+                          document.
+    --remove-star-selectors
+                          All wildcard selectors like '* {color: black}' will be
+                          removed.
+    --remove-classes      Remove all class attributes from all elements
+    --strip-important     Remove '!important' for all css declarations.
+    --method METHOD       The type of html to output. 'html' for HTML, 'xml' for
+                          XHTML.
+    --base-path BASE_PATH
+                          The base path for all external stylsheets.
+    --external-style EXTERNAL_STYLES
+                          The path to an external stylesheet to be loaded.
+    --disable-basic-attributes DISABLE_BASIC_ATTRIBUTES
+                          Disable provided basic attributes (comma separated)
+    --disable-validation  Disable CSSParser validation of attributes and values
 
 A basic example:
 
