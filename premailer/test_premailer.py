@@ -651,8 +651,8 @@ class Tests(unittest.TestCase):
         html = """<html>
         <head>
         <style type="text/css">
-        td { background-color:red; }
-        p { text-align:center; }
+        td { background-color:red; vertical-align:middle;}
+        p { text-align:center;}
         table { width:200px; }
         </style>
         </head>
@@ -674,8 +674,8 @@ class Tests(unittest.TestCase):
         <p style="text-align:center" align="center">Text</p>
         <table style="width:200px" width="200">
           <tr>
-            <td style="background-color:red" bgcolor="red">Cell 1</td>
-            <td style="background-color:red" bgcolor="red">Cell 2</td>
+            <td style="background-color:red; vertical-align:middle" bgcolor="red" valign="middle">Cell 1</td>
+            <td style="background-color:red; vertical-align:middle" bgcolor="red" valign="middle">Cell 2</td>
           </tr>
         </table>
         </body>
