@@ -75,8 +75,6 @@ class MockResponse:
 
 
 def compare_html(one, two):
-    # FIXME
-    return
     one = one.strip()
     two = two.strip()
     one = whitespace_between_tags.sub('>\n<', one)
@@ -85,9 +83,8 @@ def compare_html(one, two):
     two = two.replace('><', '>\n<')
     for i, line in enumerate(one.splitlines()):
         other = two.splitlines()[i]
-        # FIXME
-        #if line.lstrip() != other.lstrip():
-        #    eq_(line.lstrip(), other.lstrip())
+        if line.lstrip() != other.lstrip():
+            eq_(line.lstrip(), other.lstrip())
 
 
 
@@ -576,6 +573,13 @@ class Tests(unittest.TestCase):
 
         compare_html(expect_html, result_html)
 
+    def fragment_in_html(self, fragment, html, fullMessage=False):
+        if fullMessage:
+            message = '"{0}" not in\n{1}'.format(fragment, html)
+        else:
+            message = '"{0}" not in HTML'.format(fragment)
+        ok_(fragment in html, message)
+
     def test_css_with_pseudoclasses_included(self):
         "Pick up the pseudoclasses too and include them"
 
@@ -601,16 +605,18 @@ class Tests(unittest.TestCase):
         result_html = p.transform()
 
         # because we're dealing with random dicts here we can't predict what
-        # order the style attribute will be written in so we'll look for things
-        # manually.
-        # FIXME
-        #ok_('<p style="::first-letter{font-size:300%; float:left}">'
-        #    'Paragraph</p>' in result_html)
+        # order the style attribute will be written in so we'll look for
+        # things manually.
+        e = '<p style="::first-letter{font-size:300%; float:left}">'\
+            'Paragraph</p>'
+        self.fragment_in_html(e, result_html, True)
 
-        #ok_('style="{color:red; border:1px solid green}' in result_html)
-        #ok_(' :visited{border:1px solid green}' in result_html)
-        #ok_(' :hover{border:1px solid green; text-decoration:none}' in
-        #    result_html)
+        e = 'style="{color:red; border:1px solid green}'
+        self.fragment_in_html(e, result_html, True)
+        e = ' :visited{border:1px solid green}'
+        self.fragment_in_html(e, result_html, True)
+        e = ' :hover{border:1px solid green; text-decoration:none}'
+        self.fragment_in_html(e, result_html, True)
 
     def test_css_with_pseudoclasses_excluded(self):
         "Skip things like `a:hover{}` and keep them in the style block"
