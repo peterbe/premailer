@@ -75,6 +75,8 @@ class MockResponse:
 
 
 def compare_html(one, two):
+    # FIXME
+    return
     one = one.strip()
     two = two.strip()
     one = whitespace_between_tags.sub('>\n<', one)
@@ -83,9 +85,8 @@ def compare_html(one, two):
     two = two.replace('><', '>\n<')
     for i, line in enumerate(one.splitlines()):
         other = two.splitlines()[i]
-        # FIXME
-        #if line.lstrip() != other.lstrip():
-        #    eq_(line.lstrip(), other.lstrip())
+        if line.lstrip() != other.lstrip():
+            eq_(line.lstrip(), other.lstrip())
 
 
 class Tests(unittest.TestCase):
@@ -1599,7 +1600,7 @@ class Tests(unittest.TestCase):
 
         html = """<html>
         <head>
-        <link href="tests/test-external-links.css" rel="stylesheet" type="text/css">
+        <link href="test-external-links.css" rel="stylesheet" type="text/css">
         <style type="text/css">
         h1 { color: red; }
         </style>
@@ -1631,7 +1632,7 @@ class Tests(unittest.TestCase):
         p = Premailer(html,
                       strip_important=False,
                       external_styles='test-external-styles.css',
-                      base_path='premailer/tests/')
+                      base_path='premailer/tests')
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
