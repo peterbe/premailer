@@ -268,10 +268,13 @@ class Premailer(object):
                 these_rules, these_leftover = self._parse_style_rules(css_body, index)
                 index += 1
                 rules.extend(these_rules)
-                if these_leftover:
+                if these_leftover or self.keep_style_tags:
                     style = etree.Element('style')
                     style.attrib['type'] = 'text/css'
-                    style.text = self._css_rules_to_string(these_leftover)
+                    if self.keep_style_tags:
+                        style.text = css_body
+                    else:
+                        style.text = self._css_rules_to_string(these_leftover)
                     head = CSSSelector('head')(page)
                     if head:
                         head[0].append(style)

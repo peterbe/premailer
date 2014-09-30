@@ -1409,7 +1409,8 @@ class Tests(unittest.TestCase):
             main([
                 '-f',
                 'premailer/tests/test-issue78.html',
-                '--preserve-style-tags'
+                '--preserve-style-tags',
+                '--external-style=premailer/tests/test-external-styles.css',
             ])
 
         result_html = out.getvalue().strip()
@@ -1417,6 +1418,20 @@ class Tests(unittest.TestCase):
         expect_html = """
         <html>
         <head>
+        <style type="text/css">h1 {
+          color: blue;
+        }
+        h2 {
+          color: green;
+        }
+        a {
+          color: pink;
+        }
+        a:hover {
+          color: purple;
+        }
+        </style>
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
         <style type="text/css">
         .yshortcuts a {border-bottom: none !important;}
         @media screen and (max-width: 600px) {
@@ -1427,9 +1442,23 @@ class Tests(unittest.TestCase):
         /* Even comments should be preserved when the keep_style_tags flag is set */
         p {font-size:12px;}
         </style>
+        <style type="text/css">h1 {
+          color: brown;
+        }
+        h2::after {
+          content: "";
+          display: block;
+        }
+        @media all and (max-width: 320px) {
+            h1 {
+                font-size: 12px;
+            }
+        }
+        </style>
         </head>
         <body>
-        <p style="font-size:12px">html</p>
+        <h1 style="color:brown">h1</h1>
+        <p style="font-size:12px"><a href="" style="{color:pink} :hover{color:purple}">html</a></p>
         </body>
         </html>
         """
@@ -1441,20 +1470,28 @@ class Tests(unittest.TestCase):
             main([
                 '-f',
                 'premailer/tests/test-issue78.html',
+                '--external-style=premailer/tests/test-external-styles.css',
             ])
 
         result_html = out.getvalue().strip()
         expect_html = """
         <html>
         <head>
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
         <style type="text/css">@media screen and (max-width: 600px) {
             table[class="container"] {
                 width: 100% !important
                 }
             }</style>
+        <style type="text/css">@media all and (max-width: 320px) {
+            h1 {
+                font-size: 12px !important
+                }
+            }</style>
         </head>
         <body>
-        <p style="font-size:12px">html</p>
+        <h1 style="color:brown">h1</h1>
+        <p style="font-size:12px"><a href="" style="{color:pink} :hover{color:purple}">html</a></p>
         </body>
         </html>
         """
