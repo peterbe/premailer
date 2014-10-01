@@ -87,7 +87,6 @@ def compare_html(one, two):
             eq_(line.lstrip(), other.lstrip())
 
 
-
 class Tests(unittest.TestCase):
 
     def shortDescription(self):
@@ -607,16 +606,16 @@ class Tests(unittest.TestCase):
         # because we're dealing with random dicts here we can't predict what
         # order the style attribute will be written in so we'll look for
         # things manually.
-        e = '<p style="::first-letter{font-size:300%; float:left}">'\
+        e = '<p style="::first-letter{float:left; font-size:300%}">'\
             'Paragraph</p>'
         self.fragment_in_html(e, result_html, True)
 
-        e = 'style="{color:red; border:1px solid green}'
-        self.fragment_in_html(e, result_html, True)
+        e = 'style="{border:1px solid green; color:red}'
+        self.fragment_in_html(e, result_html)
         e = ' :visited{border:1px solid green}'
-        self.fragment_in_html(e, result_html, True)
+        self.fragment_in_html(e, result_html)
         e = ' :hover{border:1px solid green; text-decoration:none}'
-        self.fragment_in_html(e, result_html, True)
+        self.fragment_in_html(e, result_html)
 
     def test_css_with_pseudoclasses_excluded(self):
         "Skip things like `a:hover{}` and keep them in the style block"
@@ -824,7 +823,7 @@ class Tests(unittest.TestCase):
         <head>
         </head>
         <body>
-        <p style="height:100%; width:100%" width="100%" height="100%">Paragraph</p>
+        <p style="height:100%; width:100%" height="100%" width="100%">Paragraph</p>
         </body>
         </html>"""
 

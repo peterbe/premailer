@@ -1,4 +1,5 @@
 from __future__ import absolute_import, unicode_literals, print_function
+from collections import OrderedDict
 import sys
 import threading
 if sys.version_info >= (3, ):  # As in, Python 3
@@ -59,7 +60,7 @@ def merge_styles(old, new, class_=''):
 
     def csstext_to_pairs(csstext):
         parsed = cssutils.css.CSSVariablesDeclaration(csstext)
-        for key in parsed:
+        for key in sorted(parsed):
             yield (key, parsed.getVariableValue(key))
 
     new_keys = set()
@@ -413,7 +414,7 @@ class Premailer(object):
           style_content.count('{') == style_content.count('{'):
             style_content = style_content.split('}')[0][1:]
 
-        attributes = {}
+        attributes = OrderedDict()
         for key, value in [x.split(':') for x in style_content.split(';')
                            if len(x.split(':')) == 2]:
             key = key.strip()
