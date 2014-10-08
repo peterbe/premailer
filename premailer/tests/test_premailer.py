@@ -1,9 +1,15 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 import sys
 import re
 import unittest
 from contextlib import contextmanager
-from StringIO import StringIO
+if sys.version_info >= (3, ):  # As in, Python 3
+    from urllib.request import urlopen
+else:  # Python 2
+    #lint:disable
+    from urllib2 import urlopen
+    #lint:enable
+from io import BytesIO, StringIO  # Yes, the is an io lib in py2.x
 import gzip
 
 from nose.tools import eq_, ok_, assert_raises
@@ -14,9 +20,10 @@ from premailer.premailer import (
     transform,
     Premailer,
     merge_styles,
-    ExternalNotFoundError
+    ExternalNotFoundError,
 )
 from premailer.__main__ import main
+import premailer.premailer  # lint:ok
 
 
 whitespace_between_tags = re.compile('>\s*<')
@@ -45,7 +52,6 @@ def provide_input(content):
         sys.stdin = StringIO(content)
 
 
-
 class MockResponse:
 
     def __init__(self, content, gzip=False):
@@ -58,14 +64,20 @@ class MockResponse:
             return {'Content-Encoding': 'gzip'}
         else:
             return {}
+
     def read(self):
         if self.gzip:
-            out = StringIO()
-            with gzip.GzipFile(fileobj=out, mode="w") as f:
-                f.write(self.content)
+            out = BytesIO()
+            # If we didn't have to support python 2.6 we could instead do:
+            #   with gzip.GzipFile(fileobj=out, mode="w") as f:
+            #       ...
+            f = gzip.GzipFile(fileobj=out, mode="w")
+            f.write(self.content)
+            f.close()
             return out.getvalue()
         else:
             return self.content
+
 
 def compare_html(one, two):
     one = one.strip()
@@ -78,6 +90,7 @@ def compare_html(one, two):
         other = two.splitlines()[i]
         if line.lstrip() != other.lstrip():
             eq_(line.lstrip(), other.lstrip())
+
 
 class Tests(unittest.TestCase):
 
@@ -125,7 +138,7 @@ class Tests(unittest.TestCase):
         )
         result = merge_styles(old, new)
         for each in expect:
-           ok_(each in result)
+            ok_(each in result)
 
     def test_basic_html(self):
         """test the simplest case"""
@@ -543,7 +556,6 @@ class Tests(unittest.TestCase):
         #   from premailer import transform
         #   print transform(html, base_url=base_url)
 
-
         html = '''<html>
         <head>
         <style type="text/css">h1{color:#123}</style>
@@ -564,6 +576,13 @@ class Tests(unittest.TestCase):
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
+
+    def fragment_in_html(self, fragment, html, fullMessage=False):
+        if fullMessage:
+            message = '"{0}" not in\n{1}'.format(fragment, html)
+        else:
+            message = '"{0}" not in HTML'.format(fragment)
+        ok_(fragment in html, message)
 
     def test_css_with_pseudoclasses_included(self):
         "Pick up the pseudoclasses too and include them"
@@ -590,15 +609,18 @@ class Tests(unittest.TestCase):
         result_html = p.transform()
 
         # because we're dealing with random dicts here we can't predict what
-        # order the style attribute will be written in so we'll look for things
-        # manually.
-        ok_('<p style="::first-letter{font-size:300%; float:left}">'
-            'Paragraph</p>' in result_html)
+        # order the style attribute will be written in so we'll look for
+        # things manually.
+        e = '<p style="::first-letter{float:left; font-size:300%}">'\
+            'Paragraph</p>'
+        self.fragment_in_html(e, result_html, True)
 
-        ok_('style="{color:red; border:1px solid green}' in result_html)
-        ok_(' :visited{border:1px solid green}' in result_html)
-        ok_(' :hover{border:1px solid green; text-decoration:none}' in
-            result_html)
+        e = 'style="{border:1px solid green; color:red}'
+        self.fragment_in_html(e, result_html)
+        e = ' :visited{border:1px solid green}'
+        self.fragment_in_html(e, result_html)
+        e = ' :hover{border:1px solid green; text-decoration:none}'
+        self.fragment_in_html(e, result_html)
 
     def test_css_with_pseudoclasses_excluded(self):
         "Skip things like `a:hover{}` and keep them in the style block"
@@ -744,7 +766,7 @@ class Tests(unittest.TestCase):
         # stupidity test
         import os
 
-        html_file = os.path.join(os.path.dirname(__file__),
+        html_file = os.path.join('premailer', 'tests',
                                  'test-apple-newsletter.html')
         html = open(html_file).read()
 
@@ -806,7 +828,7 @@ class Tests(unittest.TestCase):
         <head>
         </head>
         <body>
-        <p style="height:100%; width:100%" width="100%" height="100%">Paragraph</p>
+        <p style="height:100%; width:100%" height="100%" width="100%">Paragraph</p>
         </body>
         </html>"""
 
@@ -1511,6 +1533,7 @@ class Tests(unittest.TestCase):
         class RepeatMergeStylesThread(threading.Thread):
             """The thread is instantiated by test and run multiple times in parallel."""
             exc = None
+
             def __init__(self, old, new, class_):
                 """The constructor just stores merge_styles parameters"""
                 super(RepeatMergeStylesThread, self).__init__()
@@ -1521,7 +1544,7 @@ class Tests(unittest.TestCase):
                 for i in range(0, REPEATS):
                     try:
                         merge_styles(self.old, self.new, self.class_)
-                    except Exception, e:
+                    except Exception as e:
                         logging.exception("Exception in thread %s", self.name)
                         self.exc = e
 
@@ -1530,7 +1553,10 @@ class Tests(unittest.TestCase):
         class_ = ''
 
         # start multiple threads concurrently; each calls merge_styles many times
-        threads = [RepeatMergeStylesThread(old, new, class_) for i in range(0, THREADS)]
+        threads = [
+            RepeatMergeStylesThread(old, new, class_)
+            for i in range(0, THREADS)
+        ]
         for t in threads:
             t.start()
 
@@ -1625,7 +1651,7 @@ class Tests(unittest.TestCase):
 
         html = """<html>
         <head>
-        <link href="tests/test-external-links.css" rel="stylesheet" type="text/css">
+        <link href="test-external-links.css" rel="stylesheet" type="text/css">
         <style type="text/css">
         h1 { color: red; }
         </style>
@@ -1654,16 +1680,53 @@ class Tests(unittest.TestCase):
         </body>
         </html>"""
 
-        p = Premailer(html,
+        p = Premailer(
+            html,
             strip_important=False,
-            external_styles='tests/test-external-styles.css',
-            base_path='premailer/')
+            external_styles='test-external-styles.css',
+            base_path='premailer/tests/')
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
 
-    @mock.patch('premailer.premailer.urllib2')
-    def test_external_styles_on_http(self, urllib2):
+    @mock.patch('premailer.premailer.urlopen')
+    def test_load_external_url(self, mocked_url_open):
+        'Test premailer.premailer.Premailer._load_external_url'
+        faux_response = b'This is not a response'
+        faux_uri = 'https://example.com/site.css'
+        mocked_url_open.return_value = MockResponse(faux_response)
+        p = premailer.premailer.Premailer('<p>A paragraph</p>')
+        r = p._load_external_url(faux_uri)
+
+        mocked_url_open.assert_called_once_with(faux_uri)
+        self.assertEqual(faux_response.decode('utf-8'), r)
+
+    @mock.patch('premailer.premailer.urlopen')
+    def test_load_external_url_gzip(self, mocked_url_open):
+        'Test premailer.premailer.Premailer._load_external_url with gzip'
+        faux_response = b'This is not a response'
+        faux_uri = 'http://example.com/site.css'
+        mocked_url_open.return_value = MockResponse(faux_response, True)
+        p = premailer.premailer.Premailer('<p>A paragraph</p>')
+        r = p._load_external_url(faux_uri)
+
+        mocked_url_open.assert_called_once_with(faux_uri)
+        self.assertEqual(faux_response.decode('utf-8'), r)
+
+    @staticmethod
+    def mocked_urlopen(url):
+        'The standard "response" from the "server".'
+        retval = ''
+        if 'style1.css' in url:
+            retval = "h1 { color: brown }"
+        elif 'style2.css' in url:
+            retval = "h2 { color: pink }"
+        elif 'style3.css' in url:
+            retval = "h3 { color: red }"
+        return retval
+
+    @mock.patch.object(Premailer, '_load_external_url')
+    def test_external_styles_on_http(self, mocked_pleu):
         """Test loading styles that are genuinely external"""
 
         html = """<html>
@@ -1678,6 +1741,17 @@ class Tests(unittest.TestCase):
         <h3>World</h3>
         </body>
         </html>"""
+        mocked_pleu.side_effect = self.mocked_urlopen
+        p = Premailer(html)
+        result_html = p.transform()
+
+        # Expected values are tuples of the positional values (as another
+        # tuple) and the ketword arguments (which are all null), hence the
+        # following Lisp-like explosion of brackets and commas.
+        expected_args = [(('https://www.com/style1.css',),),
+                         (('http://www.com/style2.css',),),
+                         (('http://www.com/style3.css',),)]
+        eq_(expected_args, mocked_pleu.call_args_list)
 
         expect_html = """<html>
         <head>
@@ -1688,29 +1762,10 @@ class Tests(unittest.TestCase):
         <h3 style="color:red">World</h3>
         </body>
         </html>"""
-
-        def mocked_urlopen(url):
-            if 'style1.css' in url:
-                return MockResponse(
-                    "h1 { color: brown }"
-                )
-            if 'style2.css' in url:
-                return MockResponse(
-                    "h2 { color: pink }"
-                )
-            if 'style3.css' in url:
-                return MockResponse(
-                    "h3 { color: red }", gzip=True
-                )
-        urllib2.urlopen = mocked_urlopen
-
-        p = Premailer(html)
-        result_html = p.transform()
-
         compare_html(expect_html, result_html)
 
-    @mock.patch('premailer.premailer.urllib2')
-    def test_external_styles_on_https(self, urllib2):
+    @mock.patch.object(Premailer, '_load_external_url')
+    def test_external_styles_on_https(self, mocked_pleu):
         """Test loading styles that are genuinely external"""
 
         html = """<html>
@@ -1726,6 +1781,14 @@ class Tests(unittest.TestCase):
         </body>
         </html>"""
 
+        mocked_pleu.side_effect = self.mocked_urlopen
+        p = Premailer(html, base_url='https://www.peterbe.com')
+        result_html = p.transform()
+
+        expected_args = [(('https://www.com/style1.css',),),
+                         (('https://www.com/style2.css',),),
+                         (('https://www.peterbe.com/style3.css',),)]
+        self.assertEqual(expected_args, mocked_pleu.call_args_list)
         expect_html = """<html>
         <head>
         </head>
@@ -1735,33 +1798,10 @@ class Tests(unittest.TestCase):
         <h3 style="color:red">World</h3>
         </body>
         </html>"""
-
-        def mocked_urlopen(url):
-            ok_(url.startswith('https://'))
-            if 'style1.css' in url:
-                return MockResponse(
-                    "h1 { color: brown }"
-                )
-            if 'style2.css' in url:
-                return MockResponse(
-                    "h2 { color: pink }"
-                )
-            if 'style3.css' in url:
-                return MockResponse(
-                    "h3 { color: red }", gzip=True
-                )
-        urllib2.urlopen = mocked_urlopen
-
-        p = Premailer(
-            html,
-            base_url='https://www.peterbe.com'
-        )
-        result_html = p.transform()
-
         compare_html(expect_html, result_html)
 
-    @mock.patch('premailer.premailer.urllib2')
-    def test_external_styles_with_base_url(self, urllib2):
+    @mock.patch.object(Premailer, '_load_external_url')
+    def test_external_styles_with_base_url(self, mocked_pleu):
         """Test loading styles that are genuinely external if you use
         the base_url"""
 
@@ -1773,6 +1813,11 @@ class Tests(unittest.TestCase):
         <h1>Hello</h1>
         </body>
         </html>"""
+        mocked_pleu.return_value = "h1 { color: brown }"
+        p = Premailer(html, base_url='http://www.peterbe.com/')
+        result_html = p.transform()
+        expected_args = [(('http://www.peterbe.com/style.css',),), ]
+        self.assertEqual(expected_args, mocked_pleu.call_args_list)
 
         expect_html = """<html>
         <head>
@@ -1781,22 +1826,6 @@ class Tests(unittest.TestCase):
         <h1 style="color:brown">Hello</h1>
         </body>
         </html>"""
-
-        def mocked_urlopen(url):
-            if url == 'http://www.peterbe.com/style.css':
-                return MockResponse(
-                    "h1 { color: brown }"
-                )
-            raise NotImplementedError(url)
-
-        urllib2.urlopen = mocked_urlopen
-
-        p = Premailer(
-            html,
-            base_url='http://www.peterbe.com/'
-        )
-        result_html = p.transform()
-
         compare_html(expect_html, result_html)
 
     def test_disabled_validator(self):
@@ -1854,7 +1883,6 @@ class Tests(unittest.TestCase):
         result_html = p.transform()
         ok_('/* comment */' in result_html)
 
-
     def test_fontface_selectors_with_no_selectortext(self):
         """
         @font-face selectors are weird.
@@ -1882,7 +1910,6 @@ class Tests(unittest.TestCase):
 
         p = Premailer(html, disable_validation=True)
         p.transform()  # it should just work
-
 
     def test_keyframe_selectors(self):
         """
