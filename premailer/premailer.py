@@ -6,7 +6,8 @@ except ImportError:  # pragma: no cover
     from ordereddict import OrderedDict
 import sys
 import threading
-if sys.version_info >= (3, ):  # As in, Python 3
+if sys.version_info >= (3, ):  # pragma: no cover
+    # As in, Python 3
     from io import StringIO
     from urllib.request import urlopen
     from urllib.parse import urljoin
