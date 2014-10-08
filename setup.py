@@ -1,6 +1,7 @@
 import codecs
 import os.path
 import re
+import sys
 
 # Prevent spurious errors during `python setup.py test`, a la
 # http://www.eby-sarna.com/pipermail/peak/2010-May/003357.html:
@@ -35,6 +36,18 @@ def find_version(*file_paths):
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
+install_requires = [
+    'lxml',
+    'cssselect',
+    'cssutils',
+]
+if sys.version_info >= (2, 6) and sys.version_info <= (2, 7):
+    # Python 2.6 is the oldest version we support and it
+    # needs some extra stuff
+    install_requires.extend([
+        'argparse',
+        'ordereddict',
+    ])
 
 setup(
     name='premailer',
@@ -55,6 +68,7 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.3",
@@ -71,9 +85,5 @@ setup(
     test_suite='nose.collector',
     tests_require=['nose', 'mock'],
     zip_safe=False,
-    install_requires=[
-        'lxml',
-        'cssselect',
-        'cssutils',
-    ],
+    install_requires=install_requires,
 )
