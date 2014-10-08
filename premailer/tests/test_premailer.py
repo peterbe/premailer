@@ -23,6 +23,7 @@ from premailer.premailer import (
     ExternalNotFoundError,
 )
 from premailer.__main__ import main
+import premailer.premailer  # lint:ok
 
 
 whitespace_between_tags = re.compile('>\s*<')
@@ -1647,31 +1648,29 @@ class Tests(unittest.TestCase):
 
         compare_html(expect_html, result_html)
 
-    def test_load_external_url(self):
+    @mock.patch('premailer.premailer.urlopen')
+    def test_load_external_url(self, mocked_url_open):
         'Test premailer.premailer.Premailer._load_external_url'
-        import premailer.premailer  # lint:ok
-        with mock.patch('premailer.premailer.urlopen') as mocked_url_open:
-            faux_response = b'This is not a response'
-            faux_uri = 'https://example.com/site.css'
-            mocked_url_open.return_value = MockResponse(faux_response)
-            p = premailer.premailer.Premailer('<p>A paragraph</p>')
-            r = p._load_external_url(faux_uri)
+        faux_response = b'This is not a response'
+        faux_uri = 'https://example.com/site.css'
+        mocked_url_open.return_value = MockResponse(faux_response)
+        p = premailer.premailer.Premailer('<p>A paragraph</p>')
+        r = p._load_external_url(faux_uri)
 
-            mocked_url_open.assert_called_once_with(faux_uri)
-            self.assertEqual(faux_response.decode('utf-8'), r)
+        mocked_url_open.assert_called_once_with(faux_uri)
+        self.assertEqual(faux_response.decode('utf-8'), r)
 
-    def test_load_external_url_gzip(self):
+    @mock.patch('premailer.premailer.urlopen')
+    def test_load_external_url_gzip(self, mocked_url_open):
         'Test premailer.premailer.Premailer._load_external_url with gzip'
-        import premailer.premailer  # lint:ok
-        with mock.patch('premailer.premailer.urlopen') as mocked_url_open:
-            faux_response = b'This is not a response'
-            faux_uri = 'http://example.com/site.css'
-            mocked_url_open.return_value = MockResponse(faux_response, True)
-            p = premailer.premailer.Premailer('<p>A paragraph</p>')
-            r = p._load_external_url(faux_uri)
+        faux_response = b'This is not a response'
+        faux_uri = 'http://example.com/site.css'
+        mocked_url_open.return_value = MockResponse(faux_response, True)
+        p = premailer.premailer.Premailer('<p>A paragraph</p>')
+        r = p._load_external_url(faux_uri)
 
-            mocked_url_open.assert_called_once_with(faux_uri)
-            self.assertEqual(faux_response.decode('utf-8'), r)
+        mocked_url_open.assert_called_once_with(faux_uri)
+        self.assertEqual(faux_response.decode('utf-8'), r)
 
     @staticmethod
     def mocked_urlopen(url):
