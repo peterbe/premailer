@@ -1711,7 +1711,7 @@ class Tests(unittest.TestCase):
         expected_args = [(('https://www.com/style1.css',),),
                          (('http://www.com/style2.css',),),
                          (('http://www.com/style3.css',),)]
-        self.assertEqual(expected_args, mocked_pleu.call_args_list)
+        eq_(expected_args, mocked_pleu.call_args_list)
 
         expect_html = """<html>
         <head>
