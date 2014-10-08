@@ -1650,28 +1650,28 @@ class Tests(unittest.TestCase):
     def test_load_external_url(self):
         'Test premailer.premailer.Premailer._load_external_url'
         import premailer.premailer  # lint:ok
-        with mock.patch('premailer.premailer.urlopen') as mockedUrlOpen:
-            fauxResponse = b'This is not a response'
-            fauxUri = 'https://example.com/site.css'
-            mockedUrlOpen.return_value = MockResponse(fauxResponse)
+        with mock.patch('premailer.premailer.urlopen') as mocked_url_open:
+            faux_response = b'This is not a response'
+            faux_uri = 'https://example.com/site.css'
+            mocked_url_open.return_value = MockResponse(faux_response)
             p = premailer.premailer.Premailer('<p>A paragraph</p>')
-            r = p._load_external_url(fauxUri)
+            r = p._load_external_url(faux_uri)
 
-            mockedUrlOpen.assert_called_once_with(fauxUri)
-            self.assertEqual(fauxResponse.decode('utf-8'), r)
+            mocked_url_open.assert_called_once_with(faux_uri)
+            self.assertEqual(faux_response.decode('utf-8'), r)
 
     def test_load_external_url_gzip(self):
         'Test premailer.premailer.Premailer._load_external_url with gzip'
         import premailer.premailer  # lint:ok
-        with mock.patch('premailer.premailer.urlopen') as mockedUrlOpen:
-            fauxResponse = b'This is not a response'
-            fauxUri = 'http://example.com/site.css'
-            mockedUrlOpen.return_value = MockResponse(fauxResponse, True)
+        with mock.patch('premailer.premailer.urlopen') as mocked_url_open:
+            faux_response = b'This is not a response'
+            faux_uri = 'http://example.com/site.css'
+            mocked_url_open.return_value = MockResponse(faux_response, True)
             p = premailer.premailer.Premailer('<p>A paragraph</p>')
-            r = p._load_external_url(fauxUri)
+            r = p._load_external_url(faux_uri)
 
-            mockedUrlOpen.assert_called_once_with(fauxUri)
-            self.assertEqual(fauxResponse.decode('utf-8'), r)
+            mocked_url_open.assert_called_once_with(faux_uri)
+            self.assertEqual(faux_response.decode('utf-8'), r)
 
     @staticmethod
     def mocked_urlopen(url):
@@ -1708,10 +1708,10 @@ class Tests(unittest.TestCase):
         # Expected values are tuples of the positional values (as another
         # tuple) and the ketword arguments (which are all null), hence the
         # following Lisp-like explosion of brackets and commas.
-        expectedArgs = [(('https://www.com/style1.css',),),
-                        (('http://www.com/style2.css',),),
-                        (('http://www.com/style3.css',),)]
-        self.assertEqual(expectedArgs, mocked_pleu.call_args_list)
+        expected_args = [(('https://www.com/style1.css',),),
+                         (('http://www.com/style2.css',),),
+                         (('http://www.com/style3.css',),)]
+        self.assertEqual(expected_args, mocked_pleu.call_args_list)
 
         expect_html = """<html>
         <head>
@@ -1745,10 +1745,10 @@ class Tests(unittest.TestCase):
         p = Premailer(html, base_url='https://www.peterbe.com')
         result_html = p.transform()
 
-        expectedArgs = [(('https://www.com/style1.css',),),
-                        (('https://www.com/style2.css',),),
-                        (('https://www.peterbe.com/style3.css',),)]
-        self.assertEqual(expectedArgs, mocked_pleu.call_args_list)
+        expected_args = [(('https://www.com/style1.css',),),
+                         (('https://www.com/style2.css',),),
+                         (('https://www.peterbe.com/style3.css',),)]
+        self.assertEqual(expected_args, mocked_pleu.call_args_list)
         expect_html = """<html>
         <head>
         </head>
@@ -1776,8 +1776,8 @@ class Tests(unittest.TestCase):
         mocked_pleu.return_value = "h1 { color: brown }"
         p = Premailer(html, base_url='http://www.peterbe.com/')
         result_html = p.transform()
-        expectedArgs = [(('http://www.peterbe.com/style.css',),), ]
-        self.assertEqual(expectedArgs, mocked_pleu.call_args_list)
+        expected_args = [(('http://www.peterbe.com/style.css',),), ]
+        self.assertEqual(expected_args, mocked_pleu.call_args_list)
 
         expect_html = """<html>
         <head>
@@ -1843,7 +1843,6 @@ class Tests(unittest.TestCase):
         result_html = p.transform()
         ok_('/* comment */' in result_html)
 
-
     def test_fontface_selectors_with_no_selectortext(self):
         """
         @font-face selectors are weird.
@@ -1871,7 +1870,6 @@ class Tests(unittest.TestCase):
 
         p = Premailer(html, disable_validation=True)
         p.transform()  # it should just work
-
 
     def test_keyframe_selectors(self):
         """
