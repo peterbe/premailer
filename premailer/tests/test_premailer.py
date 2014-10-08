@@ -68,8 +68,12 @@ class MockResponse:
     def read(self):
         if self.gzip:
             out = BytesIO()
-            with gzip.GzipFile(fileobj=out, mode="w") as f:
-                f.write(self.content)
+            # If we didn't have to support python 2.6 we could instead do:
+            #   with gzip.GzipFile(fileobj=out, mode="w") as f:
+            #       ...
+            f = gzip.GzipFile(fileobj=out, mode="w")
+            f.write(self.content)
+            f.close()
             return out.getvalue()
         else:
             return self.content

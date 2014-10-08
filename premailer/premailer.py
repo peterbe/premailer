@@ -1,5 +1,9 @@
 from __future__ import absolute_import, unicode_literals, print_function
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:  # pragma: no cover
+    # some old python 2.6 thing then, eh?
+    from ordereddict import OrderedDict
 import sys
 import threading
 if sys.version_info >= (3, ):  # As in, Python 3
