@@ -1511,8 +1511,10 @@ class Tests(unittest.TestCase):
         class_ = ''
 
         # start multiple threads concurrently; each calls merge_styles many times
-        threads = [RepeatMergeStylesThread(old, new, class_)
-                   for i in range(0, THREADS)]
+        threads = [
+            RepeatMergeStylesThread(old, new, class_)
+            for i in range(0, THREADS)
+        ]
         for t in threads:
             t.start()
 
