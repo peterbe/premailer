@@ -1638,10 +1638,11 @@ class Tests(unittest.TestCase):
         </body>
         </html>"""
 
-        p = Premailer(html,
-                      strip_important=False,
-                      external_styles='test-external-styles.css',
-                      base_path='premailer/tests/')
+        p = Premailer(
+            html,
+            strip_important=False,
+            external_styles='test-external-styles.css',
+            base_path='premailer/tests/')
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
