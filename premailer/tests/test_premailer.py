@@ -1713,6 +1713,109 @@ class Tests(unittest.TestCase):
         mocked_url_open.assert_called_once_with(faux_uri)
         self.assertEqual(faux_response.decode('utf-8'), r)
 
+    def test_css_text(self):
+        """Test handling css_text passed as a string"""
+
+        html = """<html>
+        <head>
+        </head>
+        <body>
+        <h1>Hello</h1>
+        <h2>Hello</h2>
+        <a href="">Hello</a>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        <style type="text/css">@media all and (max-width: 320px) {
+            h1 {
+                color: black !important
+                }
+            }</style>
+        </head>
+        <body>
+        <h1 style="color:brown">Hello</h1>
+        <h2 style="color:green">Hello</h2>
+        <a href="" style="color:pink">Hello</a>
+        </body>
+        </html>"""
+
+        css_text = """
+        h1 {
+            color: brown;
+        }
+        h2 {
+            color: green;
+        }
+        a {
+            color: pink;
+        }
+        @media all and (max-width: 320px) {
+            h1 {
+                color: black;
+            }
+        }
+
+        """
+
+        p = Premailer(
+            html,
+            strip_important=False,
+            css_text=[css_text])
+        result_html = p.transform()
+
+        compare_html(expect_html, result_html)
+
+    def test_css_text_with_only_body_present(self):
+        """Test handling css_text passed as a string when no <html> or <head> is present"""
+
+        html = """<body>
+        <h1>Hello</h1>
+        <h2>Hello</h2>
+        <a href="">Hello</a>
+        </body>"""
+
+        expect_html = """<html>
+        <head>
+        <style type="text/css">@media all and (max-width: 320px) {
+            h1 {
+                color: black !important
+                }
+            }</style>
+        </head>
+        <body>
+        <h1 style="color:brown">Hello</h1>
+        <h2 style="color:green">Hello</h2>
+        <a href="" style="color:pink">Hello</a>
+        </body>
+        </html>"""
+
+        css_text = """
+        h1 {
+            color: brown;
+        }
+        h2 {
+            color: green;
+        }
+        a {
+            color: pink;
+        }
+        @media all and (max-width: 320px) {
+            h1 {
+                color: black;
+            }
+        }
+        """
+
+        p = Premailer(
+            html,
+            strip_important=False,
+            css_text=css_text)
+        result_html = p.transform()
+
+        compare_html(expect_html, result_html)
+
     @staticmethod
     def mocked_urlopen(url):
         'The standard "response" from the "server".'

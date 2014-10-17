@@ -115,11 +115,25 @@ def merge_styles(old, new, class_=''):
 # The bug is documented in issue #65. The bug's reproduction test in test_premailer.test_multithreading.
 merge_styles._lock = threading.RLock()
 
+
 def make_important(bulk):
     """makes every property in a string !important.
     """
     return ';'.join('%s !important' % p if not p.endswith('!important') else p
                     for p in bulk.split(';'))
+
+
+def get_or_create_head(root):
+    """Ensures that `root` contains a <head> element and returns it.
+    """
+    head = CSSSelector('head')(root)
+    if not head:
+        head = etree.Element('head')
+        body = CSSSelector('body')(root)[0]
+        body.getparent().insert(0, head)
+        return head
+    else:
+        return head[0]
 
 
 _element_selector_regex = re.compile(r'(^|\s)\w')
@@ -141,6 +155,7 @@ class Premailer(object):
                  remove_classes=True,
                  strip_important=True,
                  external_styles=None,
+                 css_text=None,
                  method="html",
                  base_path=None,
                  disable_basic_attributes=None,
@@ -159,6 +174,9 @@ class Premailer(object):
         if isinstance(external_styles, STR_TYPE):
             external_styles = [external_styles]
         self.external_styles = external_styles
+        if isinstance(css_text, STR_TYPE):
+            css_text = [css_text]
+        self.css_text = css_text
         self.strip_important = strip_important
         self.method = method
         self.base_path = base_path
@@ -231,6 +249,8 @@ class Premailer(object):
 
         assert page is not None
 
+        head = get_or_create_head(tree)
+
         ##
         ## style selectors
         ##
@@ -277,22 +297,18 @@ class Premailer(object):
             elif not self.keep_style_tags or not is_style:
                 parent_of_element.remove(element)
 
+        # external style files
         if self.external_styles:
             for stylefile in self.external_styles:
                 css_body = self._load_external(stylefile)
-                these_rules, these_leftover = self._parse_style_rules(css_body, index)
+                self._process_css_text(css_body, index, rules, head)
                 index += 1
-                rules.extend(these_rules)
-                if these_leftover or self.keep_style_tags:
-                    style = etree.Element('style')
-                    style.attrib['type'] = 'text/css'
-                    if self.keep_style_tags:
-                        style.text = css_body
-                    else:
-                        style.text = self._css_rules_to_string(these_leftover)
-                    head = CSSSelector('head')(page)
-                    if head:
-                        head[0].append(style)
+
+        # css text
+        if self.css_text:
+            for css_body in self.css_text:
+                self._process_css_text(css_body, index, rules, head)
+                index += 1
 
         # rules is a tuple of (specificity, selector, styles), where specificity is a tuple
         # ordered such that more specific rules sort larger.
@@ -347,16 +363,13 @@ class Premailer(object):
             for attr in ('href', 'src'):
                 for item in page.xpath("//@%s" % attr):
                     parent = item.getparent()
-                    if attr == 'href' and self.preserve_internal_links \
-                           and parent.attrib[attr].startswith('#'):
+                    if attr == 'href' and self.preserve_internal_links and parent.attrib[attr].startswith('#'):
                         continue
-                    if attr == 'src' and self.preserve_inline_attachments \
-                           and parent.attrib[attr].startswith('cid:'):
+                    if attr == 'src' and self.preserve_inline_attachments and parent.attrib[attr].startswith('cid:'):
                         continue
                     if not self.base_url.endswith('/'):
                         self.base_url += '/'
-                    parent.attrib[attr] = urljoin(self.base_url,
-                        parent.attrib[attr].lstrip('/'))
+                    parent.attrib[attr] = urljoin(self.base_url, parent.attrib[attr].lstrip('/'))
 
         kwargs.setdefault('method', self.method)
         kwargs.setdefault('pretty_print', pretty_print)
@@ -418,8 +431,7 @@ class Premailer(object):
         Note, the style_content can contain pseudoclasses like:
         '{color:red; border:1px solid green} :visited{border:1px solid green}'
         """
-        if style_content.count('}') and \
-          style_content.count('{') == style_content.count('{'):
+        if style_content.count('}') and style_content.count('{') == style_content.count('{'):
             style_content = style_content.split('}')[0][1:]
 
         attributes = OrderedDict()
@@ -438,9 +450,6 @@ class Premailer(object):
                 if value.endswith('px'):
                     value = value[:-2]
                 attributes[key] = value
-            #else:
-            #    print "key", repr(key)
-            #    print 'value', repr(value)
 
         for key, value in attributes.items():
             if key in element.attrib and not force or key in self.disable_basic_attributes:
@@ -468,6 +477,21 @@ class Premailer(object):
                         )
                 lines.append(item.cssText)
         return '\n'.join(lines)
+
+    def _process_css_text(self, css_text, index, rules, head):
+        """processes the given css_text by adding rules that can be in-lined to the given rules list and
+        adding any that cannot be in-lined to the given `<head>` element
+        """
+        these_rules, these_leftover = self._parse_style_rules(css_text, index)
+        rules.extend(these_rules)
+        if these_leftover or self.keep_style_tags:
+            style = etree.Element('style')
+            style.attrib['type'] = 'text/css'
+            if self.keep_style_tags:
+                style.text = css_text
+            else:
+                style.text = self._css_rules_to_string(these_leftover)
+            head.append(style)
 
 
 def transform(html, base_url=None):

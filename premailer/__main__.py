@@ -83,6 +83,12 @@ def main(args):
         "--external-style", action="append", dest="external_styles",
         help="The path to an external stylesheet to be loaded."
     )
+
+    parser.add_argument(
+        "--css-text", action="append", dest="css_text",
+        help="CSS text to be applied to the html."
+    )
+
     parser.add_argument(
         "--disable-basic-attributes", dest="disable_basic_attributes",
         help="Disable provided basic attributes (comma separated)", default=[]
@@ -113,6 +119,7 @@ def main(args):
         remove_classes=options.remove_classes,
         strip_important=options.strip_important,
         external_styles=options.external_styles,
+        css_text=options.css_text,
         method=options.method,
         base_path=options.base_path,
         disable_basic_attributes=options.disable_basic_attributes,
