@@ -5,6 +5,17 @@ premailer
 
 [![Coverage Status](https://coveralls.io/repos/peterbe/premailer/badge.png?branch=master)](https://coveralls.io/r/peterbe/premailer?branch=master)
 
+Python versions
+---------------
+
+Our [tox.ini](https://github.com/peterbe/premailer/blob/master/tox.ini) makes sure premailer works in:
+
+* Python 2.6
+* Python 2.7
+* Python 3.3
+* Python 3.4
+* PyPy
+
 Turns CSS blocks into style attributes
 --------------------------------------
 
@@ -158,3 +169,17 @@ Having these extra attributes basically as a "back up" for really shit
 email clients that can't even take the style attributes. A lot of
 professional HTML newsletters such as Amazon's use this.
 You can disable some attributes in `disable_basic_attributes`
+
+Running tests with tox
+----------------------
+
+To run `tox` you don't need to have all available Python versions installed because it will only work on those you have. To use `tox` first install it:
+
+    pip install tox
+    
+Then simply start it with:
+
+    tox
+    
+    
+    
