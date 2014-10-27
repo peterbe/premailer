@@ -118,7 +118,7 @@ def main(args):
         disable_basic_attributes=options.disable_basic_attributes,
         disable_validation=options.disable_validation
     )
-    options.outfile.write(p.transform())
+    options.outfile.write(p.transform().encode('utf-8', 'replace'))
     return 0
 
 
