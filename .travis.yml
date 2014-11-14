@@ -3,10 +3,14 @@
 language: python
 
 python:
+  - "2.6"
   - "2.7"
+  - "3.3"
+  - "3.4"
+  - "pypy"
 
 before_install:
-    - pip install coverage
+  - pip install coverage
 
 install:
   - python setup.py install
@@ -15,6 +19,6 @@ script:
   - nosetests premailer --with-cover --cover-erase --cover-package=premailer
 
 after_success:
-    # Report coverage results to coveralls.io
-    - pip install coveralls --use-mirrors
-    - coveralls
+  # Report coverage results to coveralls.io
+  - pip install coveralls --use-mirrors
+  - coveralls
