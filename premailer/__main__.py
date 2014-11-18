@@ -40,12 +40,6 @@ def main(args):
     )
 
     parser.add_argument(
-        "--exclude-pseudoclasses", default=False,
-        help="Pseudo classes like p:last-child', p:first-child, etc",
-        action="store_true", dest="exclude_pseudoclasses"
-    )
-
-    parser.add_argument(
         "--preserve-style-tags", default=False,
         help="Do not delete <style></style> tags from the html document.",
         action="store_true", dest="keep_style_tags"
@@ -113,7 +107,6 @@ def main(args):
         html=html,
         base_url=options.base_url,
         preserve_internal_links=options.preserve_internal_links,
-        exclude_pseudoclasses=options.exclude_pseudoclasses,
         keep_style_tags=options.keep_style_tags,
         include_star_selectors=options.include_star_selectors,
         remove_classes=options.remove_classes,

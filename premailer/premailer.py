@@ -5,7 +5,6 @@ except ImportError:  # pragma: no cover
     # some old python 2.6 thing then, eh?
     from ordereddict import OrderedDict
 import sys
-import threading
 if sys.version_info >= (3, ):  # pragma: no cover
     # As in, Python 3
     from io import StringIO
@@ -46,6 +45,57 @@ class ExternalNotFoundError(ValueError):
 grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
 
 
+def _css_string_to_dict(css):
+    """Given a string containing CSS, creates a dictionary out of it, where the keys are CSS
+    properties and the values are their corresponding values
+    This method assumes that CSS key-value pairs are separated by a semicolon. If this is not true,
+    it can return unexpected results or even break
+    Arguments:
+        - str css: the css text
+    Returns:
+        a dictionary as described above
+    """
+    buff = ''
+    css_properties = []
+    for item in css.split(';'):
+        # if we have any buffer, append the current item to the buffer
+        if buff:
+            item = buff + ';' + item
+            buff = ''
+
+        # if this breaks any parenthesis, brakets, buffer it and continue
+        if _unbalanced(item):
+            buff = item
+            continue
+
+        # we are good to add the property
+        if item.strip():
+            css_properties.append(item.strip())
+
+    # split every property into key, value and store them in a dict
+    d = {}
+    for css_property in css_properties:
+        chunks = css_property.split(':', 1)
+        d[chunks[0].strip()] = chunks[1].strip()
+    return d
+
+
+def _unbalanced(text):
+    """
+    Checks if there is an unbalanced parenthesis or bracket in the provided text. Assumes that
+    the text is processed left to right
+    Arguments:
+        - str text: the text to check
+    Returns:
+        true if its unbalanced, false otherwise
+    """
+    if text.count('(') and text.count('(') != text.count(')'):
+        return True
+    if text.count('{') and text.count('}') != text.count('}'):
+        return True
+    return False
+
+
 def merge_styles(old, new, class_=''):
     """
     if ::
@@ -56,64 +106,11 @@ def merge_styles(old, new, class_=''):
       return 'color: red; font-size:2px; font-weight: bold'
 
     In other words, the new style bits replace the old ones.
-
-    The @class_ parameter can be something like ':hover' and if that
-    is there, you split up the style with '{...} :hover{...}'
-    Note: old could be something like '{...} ::first-letter{...}'
-
     """
-
-    def csstext_to_pairs(csstext):
-        parsed = cssutils.css.CSSVariablesDeclaration(csstext)
-        for key in sorted(parsed):
-            yield (key, parsed.getVariableValue(key))
-
-    new_keys = set()
-    news = []
-
-    # The code below is wrapped in a critical section implemented via ``RLock``-class lock.
-    # The lock is required to avoid ``cssutils`` concurrency issues documented in issue #65
-    with merge_styles._lock:
-        for k, v in csstext_to_pairs(new):
-            news.append((k.strip(), v.strip()))
-            new_keys.add(k.strip())
-
-        groups = {}
-        grouped_split = grouping_regex.findall(old)
-        if grouped_split:
-            for old_class, old_content in grouped_split:
-                olds = []
-                for k, v in csstext_to_pairs(old_content):
-                    olds.append((k.strip(), v.strip()))
-                groups[old_class] = olds
-        else:
-            olds = []
-            for k, v in csstext_to_pairs(old):
-                olds.append((k.strip(), v.strip()))
-            groups[''] = olds
-
-    # Perform the merge
-    relevant_olds = groups.get(class_, {})
-    merged = [style for style in relevant_olds if style[0] not in new_keys] + news
-    groups[class_] = merged
-
-    if len(groups) == 1:
-        return '; '.join('%s:%s' % (k, v) for
-                          (k, v) in sorted(list(groups.values())[0]))
-    else:
-        all = []
-        sorted_groups = sorted(list(groups.items()),
-                               key=lambda a: a[0].count(':'))
-        for class_, mergeable in sorted_groups:
-            all.append('%s{%s}' % (class_,
-                                   '; '.join('%s:%s' % (k, v)
-                                              for (k, v)
-                                              in mergeable)))
-        return ' '.join(x for x in all if x != '{}')
-
-# The lock is used in merge_styles function to work around threading concurrency bug of cssutils library.
-# The bug is documented in issue #65. The bug's reproduction test in test_premailer.test_multithreading.
-merge_styles._lock = threading.RLock()
+    old_style_dict = _css_string_to_dict(old)
+    style_dict = _css_string_to_dict(new)
+    old_style_dict.update(style_dict)
+    return '; '.join(['%s:%s' % (k, v) for k, v in sorted(old_style_dict.items())])
 
 
 def make_important(bulk):
@@ -149,7 +146,6 @@ class Premailer(object):
     def __init__(self, html, base_url=None,
                  preserve_internal_links=False,
                  preserve_inline_attachments=True,
-                 exclude_pseudoclasses=True,
                  keep_style_tags=False,
                  include_star_selectors=False,
                  remove_classes=True,
@@ -164,7 +160,6 @@ class Premailer(object):
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
         self.preserve_inline_attachments = preserve_inline_attachments
-        self.exclude_pseudoclasses = exclude_pseudoclasses
         # whether to delete the <style> tag once it's been processed
         # this will always preserve the original css
         self.keep_style_tags = keep_style_tags
@@ -211,7 +206,7 @@ class Premailer(object):
                 if x.strip() and not x.strip().startswith('@')
             )
             for selector in selectors:
-                if (':' in selector and self.exclude_pseudoclasses and
+                if (':' in selector and
                     ':' + selector.split(':', 1)[1]
                         not in FILTER_PSEUDOSELECTORS):
                     # a pseudoclass
