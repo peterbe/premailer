@@ -3,6 +3,9 @@ import sys
 import re
 import unittest
 from contextlib import contextmanager
+from lxml import etree
+from lxml.cssselect import CSSSelector
+
 if sys.version_info >= (3, ):  # As in, Python 3
     from urllib.request import urlopen
 else:  # Python 2
@@ -20,6 +23,7 @@ from premailer.premailer import (
     transform,
     Premailer,
     merge_styles,
+    _css_string_to_dict,
     ExternalNotFoundError,
 )
 from premailer.__main__ import main
@@ -92,6 +96,12 @@ def compare_html(one, two):
             eq_(line.lstrip(), other.lstrip())
 
 
+def query_selector(html, query):
+    parser = etree.HTMLParser()
+    page = etree.fromstring(html, parser).getroottree().getroot()
+    return CSSSelector(query)(page)
+
+
 class Tests(unittest.TestCase):
 
     def shortDescription(self):
@@ -99,46 +109,15 @@ class Tests(unittest.TestCase):
         pass
 
     def test_merge_styles_basic(self):
-        old = 'font-size:1px; color: red'
+        old = 'color:red; font-size:1px; background-image: url("data:image/png;base64,iVBORw0KGg")'
         new = 'font-size:2px; font-weight: bold'
-        expect = 'color:red;', 'font-size:2px;', 'font-weight:bold'
+
         result = merge_styles(old, new)
-        for each in expect:
-            ok_(each in result)
-
-    def test_merge_styles_with_class(self):
-        old = 'color:red; font-size:1px;'
-        new, class_ = 'font-size:2px; font-weight: bold', ':hover'
-
-        # because we're dealing with dicts (random order) we have to
-        # test carefully.
-        # We expect something like this:
-        #  {color:red; font-size:1px} :hover{font-size:2px; font-weight:bold}
-
-        result = merge_styles(old, new, class_)
-        ok_(result.startswith('{'))
-        ok_(result.endswith('}'))
-        ok_(' :hover{' in result)
-        split_regex = re.compile('{([^}]+)}')
-        eq_(len(split_regex.findall(result)), 2)
-        expect_first = 'color:red', 'font-size:1px'
-        expect_second = 'font-weight:bold', 'font-size:2px'
-        for each in expect_first:
-            ok_(each in split_regex.findall(result)[0])
-        for each in expect_second:
-            ok_(each in split_regex.findall(result)[1])
-
-    def test_merge_styles_non_trivial(self):
-        old = 'background-image:url("data:image/png;base64,iVBORw0KGg")'
-        new = 'font-size:2px; font-weight: bold'
-        expect = (
-            'background-image:url("data:image/png;base64,iVBORw0KGg")',
-            'font-size:2px;',
-            'font-weight:bold'
-        )
-        result = merge_styles(old, new)
-        for each in expect:
-            ok_(each in result)
+        result_dict = _css_string_to_dict(result)
+        ok_(result_dict['color'] == 'red')
+        ok_(result_dict['font-size'] == '2px')
+        ok_(result_dict['font-weight'] == 'bold')
+        ok_(result_dict['background-image'] == 'url("data:image/png;base64,iVBORw0KGg")')
 
     def test_basic_html(self):
         """test the simplest case"""
@@ -373,7 +352,7 @@ class Tests(unittest.TestCase):
         eq_(rules_dict['ul li'], 'list-style:2px')
         ok_('a:hover' not in rules_dict)
 
-        p = Premailer('html', exclude_pseudoclasses=True)  # won't need the html
+        p = Premailer('html')  # won't need the html
         func = p._parse_style_rules
         rules, leftover = func("""
         ul li {  list-style: 2px; }
@@ -605,66 +584,14 @@ class Tests(unittest.TestCase):
         </body>
         </html>'''
 
-        p = Premailer(html, exclude_pseudoclasses=False)
+        p = Premailer(html)
         result_html = p.transform()
 
-        # because we're dealing with random dicts here we can't predict what
-        # order the style attribute will be written in so we'll look for
-        # things manually.
-        e = '<p style="::first-letter{float:left; font-size:300%}">'\
-            'Paragraph</p>'
-        self.fragment_in_html(e, result_html, True)
+        elements = query_selector(result_html, 'a')
+        eq_(elements[0].attrib['style'], 'border:1px solid green; color:red')
 
-        e = 'style="{border:1px solid green; color:red}'
-        self.fragment_in_html(e, result_html)
-        e = ' :visited{border:1px solid green}'
-        self.fragment_in_html(e, result_html)
-        e = ' :hover{border:1px solid green; text-decoration:none}'
-        self.fragment_in_html(e, result_html)
-
-    def test_css_with_pseudoclasses_excluded(self):
-        "Skip things like `a:hover{}` and keep them in the style block"
-
-        html = '''<html>
-        <head>
-        <style type="text/css">
-        a { color:red; }
-        a:hover { text-decoration:none; }
-        a,a:hover,
-        a:visited { border:1px solid green; }
-        p::first-letter {float: left; font-size: 300%}
-        </style>
-        </head>
-        <body>
-        <a href="#">Page</a>
-        <p>Paragraph</p>
-        </body>
-        </html>'''
-
-        expect_html = '''<html>
-        <head>
-        <style type="text/css">a:hover {text-decoration:none}
-        a:hover {border:1px solid green}
-        a:visited {border:1px solid green}p::first-letter {float:left;font-size:300%}
-        </style>
-        </head>
-        <body>
-        <a href="#" style="border:1px solid green; color:red">Page</a>
-        <p>Paragraph</p>
-        </body>
-        </html>'''
-
-        p = Premailer(html, exclude_pseudoclasses=True)
-        result_html = p.transform()
-
-        expect_html = whitespace_between_tags.sub('><', expect_html).strip()
-        result_html = whitespace_between_tags.sub('><', result_html).strip()
-
-        expect_html = re.sub('}\s+', '}', expect_html)
-        result_html = result_html.replace('}\n', '}')
-
-        eq_(expect_html, result_html)
-        # XXX
+        elements = query_selector(result_html, 'p')
+        eq_('style' not in elements[0].attrib, True)
 
     def test_css_with_html_attributes(self):
         """Some CSS styles can be applied as normal HTML attribute like
@@ -704,7 +631,7 @@ class Tests(unittest.TestCase):
         </body>
         </html>"""
 
-        p = Premailer(html, exclude_pseudoclasses=True)
+        p = Premailer(html)
         result_html = p.transform()
 
         expect_html = re.sub('}\s+', '}', expect_html)
@@ -752,7 +679,6 @@ class Tests(unittest.TestCase):
 
         p = Premailer(
             html,
-            exclude_pseudoclasses=True,
             disable_basic_attributes=['align', 'width', 'height']
         )
         result_html = p.transform()
@@ -770,7 +696,7 @@ class Tests(unittest.TestCase):
                                  'test-apple-newsletter.html')
         html = open(html_file).read()
 
-        p = Premailer(html, exclude_pseudoclasses=False,
+        p = Premailer(html,
                       keep_style_tags=True,
                       strip_important=False)
         result_html = p.transform()
@@ -928,7 +854,7 @@ class Tests(unittest.TestCase):
         </body>
         </html>"""
 
-        p = Premailer(html, exclude_pseudoclasses=True)
+        p = Premailer(html)
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
@@ -1480,7 +1406,7 @@ class Tests(unittest.TestCase):
         </head>
         <body>
         <h1 style="color:brown">h1</h1>
-        <p style="font-size:12px"><a href="" style="{color:pink} :hover{color:purple}">html</a></p>
+        <p style="font-size:12px"><a href="" style="color:pink">html</a></p>
         </body>
         </html>
         """
@@ -1499,13 +1425,15 @@ class Tests(unittest.TestCase):
         expect_html = """
         <html>
         <head>
+        <style type="text/css">a:hover {color:purple !important}</style>
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
         <style type="text/css">@media screen and (max-width: 600px) {
             table[class="container"] {
                 width: 100% !important
                 }
             }</style>
-        <style type="text/css">@media all and (max-width: 320px) {
+        <style type="text/css">h2::after {content:"" !important;display:block !important}
+        @media all and (max-width: 320px) {
             h1 {
                 font-size: 12px !important
                 }
@@ -1513,7 +1441,7 @@ class Tests(unittest.TestCase):
         </head>
         <body>
         <h1 style="color:brown">h1</h1>
-        <p style="font-size:12px"><a href="" style="{color:pink} :hover{color:purple}">html</a></p>
+        <p style="font-size:12px"><a href="" style="color:pink">html</a></p>
         </body>
         </html>
         """
