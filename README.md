@@ -22,22 +22,25 @@ Turns CSS blocks into style attributes
 When you send HTML emails you can't used style tags but instead you
 have to put inline `style` attributes on every element. So from this:
 
-        <html>
-        <style type="text/css">
-        h1 { border:1px solid black }
-        p { color:red;}
-        </style>
-        <h1 style="font-weight:bolder">Peter</h1>
-        <p>Hej</p>
-        </html>
+```html
+<html>
+<style type="text/css">
+h1 { border:1px solid black }
+p { color:red;}
+</style>
+<h1 style="font-weight:bolder">Peter</h1>
+<p>Hej</p>
+</html>
+```
 
 You want this:
 
-        <html>
-        <h1 style="font-weight:bolder; border:1px solid black">Peter</h1>
-        <p style="color:red">Hej</p>
-        </html>
-
+```html
+<html>
+<h1 style="font-weight:bolder; border:1px solid black">Peter</h1>
+<p style="color:red">Hej</p>
+</html>
+```
 
 premailer does this. It parses an HTML page, looks up `style` blocks
 and parses the CSS. It then uses the `lxml.html` parser to modify the
@@ -48,29 +51,29 @@ Getting started
 
 If you haven't already done so, install `premailer` first:
 
-        $ pip install premailer
+    $ pip install premailer
 
 Next, the most basic use is to use the shortcut function, like this:
 
-        >>> from premailer import transform
-        >>> print transform("""
-        ...         <html>
-        ...         <style type="text/css">
-        ...         h1 { border:1px solid black }
-        ...         p { color:red;}
-        ...         p::first-letter { float:left; }
-        ...         </style>
-        ...         <h1 style="font-weight:bolder">Peter</h1>
-        ...         <p>Hej</p>
-        ...         </html>
-        ... """)
-        <html>
-        <head></head>
-        <body>
+    >>> from premailer import transform
+    >>> print transform("""
+    ...         <html>
+    ...         <style type="text/css">
+    ...         h1 { border:1px solid black }
+    ...         p { color:red;}
+    ...         p::first-letter { float:left; }
+    ...         </style>
+    ...         <h1 style="font-weight:bolder">Peter</h1>
+    ...         <p>Hej</p>
+    ...         </html>
+    ... """)
+    <html>
+    <head></head>
+    <body>
         <h1 style="font-weight:bolder; border:1px solid black">Peter</h1>
-                <p style="color:red">Hej</p>
-                </body>
-        </html>
+        <p style="color:red">Hej</p>
+    </body>
+    </html>
 
 For more advanced options, check out the code of the `Premailer` class
 and all its options in its constructor.
@@ -133,25 +136,29 @@ Another thing premailer can do for you is to turn relative URLs (e.g.
 does this to all `href` and `src` attributes that don't have a `://`
 part in it. For example, turning this:
 
-        <html>
-        <body>
-        <a href="/">Home</a>
-        <a href="page.html">Page</a>
-        <a href="http://crosstips.org">External</a>
-        <img src="/folder/">Folder</a>
-        </body>
-        </html>
+```html
+<html>
+<body>
+<a href="/">Home</a>
+<a href="page.html">Page</a>
+<a href="http://crosstips.org">External</a>
+<img src="/folder/">Folder</a>
+</body>
+</html>
+```
 
 Into this:
 
-        <html>
-        <body>
-        <a href="http://www.peterbe.com/">Home</a>
-        <a href="http://www.peterbe.com/page.html">Page</a>
-        <a href="http://crosstips.org">External</a>
-        <img src="http://www.peterbe.com/folder/">Folder</a>
-        </body>
-        </html>
+```html
+<html>
+<body>
+<a href="http://www.peterbe.com/">Home</a>
+<a href="http://www.peterbe.com/page.html">Page</a>
+<a href="http://crosstips.org">External</a>
+<img src="http://www.peterbe.com/folder/">Folder</a>
+</body>
+</html>
+```
 
 by using `transform('...', base_url='http://www.peterbe.com/')`.
 
@@ -176,10 +183,7 @@ Running tests with tox
 To run `tox` you don't need to have all available Python versions installed because it will only work on those you have. To use `tox` first install it:
 
     pip install tox
-    
+
 Then simply start it with:
 
     tox
-    
-    
-    
