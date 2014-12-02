@@ -186,6 +186,21 @@ class Premailer(object):
         self.disable_validation = disable_validation
 
     def _parse_style_rules(self, css_body, ruleset_index):
+        """ Returns a list of rules to apply to this doc and a list of rules that won't be used
+            because e.g. they are pseudoclasses. Rules look like: (specificity, selector, bulk) 
+            for example: ((0, 1, 0, 0, 0), u'.makeblue', u'color:blue'). The bulk of the rule
+            should not end in a semicolon.
+        """
+
+        def join_css_properties(properties):
+            """ Accepts a list of cssutils Property objects and returns a semicolon delimitted
+                string like 'color: red; font-size: 12px'
+            """
+            return ';'.join(
+                u'{0}:{1}'.format(prop.name, prop.value)
+                for prop in properties
+            )
+
         leftover = []
         rules = []
         rule_index = 0
@@ -201,10 +216,23 @@ class Premailer(object):
             # only proceed for things we recognize
             if rule.type != rule.STYLE_RULE:
                 continue
-            bulk = ';'.join(
-                u'{0}:{1}'.format(key, rule.style[key])
-                for key in rule.style.keys()
-            )
+
+            # normal means it doesn't have "!important"
+            normal_properties = [
+                prop for prop in rule.style.getProperties() 
+                if prop.priority != 'important'
+            ]
+            important_properties = [
+                prop for prop in rule.style.getProperties()
+                if prop.priority == 'important'
+            ]
+
+            # Create three strings that we can use to add to the `rules` list later
+            # as ready blocks of css.
+            bulk_normal = join_css_properties(normal_properties)
+            bulk_important = join_css_properties(important_properties)
+            bulk_all = join_css_properties(normal_properties + important_properties)
+
             selectors = (
                 x.strip()
                 for x in rule.selectorText.split(',')
@@ -215,7 +243,7 @@ class Premailer(object):
                     ':' + selector.split(':', 1)[1]
                         not in FILTER_PSEUDOSELECTORS):
                     # a pseudoclass
-                    leftover.append((selector, bulk))
+                    leftover.append((selector, bulk_all))
                     continue
                 elif '*' in selector and not self.include_star_selectors:
                     continue
@@ -225,10 +253,22 @@ class Premailer(object):
                 class_count = selector.count('.')
                 element_count = len(_element_selector_regex.findall(selector))
 
-                specificity = (id_count, class_count, element_count, ruleset_index, rule_index)
-
-                rules.append((specificity, selector, bulk))
-                rule_index += 1
+                # Within one rule individual properties have different priority depending on !important.
+                # So we split each rule into two: one that includes all the !important declarations and 
+                # another that doesn't.
+                for is_important, bulk in ((1, bulk_important), (0, bulk_normal)):
+                    if not bulk:
+                        # don't bother adding empty css rules
+                        continue
+                    specificity = (
+                        is_important,
+                        id_count,
+                        class_count,
+                        element_count,
+                        ruleset_index,
+                        len(rules) # this is the rule's index number
+                    )
+                    rules.append((specificity, selector, bulk))
 
         return rules, leftover
 

@@ -1150,6 +1150,41 @@ class Tests(unittest.TestCase):
 
         compare_html(expect_html, result_html)
 
+    def test_favour_rule_with_important_over_others(self):
+        html = """<html>
+        <head>
+        <style>
+        .makeblue {
+            color: blue !important;
+            font-size: 12px;
+        }
+        #identified {
+            color: green;
+            font-size: 22px;
+        }
+        div.example {
+            color: black;
+        }
+        </style>
+        </head>
+        <body>
+        <div class="example makeblue" id="identified"></div>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        </head>
+        <body>
+        <div id="identified" style="color:blue; font-size:22px"></div>
+        </body>
+        </html>"""
+
+        p = Premailer(html)
+        result_html = p.transform()
+
+        compare_html(expect_html, result_html)        
+
     def test_multiple_style_elements(self):
         """Asserts that rules from multiple style elements are inlined correctly."""
 
