@@ -414,7 +414,7 @@ class Premailer(object):
         kwargs.setdefault('method', self.method)
         kwargs.setdefault('pretty_print', pretty_print)
         kwargs.setdefault('encoding', 'utf-8')  # As Ken Thompson intended
-        out = etree.tostring(root, **kwargs).decode(kwargs['encoding'])
+        out = etree.tostring(root, **kwargs)
         if self.method == 'xml':
             out = _cdata_regex.sub(lambda m: '/*<![CDATA[*/%s/*]]>*/' % m.group(1), out)
         if self.strip_important:
