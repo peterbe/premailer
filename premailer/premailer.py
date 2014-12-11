@@ -276,16 +276,22 @@ class Premailer(object):
         """change the self.html and return it with CSS turned into style
         attributes.
         """
-        if self.method == 'xml':
-            parser = etree.XMLParser(ns_clean=False, resolve_entities=False)
+        if hasattr(self.html, "getroottree"):
+            # skip the next bit
+            root = self.html.getroottree()
+            page = root
+            tree = root
         else:
-            parser = etree.HTMLParser()
-        stripped = self.html.strip()
-        tree = etree.fromstring(stripped, parser).getroottree()
-        page = tree.getroot()
-        # lxml inserts a doctype if none exists, so only include it in
-        # the root if it was in the original html.
-        root = tree if stripped.startswith(tree.docinfo.doctype) else page
+            if self.method == 'xml':
+                parser = etree.XMLParser(ns_clean=False, resolve_entities=False)
+            else:
+                parser = etree.HTMLParser()
+            stripped = self.html.strip()
+            tree = etree.fromstring(stripped, parser).getroottree()
+            page = tree.getroot()
+            # lxml inserts a doctype if none exists, so only include it in
+            # the root if it was in the original html.
+            root = tree if stripped.startswith(tree.docinfo.doctype) else page
 
         assert page is not None
 
@@ -411,15 +417,18 @@ class Premailer(object):
                         self.base_url += '/'
                     parent.attrib[attr] = urljoin(self.base_url, parent.attrib[attr].lstrip('/'))
 
-        kwargs.setdefault('method', self.method)
-        kwargs.setdefault('pretty_print', pretty_print)
-        kwargs.setdefault('encoding', 'utf-8')  # As Ken Thompson intended
-        out = etree.tostring(root, **kwargs).decode(kwargs['encoding'])
-        if self.method == 'xml':
-            out = _cdata_regex.sub(lambda m: '/*<![CDATA[*/%s/*]]>*/' % m.group(1), out)
-        if self.strip_important:
-            out = _importants.sub('', out)
-        return out
+        if hasattr(self.html, "getroottree"):
+            return root
+        else:
+            kwargs.setdefault('method', self.method)
+            kwargs.setdefault('pretty_print', pretty_print)
+            kwargs.setdefault('encoding', 'utf-8')  # As Ken Thompson intended
+            out = etree.tostring(root, **kwargs).decode(kwargs['encoding'])
+            if self.method == 'xml':
+                out = _cdata_regex.sub(lambda m: '/*<![CDATA[*/%s/*]]>*/' % m.group(1), out)
+            if self.strip_important:
+                out = _importants.sub('', out)
+            return out
 
     def _load_external_url(self, url):
         r = urlopen(url)
