@@ -14,7 +14,7 @@ import gzip
 
 from nose.tools import eq_, ok_, assert_raises
 import mock
-from lxml.etree import XMLSyntaxError
+from lxml.etree import fromstring, XMLSyntaxError
 
 from premailer.premailer import (
     transform,
@@ -2094,3 +2094,33 @@ class Tests(unittest.TestCase):
 
         p = Premailer(html, disable_validation=True)
         p.transform()  # it should just work
+
+    def test_type_test(self):
+        """test the corrent type is returned"""
+
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1, h2 { color:red; }
+        strong {
+            text-decoration:none
+            }
+        </style>
+        </head>
+        <body>
+        <h1>Hi!</h1>
+        <p><strong>Yes!</strong></p>
+        </body>
+        </html>"""
+
+        p = Premailer(html)
+        result = p.transform()
+        self.assertEqual(type(result), type(""))
+
+        html = fromstring(html)
+        etree_type = type(html)
+
+        p = Premailer(html)
+        result = p.transform()
+        self.assertNotEqual(type(result), etree_type)
