@@ -1183,7 +1183,7 @@ class Tests(unittest.TestCase):
         p = Premailer(html)
         result_html = p.transform()
 
-        compare_html(expect_html, result_html)        
+        compare_html(expect_html, result_html)
 
     def test_multiple_style_elements(self):
         """Asserts that rules from multiple style elements are inlined correctly."""
@@ -1734,7 +1734,7 @@ class Tests(unittest.TestCase):
         r = p._load_external_url(faux_uri)
 
         mocked_url_open.assert_called_once_with(faux_uri)
-        self.assertEqual(faux_response.decode('utf-8'), r)
+        eq_(faux_response.decode('utf-8'), r)
 
     @mock.patch('premailer.premailer.urlopen')
     def test_load_external_url_gzip(self, mocked_url_open):
@@ -1746,7 +1746,7 @@ class Tests(unittest.TestCase):
         r = p._load_external_url(faux_uri)
 
         mocked_url_open.assert_called_once_with(faux_uri)
-        self.assertEqual(faux_response.decode('utf-8'), r)
+        eq_(faux_response.decode('utf-8'), r)
 
     def test_css_text(self):
         """Test handling css_text passed as a string"""
@@ -1926,7 +1926,7 @@ class Tests(unittest.TestCase):
         expected_args = [(('https://www.com/style1.css',),),
                          (('https://www.com/style2.css',),),
                          (('https://www.peterbe.com/style3.css',),)]
-        self.assertEqual(expected_args, mocked_pleu.call_args_list)
+        eq_(expected_args, mocked_pleu.call_args_list)
         expect_html = """<html>
         <head>
         </head>
@@ -1955,7 +1955,7 @@ class Tests(unittest.TestCase):
         p = Premailer(html, base_url='http://www.peterbe.com/')
         result_html = p.transform()
         expected_args = [(('http://www.peterbe.com/style.css',),), ]
-        self.assertEqual(expected_args, mocked_pleu.call_args_list)
+        eq_(expected_args, mocked_pleu.call_args_list)
 
         expect_html = """<html>
         <head>
@@ -2116,11 +2116,11 @@ class Tests(unittest.TestCase):
 
         p = Premailer(html)
         result = p.transform()
-        self.assertEqual(type(result), type(""))
+        eq_(type(result), type(""))
 
         html = fromstring(html)
         etree_type = type(html)
 
         p = Premailer(html)
         result = p.transform()
-        self.assertNotEqual(type(result), etree_type)
+        ok_(type(result) != etree_type)
