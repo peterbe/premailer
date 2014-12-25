@@ -2096,7 +2096,7 @@ class Tests(unittest.TestCase):
         p.transform()  # it should just work
 
     def test_type_test(self):
-        """test the corrent type is returned"""
+        """test the correct type is returned"""
 
         html = """<html>
         <head>
