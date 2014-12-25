@@ -19,7 +19,7 @@ Our [tox.ini](https://github.com/peterbe/premailer/blob/master/tox.ini) makes su
 Turns CSS blocks into style attributes
 --------------------------------------
 
-When you send HTML emails you can't used style tags but instead you
+When you send HTML emails you can't use style tags but instead you
 have to put inline `style` attributes on every element. So from this:
 
 ```html
