@@ -162,6 +162,30 @@ Into this:
 
 by using `transform('...', base_url='http://www.peterbe.com/')`.
 
+Ignore certain `<style>` or `<link>` tags
+-----------------------------------------
+
+Suppose you have a style tag that you don't want to have processed and
+transformed you can simply set a data attribute on the tag like:
+
+```html
+<head>
+<style>/* this gets processed */</style>
+<style data-premailer="ignore">/* this gets ignored */</style>
+</head>
+```
+
+That tag gets completely ignored except when the HTML is processed, the
+attribute `data-premailer` is removed.
+
+It works equally for a `<link>` tag like:
+
+```html
+<head>
+<link rel="stylesheet" href="foo.css" data-premailer="ignore">
+</head>
+```
+
 
 HTML attributes created additionally
 ------------------------------------

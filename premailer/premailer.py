@@ -27,6 +27,8 @@ import gzip
 import operator
 import os
 import re
+import warnings
+
 import cssutils
 from lxml import etree
 from lxml.cssselect import CSSSelector
@@ -187,7 +189,7 @@ class Premailer(object):
 
     def _parse_style_rules(self, css_body, ruleset_index):
         """ Returns a list of rules to apply to this doc and a list of rules that won't be used
-            because e.g. they are pseudoclasses. Rules look like: (specificity, selector, bulk) 
+            because e.g. they are pseudoclasses. Rules look like: (specificity, selector, bulk)
             for example: ((0, 1, 0, 0, 0), u'.makeblue', u'color:blue'). The bulk of the rule
             should not end in a semicolon.
         """
@@ -219,7 +221,7 @@ class Premailer(object):
 
             # normal means it doesn't have "!important"
             normal_properties = [
-                prop for prop in rule.style.getProperties() 
+                prop for prop in rule.style.getProperties()
                 if prop.priority != 'important'
             ]
             important_properties = [
@@ -254,7 +256,7 @@ class Premailer(object):
                 element_count = len(_element_selector_regex.findall(selector))
 
                 # Within one rule individual properties have different priority depending on !important.
-                # So we split each rule into two: one that includes all the !important declarations and 
+                # So we split each rule into two: one that includes all the !important declarations and
                 # another that doesn't.
                 for is_important, bulk in ((1, bulk_important), (0, bulk_normal)):
                     if not bulk:
@@ -310,6 +312,17 @@ class Premailer(object):
             media = element.attrib.get('media')
             if media and media != 'screen':
                 continue
+
+            data_attribute = element.attrib.get('data-premailer')
+            if data_attribute == 'ignore':
+                del element.attrib['data-premailer']
+                continue
+            elif data_attribute:
+                warnings.warn(
+                    'Unrecognized data-premailer attribute (%r)' % (
+                        data_attribute,
+                    )
+                )
 
             is_style = element.tag == 'style'
             if is_style:

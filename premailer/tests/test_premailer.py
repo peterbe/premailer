@@ -2124,3 +2124,115 @@ class Tests(unittest.TestCase):
         p = Premailer(html)
         result = p.transform()
         ok_(type(result) != etree_type)
+
+    def test_ignore_some_inline_stylesheets(self):
+        """test that it's possible to put a `data-premailer="ignore"`
+        attribute on a <style> tag and it gets left alone (except that
+        the attribute gets removed)"""
+
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1 { color:red; }
+        </style>
+        <style type="text/css" data-premailer="ignore">
+        h1 { color:blue; }
+        </style>
+        </head>
+        <body>
+        <h1>Hello</h1>
+        <h2>World</h2>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1 { color:blue; }
+        </style>
+        </head>
+        <body>
+        <h1 style="color:red">Hello</h1>
+        <h2>World</h2>
+        </body>
+        </html>"""
+
+        p = Premailer(html, disable_validation=True)
+        result_html = p.transform()
+
+    @mock.patch('premailer.premailer.warnings')
+    def test_ignore_some_incorrectly(self, warnings_mock):
+        """You can put `data-premailer="ignore"` but if the attribute value
+        is something we don't recognize you get a warning"""
+
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css" data-premailer="blah">
+        h1 { color:blue; }
+        </style>
+        </head>
+        <body>
+        <h1>Hello</h1>
+        <h2>World</h2>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        <title>Title</title>
+        </head>
+        <body>
+        <h1 style="color:blue">Hello</h1>
+        <h2>World</h2>
+        </body>
+        </html>"""
+
+        p = Premailer(html, disable_validation=True)
+        result_html = p.transform()
+        warnings_mock.warn.assert_called_with(
+            "Unrecognized data-premailer attribute ('blah')"
+        )
+
+        compare_html(expect_html, result_html)
+
+    def test_ignore_some_external_stylesheets(self):
+        """test that it's possible to put a `data-premailer="ignore"`
+        attribute on a <link> tag and it gets left alone (except that
+        the attribute gets removed)"""
+
+        # Know thy fixtures!
+        # The test-external-links.css has a `h1{color:blue}`
+        # And the test-external-styles.css has a `h1{color:brown}`
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <link href="premailer/tests/test-external-links.css"
+         rel="stylesheet" type="text/css">
+        <link data-premailer="ignore"
+          href="premailer/tests/test-external-styles.css"
+          rel="stylesheet" type="text/css">
+        </head>
+        <body>
+        <h1>Hello</h1>
+        </body>
+        </html>"""
+
+        # Note that the `test-external-links.css` gets converted to a inline
+        # style sheet.
+        expect_html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">a:hover {color:purple}</style>
+        <link href="premailer/tests/test-external-styles.css" rel="stylesheet" type="text/css">
+        </head>
+        <body>
+        <h1 style="color:blue">Hello</h1>
+        </body>
+        </html>"""
+
+        p = Premailer(html, disable_validation=True)
+        result_html = p.transform()
+        compare_html(expect_html, result_html)
