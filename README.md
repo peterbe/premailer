@@ -5,6 +5,16 @@ premailer
 
 [![Coverage Status](https://coveralls.io/repos/peterbe/premailer/badge.png?branch=master)](https://coveralls.io/r/peterbe/premailer?branch=master)
 
+Donations aka. the tip jar
+--------------------------
+
+If you enjoy, benefit and want premailer to continue to be an actively
+maintained project please consider supporting me on [Gratipay](https://gratipay.com/peterbe/).
+
+[![Gratipay](https://img.shields.io/gratipay/peterbe.svg)](https://gratipay.com/peterbe/)
+
+Every little helps.
+
 Python versions
 ---------------
 
