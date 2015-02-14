@@ -1,0 +1,1032 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width">
+
+<style type="text/css">a:hover {color:#2795b6}
+a:active {color:#2795b6}
+a:visited {color:#2ba6cb}
+h1 a:active {color:#2ba6cb}
+h2 a:active {color:#2ba6cb}
+h3 a:active {color:#2ba6cb}
+h4 a:active {color:#2ba6cb}
+h5 a:active {color:#2ba6cb}
+h6 a:active {color:#2ba6cb}
+h1 a:visited {color:#2ba6cb}
+h2 a:visited {color:#2ba6cb}
+h3 a:visited {color:#2ba6cb}
+h4 a:visited {color:#2ba6cb}
+h5 a:visited {color:#2ba6cb}
+h6 a:visited {color:#2ba6cb}
+table.button:hover td {background:#2795b6}
+table.button:visited td {background:#2795b6}
+table.button:active td {background:#2795b6}
+table.button:hover td a {color:#fff}
+table.button:visited td a {color:#fff}
+table.button:active td a {color:#fff}
+table.button:hover td {background:#2795b6}
+table.tiny-button:hover td {background:#2795b6}
+table.small-button:hover td {background:#2795b6}
+table.medium-button:hover td {background:#2795b6}
+table.large-button:hover td {background:#2795b6}
+table.button:hover td a {color:#fff}
+table.button:active td a {color:#fff}
+table.button td a:visited {color:#fff}
+table.tiny-button:hover td a {color:#fff}
+table.tiny-button:active td a {color:#fff}
+table.tiny-button td a:visited {color:#fff}
+table.small-button:hover td a {color:#fff}
+table.small-button:active td a {color:#fff}
+table.small-button td a:visited {color:#fff}
+table.medium-button:hover td a {color:#fff}
+table.medium-button:active td a {color:#fff}
+table.medium-button td a:visited {color:#fff}
+table.large-button:hover td a {color:#fff}
+table.large-button:active td a {color:#fff}
+table.large-button td a:visited {color:#fff}
+table.secondary:hover td {color:#555;background:#d0d0d0}
+table.secondary:hover td a {color:#555}
+table.secondary td a:visited {color:#555}
+table.secondary:active td a {color:#555}
+table.success:hover td {background:#457a1a}
+table.alert:hover td {background:#970b0e}
+@media only screen and (max-width: 600px) {
+    table[class="body"] img {
+        width: auto;
+        height: auto
+        }
+    table[class="body"] center {
+        min-width: 0
+        }
+    table[class="body"] .container {
+        width: 95%
+        }
+    table[class="body"] .row {
+        width: 100%;
+        display: block
+        }
+    table[class="body"] .wrapper {
+        display: block;
+        padding-right: 0
+        }
+    table[class="body"] .columns, table[class="body"] .column {
+        table-layout: fixed;
+        float: none;
+        width: 100%;
+        padding-right: 0;
+        padding-left: 0;
+        display: block
+        }
+    table[class="body"] .wrapper.first .columns, table[class="body"] .wrapper.first .column {
+        display: table
+        }
+    table[class="body"] table.columns td, table[class="body"] table.column td {
+        width: 100%
+        }
+    table[class="body"] .columns td.one, table[class="body"] .column td.one {
+        width: 8.333333%
+        }
+    table[class="body"] .columns td.two, table[class="body"] .column td.two {
+        width: 16.666666%
+        }
+    table[class="body"] .columns td.three, table[class="body"] .column td.three {
+        width: 25%
+        }
+    table[class="body"] .columns td.four, table[class="body"] .column td.four {
+        width: 33.333333%
+        }
+    table[class="body"] .columns td.five, table[class="body"] .column td.five {
+        width: 41.666666%
+        }
+    table[class="body"] .columns td.six, table[class="body"] .column td.six {
+        width: 50%
+        }
+    table[class="body"] .columns td.seven, table[class="body"] .column td.seven {
+        width: 58.333333%
+        }
+    table[class="body"] .columns td.eight, table[class="body"] .column td.eight {
+        width: 66.666666%
+        }
+    table[class="body"] .columns td.nine, table[class="body"] .column td.nine {
+        width: 75%
+        }
+    table[class="body"] .columns td.ten, table[class="body"] .column td.ten {
+        width: 83.333333%
+        }
+    table[class="body"] .columns td.eleven, table[class="body"] .column td.eleven {
+        width: 91.666666%
+        }
+    table[class="body"] .columns td.twelve, table[class="body"] .column td.twelve {
+        width: 100%
+        }
+    table[class="body"] td.offset-by-one, table[class="body"] td.offset-by-two, table[class="body"] td.offset-by-three, table[class="body"] td.offset-by-four, table[class="body"] td.offset-by-five, table[class="body"] td.offset-by-six, table[class="body"] td.offset-by-seven, table[class="body"] td.offset-by-eight, table[class="body"] td.offset-by-nine, table[class="body"] td.offset-by-ten, table[class="body"] td.offset-by-eleven {
+        padding-left: 0
+        }
+    table[class="body"] table.columns td.expander {
+        width: 1px
+        }
+    table[class="body"] .right-text-pad, table[class="body"] .text-pad-right {
+        padding-left: 10px
+        }
+    table[class="body"] .left-text-pad, table[class="body"] .text-pad-left {
+        padding-right: 10px
+        }
+    table[class="body"] .hide-for-small, table[class="body"] .show-for-desktop {
+        display: none
+        }
+    table[class="body"] .show-for-small, table[class="body"] .hide-for-desktop {
+        display: inherit
+        }
+    }</style>
+
+
+<style type="text/css">table.main-content .content tbody tr:nth-of-type(even) {background:#f7f7f7}
+table.site .title a:hover {color:#333}
+table.site .title a:visited {color:#333}</style>
+
+
+
+
+</head>
+  <body style='color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; min-width:100%; padding:0; text-align:left; width:100%' align="left" width="100%">
+    <table style='border-collapse:collapse; border-spacing:0; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; height:100%; line-height:19px; margin:0; padding:0; text-align:left; vertical-align:top; width:100%' align="left" valign="top" height="100%" width="100%">
+      <tbody>
+        <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+        <td align="center" valign="top" style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:0; text-align:center; vertical-align:top'>
+          <center style="min-width:580px; width:100%" width="100%">
+
+            <table style="background-color:#f4f4f4; border-bottom:4px solid #fafafa; border-collapse:collapse; border-spacing:0; padding:0; position:relative; text-align:left; vertical-align:top; width:100%" align="left" valign="top" width="100%" bgcolor="#f4f4f4">
+              <tbody>
+              <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                <td align="center" style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:0; text-align:center; vertical-align:top' valign="top">
+                  <center style="min-width:580px; width:100%" width="100%">
+
+                    <table style="border-collapse:collapse; border-spacing:0; margin:0 auto; padding:0; text-align:inherit; vertical-align:top; width:580px" align="inherit" valign="top" width="580">
+                      <tbody>
+                        <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                        <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:20px 0; padding-right:0; position:relative; text-align:left; vertical-align:top' align="left" valign="top">
+
+                          <table style="border-collapse:collapse; border-spacing:0; margin:0 auto; padding:0; text-align:left; vertical-align:top; width:580px" align="left" valign="top" width="580">
+                            <tbody>
+<tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+
+                              <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; min-width:0; padding:0 0 10px; padding-right:10px; text-align:center; vertical-align:top; width:33.333333%' align="center" valign="top" width="33.333333%">
+                                <a href="http://example.com" style="color:#2ba6cb; text-decoration:none">
+                                  <img src="cid:logo" alt="logo" style="border:none; clear:both; display:block; float:none; max-width:100%; outline:none; text-decoration:none; width:auto" width="auto">
+                                </a>
+                              </td>
+
+                            </tr>
+                          </tbody>
+</table>
+
+                        </td>
+                      </tr>
+                    </tbody>
+                    </table>
+
+                  </center>
+                </td>
+              </tr>
+            </tbody>
+            </table>
+
+            <table style="background-color:#fff; border-collapse:collapse; border-spacing:0; padding:0; position:relative; text-align:left; vertical-align:top; width:100%" align="left" valign="top" width="100%" bgcolor="#fff">
+              <tbody>
+                <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                  <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:0; text-align:left; vertical-align:top' align="left" valign="top">
+                    <center style="min-width:580px; width:100%" width="100%">
+                      <table style="border-collapse:collapse; border-spacing:0; margin:0 auto; padding:0; text-align:inherit; vertical-align:top; width:580px" align="inherit" valign="top" width="580">
+                        <tbody>
+                          <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                            <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:20px 0; padding-right:0; position:relative; text-align:left; vertical-align:top' align="left" valign="top">
+                              <table style="border-collapse:collapse; border-spacing:0; margin:0 auto; padding:0; text-align:left; vertical-align:top; width:580px" align="left" valign="top" width="580">
+                                <tbody>
+                                  <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                                    <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:0 0 10px; text-align:left; vertical-align:top' align="left" valign="top">
+                                      <h1 style='color:#888; font-family:"Helvetica", "Arial", sans-serif; font-size:40px; font-weight:normal; line-height:1.3; margin:0; padding:0; text-align:center' align="center">Your Email Report</h1>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </center>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table style="background-color:#fff; border-collapse:collapse; border-spacing:0; padding:0; position:relative; text-align:left; vertical-align:top; width:100%" align="left" valign="top" width="100%" bgcolor="#fff">
+              <tbody>
+                <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                  <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:0; text-align:left; vertical-align:top' align="left" valign="top">
+                    <center style="min-width:580px; width:100%" width="100%">
+                      <table style="border-collapse:collapse; border-spacing:0; margin:0 auto; padding:0; text-align:inherit; vertical-align:top; width:580px" align="inherit" valign="top" width="580">
+                        <tbody>
+                          <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                            <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:20px 0; padding-right:0; position:relative; text-align:left; vertical-align:top' align="left" valign="top">
+                              <table style="border-collapse:collapse; border-spacing:0; margin:0 auto; padding:0; text-align:left; vertical-align:top; width:580px" align="left" valign="top" width="580">
+                                <tbody>
+                                  <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                                    <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:0 0 10px; text-align:left; vertical-align:top' align="left" valign="top">
+
+                                       <h2 style='color:#555; font-family:"Helvetica", "Arial", sans-serif; font-size:36px; font-weight:normal; line-height:1.3; margin:0; padding:0; text-align:center' align="center">My Company</h2>
+
+
+
+                                       <h5 style='color:#666; font-family:"Helvetica", "Arial", sans-serif; font-size:24px; font-weight:lighter; line-height:1.3; margin:0; padding:0; text-align:center' align="center">
+                                           Date Range: 08/02/2015 - 14/02/2015
+                                       </h5>
+
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </center>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table style="background-color:#fdfdfd; border-collapse:collapse; border-spacing:0; padding:0; position:relative; text-align:left; vertical-align:top; width:100%" align="left" valign="top" width="100%" bgcolor="#fdfdfd">
+              <tbody>
+                <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                  <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:0; text-align:left; vertical-align:top' align="left" valign="top">
+                    <center style="min-width:580px; width:100%" width="100%">
+                      <table style="border-collapse:collapse; border-spacing:0; margin:0 auto; padding:0; text-align:inherit; vertical-align:top; width:580px" align="inherit" valign="top" width="580">
+                        <tbody>
+                          <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                            <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:40px 0; padding-right:0; position:relative; text-align:left; vertical-align:top' align="left" valign="top">
+                              <table style="border-collapse:collapse; border-spacing:0; margin:0 auto; padding:0; text-align:left; vertical-align:top; width:580px" align="left" valign="top" width="580">
+                                <tbody>
+                                  <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                                    <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:0 0 10px; text-align:left; vertical-align:top' align="left" valign="top">
+
+  <table style="border-collapse:collapse; border-spacing:0; margin:0 auto; padding:0; text-align:left; vertical-align:top; width:580px" align="left" valign="top" width="580">
+    <thead>
+      <tr style="background-color:#424345; color:#fff; font-weight:lighter; padding:0; text-align:left; vertical-align:top" align="left" valign="top" bgcolor="#424345">
+        <th style="font-weight:lighter; padding:10px 3px; text-align:center" align="center">
+         Column 1
+        </th>
+        <th style="font-weight:lighter; padding:10px 3px; text-align:center" align="center">
+         Column 2
+        </th>
+        <th style="font-weight:lighter; padding:10px 3px; text-align:center" align="center">
+         Column 3
+        </th>
+        <th style="font-weight:lighter; padding:10px 3px; text-align:center" align="center">
+         Column 4
+        </th>
+        <th style="font-weight:lighter; padding:10px 3px; text-align:center" align="center">
+         Column 5
+        </th>
+        <th style="font-weight:lighter; padding:10px 3px; text-align:center" align="center">
+         Column 6
+        </th>
+        <th style="font-weight:lighter; padding:10px 3px; text-align:center" align="center">
+         Column 7
+        </th>
+      </tr>
+      <tr style="background-color:#424345; color:#fff; font-weight:lighter; padding:0; text-align:left; vertical-align:top" align="left" valign="top" bgcolor="#424345">
+       <th style="font-weight:lighter; padding:0 0 5px 0; text-align:center" align="center"></th>
+       <th style="font-weight:lighter; padding:0 0 5px 0; text-align:center" align="center"></th>
+       <th style="font-weight:lighter; padding:0 0 5px 0; text-align:center" align="center"></th>
+       <th style="font-weight:lighter; padding:0 0 5px 0; text-align:center" align="center"></th>
+       <th style="font-weight:lighter; padding:0 0 5px 0; text-align:center" align="center"></th>
+       <th style="font-weight:lighter; padding:0 0 5px 0; text-align:center" align="center">
+        units 1
+       </th>
+       <th style="font-weight:lighter; padding:0 0 5px 0; text-align:center" align="center">
+        units 2
+       </th>
+      </tr>
+    </thead>
+    <tbody style="border-bottom:6px solid #424345">
+
+       <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+         <td colspan="7" style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">
+           <h5 style='color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:24px; font-weight:normal; line-height:1.3; margin:0; padding:0; text-align:left' align="left"><b>Header</b></h5>
+         </td>
+       </tr>
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; border-top:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+           <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+             <td style='border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+           </tr>
+
+
+
+
+
+       <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+         <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+         <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+         <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+         <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+         <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+         <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+         <td style='border-bottom:1px solid #BBB; border-collapse:collapse; border-right:1px solid #BBB; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:10px 0; text-align:center; vertical-align:top' align="center" valign="top">0.03</td>
+       </tr>
+
+    </tbody>
+  </table>
+
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </center>
+
+                  </td>
+                </tr>
+              </tbody>
+
+            </table>
+
+            <table style="background-color:#f2f2f2; border-collapse:collapse; border-spacing:0; padding:0; position:relative; text-align:left; vertical-align:top; width:100%" align="left" valign="top" width="100%" bgcolor="#f2f2f2">
+              <tbody style="display:table; width:100%" width="100%">
+                <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                  <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:0; text-align:left; vertical-align:top' align="left" valign="top">
+                    <center style="min-width:580px; width:100%" width="100%">
+                      <table style="border-collapse:collapse; border-spacing:0; margin:0 auto; padding:0; text-align:inherit; vertical-align:top; width:580px" align="inherit" valign="top" width="580">
+                        <tbody style="display:table; width:100%" width="100%">
+                          <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                            <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:40px 0; padding-right:0; position:relative; text-align:left; vertical-align:top' align="left" valign="top">
+                              <table style="border-collapse:collapse; border-spacing:0; margin:0 auto; padding:0; text-align:left; vertical-align:top; width:580px" align="left" valign="top" width="580">
+                                <tbody style="display:table; width:100%" width="100%">
+                                  <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                                    <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:0 0 10px; text-align:left; vertical-align:top' align="left" valign="top">
+                                      <h3 style='color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:26px; font-weight:normal; line-height:1.3; margin:0; padding:0; text-align:center; text-transform:uppercase' align="center"><a href="http://example.com" style="color:#666769; text-decoration:none">example.com</a></h3>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </center>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+
+            <table style="background-color:#656567; border-collapse:collapse; border-spacing:0; padding:0; position:relative; text-align:left; vertical-align:top; width:100%" align="left" valign="top" width="100%" bgcolor="#656567">
+              <tbody>
+                <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                  <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:0; text-align:left; vertical-align:top' align="left" valign="top">
+                    <center style="min-width:580px; width:100%" width="100%">
+                      <table style="border-collapse:collapse; border-spacing:0; margin:0 auto; padding:0; text-align:inherit; vertical-align:top; width:580px" align="inherit" valign="top" width="580">
+                        <tbody>
+                          <tr style="padding:0; text-align:left; vertical-align:top" align="left" valign="top">
+                            <td style='border-collapse:collapse; color:#222; font-family:"Helvetica", "Arial", sans-serif; font-size:14px; font-weight:normal; line-height:19px; margin:0; padding:30px 0 30px; position:relative; text-align:left; vertical-align:top' align="left" valign="top">
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </center>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+          </center>
+        </td>
+      </tr>
+    </tbody>
+    </table>
+  </body>
+</html>

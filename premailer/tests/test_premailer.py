@@ -2252,7 +2252,11 @@ class Tests(unittest.TestCase):
 
         p = Premailer(html)
         start = time.time()
-        p.transform()
+        result_html = p.transform()
         end = time.time()
 
-        self.assertLess(end - start, 10)
+        processed_html_file = os.path.join('premailer', 'tests', 'test-long-table-process.html')
+        expect_html = open(processed_html_file, 'r').read()
+
+        self.assertLess(end - start, 2)
+        compare_html(expect_html, result_html)
