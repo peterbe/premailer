@@ -48,6 +48,9 @@ class ExternalNotFoundError(ValueError):
 grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
 
 
+styles_cache = {}
+variable_value_cache = {}
+
 def merge_styles(old, new, class_=''):
     """
     if ::
@@ -66,9 +69,21 @@ def merge_styles(old, new, class_=''):
     """
 
     def csstext_to_pairs(csstext):
-        parsed = cssutils.css.CSSVariablesDeclaration(csstext)
+        try:
+            parsed = styles_cache[csstext]
+        except KeyError:
+            parsed = cssutils.css.CSSVariablesDeclaration(csstext)
+            styles_cache[csstext] = parsed
+
         for key in sorted(parsed):
-            yield (key, parsed.getVariableValue(key))
+            cache_key = (csstext, key)
+            try:
+                variable_value = variable_value_cache[cache_key]
+            except KeyError:
+                variable_value = parsed.getVariableValue(key)
+                variable_value_cache[cache_key] = variable_value
+
+            yield (key, variable_value)
 
     new_keys = set()
     news = []
