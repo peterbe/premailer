@@ -6,7 +6,7 @@ except ImportError:  # pragma: no cover
     from ordereddict import OrderedDict
 import sys
 import threading
-if sys.version_info >= (3, ):  # pragma: no cover
+if sys.version_info >= (3,):  # pragma: no cover
     # As in, Python 3
     from io import StringIO
     from urllib.request import urlopen
@@ -33,6 +33,7 @@ import cssutils
 from lxml import etree
 from lxml.cssselect import CSSSelector
 
+from .cache import function_cache
 
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
@@ -47,7 +48,7 @@ class ExternalNotFoundError(ValueError):
 
 grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
 
-
+@function_cache()
 def merge_styles(old, new, class_=''):
     """
     if ::
@@ -64,35 +65,25 @@ def merge_styles(old, new, class_=''):
     Note: old could be something like '{...} ::first-letter{...}'
 
     """
-
+    
     def csstext_to_pairs(csstext):
         parsed = cssutils.css.CSSVariablesDeclaration(csstext)
         for key in sorted(parsed):
-            yield (key, parsed.getVariableValue(key))
+            yield (key.strip(), parsed.getVariableValue(key).strip())
 
-    new_keys = set()
-    news = []
 
     # The code below is wrapped in a critical section implemented via ``RLock``-class lock.
     # The lock is required to avoid ``cssutils`` concurrency issues documented in issue #65
     with merge_styles._lock:
-        for k, v in csstext_to_pairs(new):
-            news.append((k.strip(), v.strip()))
-            new_keys.add(k.strip())
-
+        news = [(k, v) for k, v in csstext_to_pairs(new)]
+        new_keys = set([k for k, _ in news])
         groups = {}
         grouped_split = grouping_regex.findall(old)
         if grouped_split:
             for old_class, old_content in grouped_split:
-                olds = []
-                for k, v in csstext_to_pairs(old_content):
-                    olds.append((k.strip(), v.strip()))
-                groups[old_class] = olds
+                groups[old_class] = [(k, v) for k, v in csstext_to_pairs(old_content)]
         else:
-            olds = []
-            for k, v in csstext_to_pairs(old):
-                olds.append((k.strip(), v.strip()))
-            groups[''] = olds
+            groups[''] = [(k, v) for k, v in csstext_to_pairs(old)]
 
     # Perform the merge
     relevant_olds = groups.get(class_, {})
@@ -187,7 +178,8 @@ class Premailer(object):
         self.disable_basic_attributes = disable_basic_attributes
         self.disable_validation = disable_validation
 
-    def _parse_style_rules(self, css_body, ruleset_index):
+    @function_cache()
+    def _parse_style_rules(self, css_body, ruleset_index, validate=False):
         """ Returns a list of rules to apply to this doc and a list of rules that won't be used
             because e.g. they are pseudoclasses. Rules look like: (specificity, selector, bulk)
             for example: ((0, 1, 0, 0, 0), u'.makeblue', u'color:blue'). The bulk of the rule
@@ -205,11 +197,11 @@ class Premailer(object):
 
         leftover = []
         rules = []
-        rule_index = 0
+        
         # empty string
         if not css_body:
             return rules, leftover
-        sheet = cssutils.parseString(css_body, validate=not self.disable_validation)
+        sheet = cssutils.parseString(css_body, validate=validate)
         for rule in sheet:
             # handle media rule
             if rule.type == rule.MEDIA_RULE:
@@ -268,7 +260,7 @@ class Premailer(object):
                         class_count,
                         element_count,
                         ruleset_index,
-                        len(rules) # this is the rule's index number
+                        len(rules)  # this is the rule's index number
                     )
                     rules.append((specificity, selector, bulk))
 
@@ -296,12 +288,12 @@ class Premailer(object):
             root = tree if stripped.startswith(tree.docinfo.doctype) else page
 
         assert page is not None
-
+        
         head = get_or_create_head(tree)
-
-        ##
-        ## style selectors
-        ##
+        
+        # #
+        # # style selectors
+        # #
 
         rules = []
         index = 0
@@ -330,11 +322,10 @@ class Premailer(object):
             else:
                 href = element.attrib.get('href')
                 css_body = self._load_external(href)
-
-            these_rules, these_leftover = self._parse_style_rules(css_body, index)
+                
+            these_rules, these_leftover = self._parse_style_rules(css_body, index, validate=not self.disable_validation)
             index += 1
             rules.extend(these_rules)
-
             parent_of_element = element.getparent()
             if these_leftover or self.keep_style_tags:
                 if is_style:
@@ -355,26 +346,28 @@ class Premailer(object):
 
             elif not self.keep_style_tags or not is_style:
                 parent_of_element.remove(element)
-
+            
         # external style files
         if self.external_styles:
             for stylefile in self.external_styles:
                 css_body = self._load_external(stylefile)
                 self._process_css_text(css_body, index, rules, head)
                 index += 1
-
+        
         # css text
         if self.css_text:
             for css_body in self.css_text:
                 self._process_css_text(css_body, index, rules, head)
                 index += 1
 
+        
         # rules is a tuple of (specificity, selector, styles), where specificity is a tuple
         # ordered such that more specific rules sort larger.
         rules.sort(key=operator.itemgetter(0))
-
+        
         first_time = []
         first_time_styles = []
+        
         for __, selector, style in rules:
             new_selector = selector
             class_ = ''
@@ -386,7 +379,8 @@ class Premailer(object):
                 class_ = ''
             else:
                 selector = new_selector
-
+            
+              
             sel = CSSSelector(selector)
             for item in sel(page):
                 old_style = item.attrib.get('style', '')
@@ -397,14 +391,13 @@ class Premailer(object):
                 else:
                     new_style = merge_styles(old_style, style, class_)
                 item.attrib['style'] = new_style
-                self._style_to_basic_html_attributes(item, new_style,
-                                                     force=True)
-
+                self._style_to_basic_html_attributes(item, new_style, force=True)
+        
         # Re-apply initial inline styles.
         for item, inline_style in first_time_styles:
-            old_style = item.attrib.get('style', '')
             if not inline_style:
                 continue
+            old_style = item.attrib.get('style', '')
             new_style = merge_styles(old_style, inline_style, class_)
             item.attrib['style'] = new_style
             self._style_to_basic_html_attributes(item, new_style, force=True)
@@ -414,10 +407,11 @@ class Premailer(object):
             for item in page.xpath('//@class'):
                 parent = item.getparent()
                 del parent.attrib['class']
+                
 
-        ##
-        ## URLs
-        ##
+        # #
+        # # URLs
+        # #
         if self.base_url:
             for attr in ('href', 'src'):
                 for item in page.xpath("//@%s" % attr):
@@ -544,7 +538,7 @@ class Premailer(object):
         """processes the given css_text by adding rules that can be in-lined to the given rules list and
         adding any that cannot be in-lined to the given `<head>` element
         """
-        these_rules, these_leftover = self._parse_style_rules(css_text, index)
+        these_rules, these_leftover = self._parse_style_rules(css_text, index, validate=not self.disable_validation)
         rules.extend(these_rules)
         if these_leftover or self.keep_style_tags:
             style = etree.Element('style')
@@ -554,8 +548,7 @@ class Premailer(object):
             else:
                 style.text = self._css_rules_to_string(these_leftover)
             head.append(style)
-
-
+            
 def transform(html, base_url=None):
     return Premailer(html, base_url=base_url).transform()
 
