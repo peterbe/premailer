@@ -49,7 +49,6 @@ grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
 
 
 styles_cache = {}
-variable_value_cache = {}
 
 def merge_styles(old, new, class_=''):
     """
@@ -70,18 +69,18 @@ def merge_styles(old, new, class_=''):
 
     def csstext_to_pairs(csstext):
         try:
-            parsed = styles_cache[csstext]
+            (parsed, variable_value_cache) = styles_cache[csstext]
         except KeyError:
             parsed = cssutils.css.CSSVariablesDeclaration(csstext)
-            styles_cache[csstext] = parsed
+            variable_value_cache = {}
+            styles_cache[csstext] = (parsed, variable_value_cache)
 
         for key in sorted(parsed):
-            cache_key = (csstext, key)
             try:
-                variable_value = variable_value_cache[cache_key]
+                variable_value = variable_value_cache[key]
             except KeyError:
                 variable_value = parsed.getVariableValue(key)
-                variable_value_cache[cache_key] = variable_value
+                variable_value_cache[key] = variable_value
 
             yield (key, variable_value)
 
