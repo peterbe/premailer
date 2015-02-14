@@ -104,7 +104,8 @@ class Tests(unittest.TestCase):
         old = 'font-size:1px; color: red'
         new = 'font-size:2px; font-weight: bold'
         expect = 'color:red;', 'font-size:2px;', 'font-weight:bold'
-        result = merge_styles(old, new)
+        cache = {}
+        result = merge_styles(old, new, cache)
         for each in expect:
             ok_(each in result)
 
@@ -117,7 +118,8 @@ class Tests(unittest.TestCase):
         # We expect something like this:
         #  {color:red; font-size:1px} :hover{font-size:2px; font-weight:bold}
 
-        result = merge_styles(old, new, class_)
+        cache = {}
+        result = merge_styles(old, new, cache, class_)
         ok_(result.startswith('{'))
         ok_(result.endswith('}'))
         ok_(' :hover{' in result)
@@ -138,7 +140,8 @@ class Tests(unittest.TestCase):
             'font-size:2px;',
             'font-weight:bold'
         )
-        result = merge_styles(old, new)
+        cache = {}
+        result = merge_styles(old, new, cache)
         for each in expect:
             ok_(each in result)
 
@@ -1578,9 +1581,10 @@ class Tests(unittest.TestCase):
 
             def run(self):
                 """Calls merge_styles in a loop and sets exc attribute if merge_styles raises an exception."""
+                cache = {}
                 for i in range(0, REPEATS):
                     try:
-                        merge_styles(self.old, self.new, self.class_)
+                        merge_styles(self.old, self.new, cache, self.class_)
                     except Exception as e:
                         logging.exception("Exception in thread %s", self.name)
                         self.exc = e
