@@ -2168,6 +2168,8 @@ class Tests(unittest.TestCase):
         p = Premailer(html, disable_validation=True)
         result_html = p.transform()
 
+        compare_html(expect_html, result_html)
+
     @mock.patch('premailer.premailer.warnings')
     def test_ignore_some_incorrectly(self, warnings_mock):
         """You can put `data-premailer="ignore"` but if the attribute value
