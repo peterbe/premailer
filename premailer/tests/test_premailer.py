@@ -1,5 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 import sys
+import os
+import time
 import re
 import unittest
 from contextlib import contextmanager
@@ -2236,3 +2238,15 @@ class Tests(unittest.TestCase):
         p = Premailer(html, disable_validation=True)
         result_html = p.transform()
         compare_html(expect_html, result_html)
+
+    def test_long_table_html(self):
+
+        html_file = os.path.join('premailer', 'tests', 'test-long-table.html')
+        html = open(html_file, 'r').read()
+
+        p = Premailer(html)
+        start = time.time()
+        p.transform()
+        end = time.time()
+
+        self.assertLess(end - start, 10)
