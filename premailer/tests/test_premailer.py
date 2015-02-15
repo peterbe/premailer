@@ -20,6 +20,7 @@ from premailer.premailer import (
     transform,
     Premailer,
     merge_styles,
+    csstext_to_pairs,
     ExternalNotFoundError,
 )
 from premailer.__main__ import main
@@ -99,15 +100,15 @@ class Tests(unittest.TestCase):
         pass
 
     def test_merge_styles_basic(self):
-        old = 'font-size:1px; color: red'
+        inline_style = 'font-size:1px; color: red'
         new = 'font-size:2px; font-weight: bold'
-        expect = 'color:red;', 'font-size:2px;', 'font-weight:bold'
-        result = merge_styles(old, new)
+        expect = 'color:red;', 'font-size:1px;', 'font-weight:bold'
+        result = merge_styles(inline_style, [csstext_to_pairs(new)],[''])
         for each in expect:
             ok_(each in result)
 
     def test_merge_styles_with_class(self):
-        old = 'color:red; font-size:1px;'
+        inline_style = 'color:red; font-size:1px;'
         new, class_ = 'font-size:2px; font-weight: bold', ':hover'
 
         # because we're dealing with dicts (random order) we have to
@@ -115,7 +116,7 @@ class Tests(unittest.TestCase):
         # We expect something like this:
         #  {color:red; font-size:1px} :hover{font-size:2px; font-weight:bold}
 
-        result = merge_styles(old, new, class_)
+        result = merge_styles(inline_style, [csstext_to_pairs(new)], [class_])
         ok_(result.startswith('{'))
         ok_(result.endswith('}'))
         ok_(' :hover{' in result)
@@ -129,14 +130,14 @@ class Tests(unittest.TestCase):
             ok_(each in split_regex.findall(result)[1])
 
     def test_merge_styles_non_trivial(self):
-        old = 'background-image:url("data:image/png;base64,iVBORw0KGg")'
+        inline_style = 'background-image:url("data:image/png;base64,iVBORw0KGg")'
         new = 'font-size:2px; font-weight: bold'
         expect = (
             'background-image:url("data:image/png;base64,iVBORw0KGg")',
             'font-size:2px;',
             'font-weight:bold'
         )
-        result = merge_styles(old, new)
+        result = merge_styles(inline_style, [csstext_to_pairs(new)],[''])
         for each in expect:
             ok_(each in result)
 
@@ -607,7 +608,6 @@ class Tests(unittest.TestCase):
 
         p = Premailer(html, exclude_pseudoclasses=False)
         result_html = p.transform()
-
         # because we're dealing with random dicts here we can't predict what
         # order the style attribute will be written in so we'll look for
         # things manually.
@@ -621,6 +621,7 @@ class Tests(unittest.TestCase):
         self.fragment_in_html(e, result_html)
         e = ' :hover{border:1px solid green; text-decoration:none}'
         self.fragment_in_html(e, result_html)
+        
 
     def test_css_with_pseudoclasses_excluded(self):
         "Skip things like `a:hover{}` and keep them in the style block"
@@ -1576,21 +1577,21 @@ class Tests(unittest.TestCase):
 
             def run(self):
                 """Calls merge_styles in a loop and sets exc attribute if merge_styles raises an exception."""
-                for i in range(0, REPEATS):
+                for _ in range(0, REPEATS):
                     try:
                         merge_styles(self.old, self.new, self.class_)
                     except Exception as e:
                         logging.exception("Exception in thread %s", self.name)
                         self.exc = e
 
-        old = 'background-color:#ffffff;'
+        inline_style = 'background-color:#ffffff;'
         new = 'background-color:#dddddd;'
         class_ = ''
 
         # start multiple threads concurrently; each calls merge_styles many times
         threads = [
-            RepeatMergeStylesThread(old, new, class_)
-            for i in range(0, THREADS)
+            RepeatMergeStylesThread(inline_style, [csstext_to_pairs(new)], [class_])
+            for _ in range(0, THREADS)
         ]
         for t in threads:
             t.start()
