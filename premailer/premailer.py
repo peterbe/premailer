@@ -32,6 +32,7 @@ import cssutils
 from lxml import etree
 from lxml.cssselect import CSSSelector
 from premailer.merge_style import merge_styles, csstext_to_pairs
+from premailer.cache import function_cache
 
 __all__ = ['PremailerError', 'Premailer', 'transform']
 
@@ -64,6 +65,21 @@ def get_or_create_head(root):
     else:
         return head[0]
 
+@function_cache()
+def _cache_parse_css_string(css_body, validate=True):
+    """
+        This function will cache the result from cssutils
+        It is a big gain when number of rules is big
+
+        Args:
+            css_body(str): css rules in string format
+            validate(bool): if cssutils should validate
+
+        Returns:
+            cssutils.css.cssstylesheet.CSSStyleSheet
+
+    """
+    return cssutils.parseString(css_body, validate=validate)
 
 _element_selector_regex = re.compile(r'(^|\s)\w')
 _cdata_regex = re.compile(r'\<\!\[CDATA\[(.*?)\]\]\>', re.DOTALL)
@@ -71,7 +87,6 @@ _importants = re.compile('\s*!important')
 # These selectors don't apply to all elements. Rather, they specify
 # which elements to apply to.
 FILTER_PSEUDOSELECTORS = [':last-child', ':first-child', 'nth-child']
-
 
 class Premailer(object):
 
@@ -88,7 +103,8 @@ class Premailer(object):
                  method="html",
                  base_path=None,
                  disable_basic_attributes=None,
-                 disable_validation=False):
+                 disable_validation=False,
+                 cache_css_parsing=True):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
@@ -113,6 +129,15 @@ class Premailer(object):
             disable_basic_attributes = []
         self.disable_basic_attributes = disable_basic_attributes
         self.disable_validation = disable_validation
+        self.cache_css_parsing = cache_css_parsing
+
+
+    def _parse_css_string(self, css_body, validate=True):
+        if self.cache_css_parsing:
+            return _cache_parse_css_string(css_body, validate=validate)
+
+        return cssutils.parseString(css_body, validate=validate)
+
 
     def _parse_style_rules(self, css_body, ruleset_index):
         """ Returns a list of rules to apply to this doc and a list of rules that won't be used
@@ -135,7 +160,7 @@ class Premailer(object):
         # empty string
         if not css_body:
             return rules, leftover
-        sheet = cssutils.parseString(css_body, validate=not self.disable_validation)
+        sheet = self._parse_css_string(css_body, validate=not self.disable_validation)
         for rule in sheet:
             # handle media rule
             if rule.type == rule.MEDIA_RULE:
@@ -221,7 +246,7 @@ class Premailer(object):
             root = tree if stripped.startswith(tree.docinfo.doctype) else page
 
         assert page is not None
-        
+
         head = get_or_create_head(tree)
         # #
         # # style selectors
@@ -229,14 +254,14 @@ class Premailer(object):
 
         rules = []
         index = 0
-        
+
         for element in CSSSelector('style,link[rel~=stylesheet]')(page):
             # If we have a media attribute whose value is anything other than
             # 'screen', ignore the ruleset.
             media = element.attrib.get('media')
             if media and media != 'screen':
                 continue
-            
+
             data_attribute = element.attrib.get('data-premailer')
             if data_attribute:
                 if data_attribute == 'ignore':
@@ -248,14 +273,14 @@ class Premailer(object):
                             data_attribute,
                         )
                     )
-                
+
             is_style = element.tag == 'style'
             if is_style:
                 css_body = element.text
             else:
                 href = element.attrib.get('href')
                 css_body = self._load_external(href)
-                
+
             these_rules, these_leftover = self._parse_style_rules(css_body, index)
             index += 1
             rules.extend(these_rules)
@@ -279,24 +304,24 @@ class Premailer(object):
 
             elif not self.keep_style_tags or not is_style:
                 parent_of_element.remove(element)
-            
+
         # external style files
         if self.external_styles:
             for stylefile in self.external_styles:
                 css_body = self._load_external(stylefile)
                 self._process_css_text(css_body, index, rules, head)
                 index += 1
-        
+
         # css text
         if self.css_text:
             for css_body in self.css_text:
                 self._process_css_text(css_body, index, rules, head)
                 index += 1
-        
+
         # rules is a tuple of (specificity, selector, styles), where specificity is a tuple
         # ordered such that more specific rules sort larger.
         rules.sort(key=operator.itemgetter(0))
-        
+
         # collecting all elements that we need to apply rules on
         # id is unique for the lifetime of the object
         # and lxml should give us the same everytime during this run
@@ -313,7 +338,7 @@ class Premailer(object):
                 class_ = ''
             else:
                 selector = new_selector
-            
+
             sel = CSSSelector(selector)
             items = sel(page)
             if len(items):
@@ -321,15 +346,15 @@ class Premailer(object):
                 processed_style = csstext_to_pairs(style)
                 if not processed_style:
                     continue
-                
+
                 for item in items:
                     item_id = id(item)
                     if item_id not in elements:
                         elements[item_id] = {'item': item, 'classes': [], 'style': []}
-                    
+
                     elements[item_id]['style'].append(processed_style)
                     elements[item_id]['classes'].append(class_)
-        
+
         # Now apply inline style
         # merge style only once for each element
         # crucial when you have a lot of pseudo/classes
@@ -339,13 +364,13 @@ class Premailer(object):
                                        element['style'], element['classes'])
             element['item'].attrib['style'] = final_style
             self._style_to_basic_html_attributes(element['item'], final_style, force=True)
- 
+
         if self.remove_classes:
             # now we can delete all 'class' attributes
             for item in page.xpath('//@class'):
                 parent = item.getparent()
                 del parent.attrib['class']
-                
+
         # #
         # # URLs
         # #
@@ -485,7 +510,7 @@ class Premailer(object):
             else:
                 style.text = self._css_rules_to_string(these_leftover)
             head.append(style)
-            
+
 def transform(html, base_url=None):
     return Premailer(html, base_url=base_url).transform()
 
