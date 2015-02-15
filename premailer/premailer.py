@@ -48,7 +48,7 @@ class ExternalNotFoundError(ValueError):
 grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
 
 
-def merge_styles(old, new, class_=''):
+def merge_styles(old, new, styles_cache, class_=''):
     """
     if ::
       old = 'font-size:1px; color: red'
@@ -66,9 +66,21 @@ def merge_styles(old, new, class_=''):
     """
 
     def csstext_to_pairs(csstext):
-        parsed = cssutils.css.CSSVariablesDeclaration(csstext)
+        try:
+            (parsed, variable_value_cache) = styles_cache[csstext]
+        except KeyError:
+            parsed = cssutils.css.CSSVariablesDeclaration(csstext)
+            variable_value_cache = {}
+            styles_cache[csstext] = (parsed, variable_value_cache)
+
         for key in sorted(parsed):
-            yield (key, parsed.getVariableValue(key))
+            try:
+                variable_value = variable_value_cache[key]
+            except KeyError:
+                variable_value = parsed.getVariableValue(key)
+                variable_value_cache[key] = variable_value
+
+            yield (key, variable_value)
 
     new_keys = set()
     news = []
@@ -375,6 +387,7 @@ class Premailer(object):
 
         first_time = []
         first_time_styles = []
+        styles_cache = {}
         for __, selector, style in rules:
             new_selector = selector
             class_ = ''
@@ -391,11 +404,11 @@ class Premailer(object):
             for item in sel(page):
                 old_style = item.attrib.get('style', '')
                 if not item in first_time:
-                    new_style = merge_styles(old_style, style, class_)
+                    new_style = merge_styles(old_style, style, styles_cache, class_)
                     first_time.append(item)
                     first_time_styles.append((item, old_style))
                 else:
-                    new_style = merge_styles(old_style, style, class_)
+                    new_style = merge_styles(old_style, style, styles_cache, class_)
                 item.attrib['style'] = new_style
                 self._style_to_basic_html_attributes(item, new_style,
                                                      force=True)
@@ -405,7 +418,7 @@ class Premailer(object):
             old_style = item.attrib.get('style', '')
             if not inline_style:
                 continue
-            new_style = merge_styles(old_style, inline_style, class_)
+            new_style = merge_styles(old_style, inline_style, styles_cache, class_)
             item.attrib['style'] = new_style
             self._style_to_basic_html_attributes(item, new_style, force=True)
 

@@ -1,7 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 import sys
+import os
+import time
 import re
 import unittest
+import platform
 from contextlib import contextmanager
 if sys.version_info >= (3, ):  # As in, Python 3
     from urllib.request import urlopen
@@ -102,7 +105,8 @@ class Tests(unittest.TestCase):
         old = 'font-size:1px; color: red'
         new = 'font-size:2px; font-weight: bold'
         expect = 'color:red;', 'font-size:2px;', 'font-weight:bold'
-        result = merge_styles(old, new)
+        cache = {}
+        result = merge_styles(old, new, cache)
         for each in expect:
             ok_(each in result)
 
@@ -115,7 +119,8 @@ class Tests(unittest.TestCase):
         # We expect something like this:
         #  {color:red; font-size:1px} :hover{font-size:2px; font-weight:bold}
 
-        result = merge_styles(old, new, class_)
+        cache = {}
+        result = merge_styles(old, new, cache, class_)
         ok_(result.startswith('{'))
         ok_(result.endswith('}'))
         ok_(' :hover{' in result)
@@ -136,7 +141,8 @@ class Tests(unittest.TestCase):
             'font-size:2px;',
             'font-weight:bold'
         )
-        result = merge_styles(old, new)
+        cache = {}
+        result = merge_styles(old, new, cache)
         for each in expect:
             ok_(each in result)
 
@@ -1576,9 +1582,10 @@ class Tests(unittest.TestCase):
 
             def run(self):
                 """Calls merge_styles in a loop and sets exc attribute if merge_styles raises an exception."""
+                cache = {}
                 for i in range(0, REPEATS):
                     try:
-                        merge_styles(self.old, self.new, self.class_)
+                        merge_styles(self.old, self.new, cache, self.class_)
                     except Exception as e:
                         logging.exception("Exception in thread %s", self.name)
                         self.exc = e
@@ -2162,6 +2169,8 @@ class Tests(unittest.TestCase):
         p = Premailer(html, disable_validation=True)
         result_html = p.transform()
 
+        compare_html(expect_html, result_html)
+
     @mock.patch('premailer.premailer.warnings')
     def test_ignore_some_incorrectly(self, warnings_mock):
         """You can put `data-premailer="ignore"` but if the attribute value
@@ -2235,4 +2244,36 @@ class Tests(unittest.TestCase):
 
         p = Premailer(html, disable_validation=True)
         result_html = p.transform()
+        compare_html(expect_html, result_html)
+
+    def test_long_table_html(self):
+
+        html_file = os.path.join('premailer', 'tests', 'test-long-table.html')
+        html = open(html_file, 'r').read()
+
+        p = Premailer(html)
+        start = time.time()
+        result_html = p.transform()
+        end = time.time()
+
+        processed_html_file = os.path.join('premailer', 'tests', 'test-long-table-process.html')
+        expect_html = open(processed_html_file, 'r').read()
+
+        is_cpython = platform.python_implementation() == 'CPython'
+        is_pypy = platform.python_implementation() == 'PyPy'
+
+        if is_cpython:
+            # It seems to take around 2.2 secs on Travis but we some padding
+            max_time = 6
+        elif is_pypy:
+            # It seems to take around 17 secs on Travis for PyPy but we some padding
+            max_time = 25
+        else:
+            raise Exception('Unknown platform')
+
+        exec_time = end - start
+        self.assertTrue(
+            exec_time < max_time,
+            'Execution time {0} is less than the upper limit of {1}'.format(exec_time, max_time)
+        )
         compare_html(expect_html, result_html)
