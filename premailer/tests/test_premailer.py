@@ -2237,3 +2237,36 @@ class Tests(unittest.TestCase):
         p = Premailer(html, disable_validation=True)
         result_html = p.transform()
         compare_html(expect_html, result_html)
+    
+    def test_turnoff_cache_works_as_expected(self):
+        html = """<html>
+        <head>
+        <style>
+        .color {
+            color: green;
+        }
+        div.example {
+            font-size: 10px;
+        }
+        </style>
+        </head>
+        <body>
+        <div class="color example"></div>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        </head>
+        <body>
+        <div style="color:green; font-size:10px"></div>
+        </body>
+        </html>"""
+
+        p = Premailer(html, cache_css_parsing=False)
+        self.assertFalse(p.cache_css_parsing)
+        # run one time first
+        p.transform()
+        result_html = p.transform()
+
+        compare_html(expect_html, result_html)
