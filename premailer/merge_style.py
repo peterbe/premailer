@@ -32,9 +32,10 @@ def merge_styles(inline_style, new_styles, classes):
             str: the final style
     """
     # building classes
-    styles = {pc: {} for pc in set(classes)}
-    # probably faster just override
-    styles[''] = {}
+    styles = {'': {}}
+    for pc in set(classes):
+        styles[pc] = {}
+    
     for i, style in enumerate(new_styles):
         for k, v in style:
             styles[classes[i]][k] = v
