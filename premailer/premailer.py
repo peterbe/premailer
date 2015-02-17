@@ -347,8 +347,6 @@ class Premailer(object):
             if len(items):
                 # same so process it first
                 processed_style = csstext_to_pairs(style)
-                if not processed_style:
-                    continue
 
                 for item in items:
                     item_id = id(item)
