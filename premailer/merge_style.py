@@ -20,6 +20,8 @@ def merge_styles(inline_style, new_styles, classes):
         This will merge all new styles where the order is important
         The last one will override the first
         When that is done it will apply old inline style again
+        The old inline style is always important and override
+        all new ones. The inline style must be valid.
         
         Args:
             inline_style(str): the old inline style of the element if there is one
@@ -55,9 +57,11 @@ def merge_styles(inline_style, new_styles, classes):
             normal_styles.append('; '.join('%s:%s' % (k, v) for k, v in sorted(kv.items())))
     
     if pseudo_styles:
+        # if we do or code thing correct this should not happen
+        # inline style definition: declarations without braces
         all_styles = (['{%s}' % ''.join(normal_styles)] + pseudo_styles) if normal_styles else pseudo_styles
     else:
         all_styles = normal_styles
-        
+    
     return ' '.join(all_styles).strip()
 

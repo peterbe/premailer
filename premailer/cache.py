@@ -19,7 +19,22 @@ class _Cache(object):
         self.cache = {}
 
 def function_cache(expected_max_entries=1000):
-    
+    """
+        function_cache is a decorator for caching function call
+        the argument to the wrapped function must be hashable else
+        it will not work
+        
+        expected_max_entries is for protecting cache failure. If cache misses more than
+        this number the cache will turn off itself. Specify None you sure that the cache
+        will not cause memory limit problem
+        
+        Args:
+            expected_max_entries(integer OR None): will raise if not correct
+            
+        Returns:
+            function
+            
+    """
     if expected_max_entries is not None and not isinstance(expected_max_entries, int):
         raise TypeError('Expected expected_max_entries to be an integer or None')
     

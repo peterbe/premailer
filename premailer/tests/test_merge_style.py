@@ -6,7 +6,7 @@ from premailer.merge_style import csstext_to_pairs, merge_styles
 
 class TestMergeStyle(unittest.TestCase):
     # test what is not cover in test_premailer
-    # should romve them here
+    # should move them here
     # smaller files are easier to work with
     def test_csstext_to_pairs(self):
         csstext = 'font-size:1px; color: red'
