@@ -15,8 +15,6 @@ def csstext_to_pairs(csstext):
 
 csstext_to_pairs._lock = threading.RLock()
 
-grouping_regex = re.compile('([:\-\w]*){([^}]+)}')
-
 def merge_styles(inline_style, new_styles, classes):    
     """
         This will merge all new styles where the order is important
@@ -41,15 +39,10 @@ def merge_styles(inline_style, new_styles, classes):
             
     # keep always the old inline style
     if inline_style:
-        ## finding pseudoclasses
-        grouped_split = grouping_regex.findall(inline_style)
-        if grouped_split:
-            for old_class, old_content in grouped_split:
-                for k, v in csstext_to_pairs(old_content):
-                    styles[old_class][k] = v
-        else:
-            for k, v in csstext_to_pairs(inline_style):
-                styles[''][k] = v
+        # inline should be a declaration list as I understand
+        # ie property-name:property-value;...
+        for k, v in csstext_to_pairs(inline_style):
+            styles[''][k] = v
         
     normal_styles = []
     pseudo_styles = []
