@@ -1,5 +1,15 @@
 # https://travis-ci.org/peterbe/premailer
 
+# This indicates to Travis that we will not use or need sudo
+# so that we can benefit from and use the cache->directories
+# directive.
+sudo: no
+
+env: PIP_DOWNLOAD_CACHE="pip_cache"
+cache:
+    directories:
+        - pip_cache
+
 language: python
 
 before_install:
