@@ -2,25 +2,25 @@
 
 language: python
 
-python:
-  - "2.6"
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "pypy"
-
 before_install:
-  - pip install coverage
+  - travis_retry pip install coverage tox coveralls
 
 install:
-  - python setup.py install
+  - travis_retry python setup.py install
+
+env:
+  - TOX_ENV=flake8
+  - TOX_ENV=py26
+  - TOX_ENV=py27
+  - TOX_ENV=py33
+  - TOX_ENV=py34
+  - TOX_ENV=pypy
 
 script:
-  - nosetests premailer --with-cover --cover-erase --cover-package=premailer
+  - tox -e $TOX_ENV
 
 after_success:
   # Report coverage results to coveralls.io
-  - pip install coveralls --use-mirrors
   - coveralls
 
 deploy:
