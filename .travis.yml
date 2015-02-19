@@ -14,13 +14,13 @@ before_install:
 
 install:
   - python setup.py install
+  - pip install tox coveralls
 
 script:
-  - nosetests premailer --with-cover --cover-erase --cover-package=premailer
+  - tox -e $TOX_ENV
 
 after_success:
   # Report coverage results to coveralls.io
-  - pip install coveralls --use-mirrors
   - coveralls
 
 deploy:

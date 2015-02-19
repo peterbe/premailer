@@ -13,7 +13,7 @@ class TestMergeStyle(unittest.TestCase):
         csstext = 'font-size:1px'
         parsed_csstext = csstext_to_pairs(csstext)
         self.assertEqual(('font-size', '1px'), parsed_csstext[0])
-        
+
     @raises(xml.dom.SyntaxErr)
     def test_inline_invalid_syntax(self):
         # inline shouldn't have those as I understand

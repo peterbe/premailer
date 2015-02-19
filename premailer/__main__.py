@@ -10,7 +10,8 @@ def main(args):
 
     Usage::
 
-        $ echo '<style>h1 { color:red; }</style><h1>Title</h1>' | python -m premailer
+        $ echo '<style>h1 { color:red; }</style><h1>Title</h1>' | \
+        python -m premailer
         <h1 style="color:red"></h1>
         $ cat newsletter.html | python -m premailer
     """
@@ -103,7 +104,9 @@ def main(args):
     options = parser.parse_args(args)
 
     if options.disable_basic_attributes:
-        options.disable_basic_attributes = options.disable_basic_attributes.split()
+        options.disable_basic_attributes = (
+            options.disable_basic_attributes.split()
+        )
 
     html = options.infile.read()
     if hasattr(html, 'decode'):  # Forgive me: Python 2 compatability
