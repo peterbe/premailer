@@ -1,4 +1,12 @@
 from __future__ import absolute_import, unicode_literals, print_function
+from io import BytesIO  # Yes, there is an io module in Python 2
+import cgi
+import codecs
+import gzip
+import operator
+import os
+import re
+import warnings
 try:
     from collections import OrderedDict
 except ImportError:  # pragma: no cover
@@ -20,14 +28,6 @@ else:  # Python 2
     from urllib2 import urlopen
     from urlparse import urljoin
     STR_TYPE = basestring
-from io import BytesIO  # Yes, there is an io module in Python 2
-import cgi
-import codecs
-import gzip
-import operator
-import os
-import re
-import warnings
 
 import cssutils
 from lxml import etree
