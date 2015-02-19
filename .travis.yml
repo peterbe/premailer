@@ -16,6 +16,14 @@ install:
   - python setup.py install
   - pip install tox coveralls
 
+env:
+  - TOX_ENV=flake8
+  - TOX_ENV=py26
+  - TOX_ENV=py27
+  - TOX_ENV=py33
+  - TOX_ENV=py34
+  - TOX_ENV=pypy
+
 script:
   - tox -e $TOX_ENV
 
