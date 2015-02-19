@@ -3,11 +3,10 @@
 language: python
 
 before_install:
-  - pip install coverage
+  - travis_retry pip install coverage tox coveralls
 
 install:
-  - python setup.py install
-  - pip install tox coveralls
+  - travis_retry python setup.py install
 
 env:
   - TOX_ENV=flake8
