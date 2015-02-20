@@ -41,3 +41,7 @@ deploy:
   on:
     repo: peterbe/premailer
   distributions: "sdist bdist_wheel"
+
+notifications:
+  email:
+    on_success: never
