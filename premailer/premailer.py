@@ -95,6 +95,8 @@ FILTER_PSEUDOSELECTORS = [':last-child', ':first-child', 'nth-child']
 
 class Premailer(object):
 
+    attribute_name = 'data-premailer'
+
     def __init__(self, html, base_url=None,
                  preserve_internal_links=False,
                  preserve_inline_attachments=True,
@@ -277,14 +279,15 @@ class Premailer(object):
             if media and media != 'screen':
                 continue
 
-            data_attribute = element.attrib.get('data-premailer')
+            data_attribute = element.attrib.get(self.attribute_name)
             if data_attribute:
                 if data_attribute == 'ignore':
-                    del element.attrib['data-premailer']
+                    del element.attrib[self.attribute_name]
                     continue
                 else:
                     warnings.warn(
-                        'Unrecognized data-premailer attribute (%r)' % (
+                        'Unrecognized %s attribute (%r)' % (
+                            self.attribute_name,
                             data_attribute,
                         )
                     )
