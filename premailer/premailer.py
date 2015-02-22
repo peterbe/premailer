@@ -399,6 +399,8 @@ class Premailer(object):
         # URLs
         #
         if self.base_url:
+            if not self.base_url.endswith('/'):
+                self.base_url += '/'
             for attr in ('href', 'src'):
                 for item in page.xpath("//@%s" % attr):
                     parent = item.getparent()
@@ -412,8 +414,6 @@ class Premailer(object):
                         parent.attrib[attr].startswith('cid:')
                     ):
                         continue
-                    if not self.base_url.endswith('/'):
-                        self.base_url += '/'
                     parent.attrib[attr] = urljoin(
                         self.base_url,
                         parent.attrib[attr].lstrip('/')
