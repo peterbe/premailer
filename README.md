@@ -13,7 +13,6 @@ maintained project please consider supporting me on [Gratipay](https://gratipay.
 
 [![Gratipay](https://img.shields.io/gratipay/peterbe.svg)](https://gratipay.com/peterbe/)
 
-Every little helps.
 
 Python versions
 ---------------
