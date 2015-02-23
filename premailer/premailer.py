@@ -487,7 +487,7 @@ class Premailer(object):
         """
         if (
             style_content.count('}') and
-            style_content.count('{') == style_content.count('{')
+            style_content.count('{') == style_content.count('}')
         ):
             style_content = style_content.split('}')[0][1:]
 
