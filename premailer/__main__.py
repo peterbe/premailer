@@ -101,6 +101,12 @@ def main(args):
         help="Disable CSSParser validation of attributes and values",
     )
 
+    parser.add_argument(
+        "--pretty", default=False,
+        action="store_true",
+        help="Pretty-print the outputted HTML.",
+    )
+
     options = parser.parse_args(args)
 
     if options.disable_basic_attributes:
@@ -128,7 +134,7 @@ def main(args):
         disable_basic_attributes=options.disable_basic_attributes,
         disable_validation=options.disable_validation
     )
-    options.outfile.write(p.transform())
+    options.outfile.write(p.transform(pretty_print=options.pretty))
     return 0
 
 
