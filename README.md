@@ -120,7 +120,7 @@ You can also use premailer from the command line by using his main module.
     --disable-basic-attributes DISABLE_BASIC_ATTRIBUTES
                           Disable provided basic attributes (comma separated)
     --disable-validation  Disable CSSParser validation of attributes and values
-		--pretty              Pretty-print the outputted HTML.
+    --pretty              Pretty-print the outputted HTML.
 
 A basic example:
 
