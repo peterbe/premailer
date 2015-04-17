@@ -5,14 +5,14 @@ premailer
 
 [![Coverage Status](https://coveralls.io/repos/peterbe/premailer/badge.png?branch=master)](https://coveralls.io/r/peterbe/premailer?branch=master)
 
-Donations aka. the tip jar
---------------------------
 
-If you enjoy, benefit and want premailer to continue to be an actively
-maintained project please consider supporting me on [Gratipay](https://gratipay.com/peterbe/).
+Looking for sponsors
+--------------------
 
-[![Gratipay](https://img.shields.io/gratipay/peterbe.svg)](https://gratipay.com/peterbe/)
-
+This project is actively looking for corporate sponsorship. 
+If you want to help making this an active project consider 
+[pinging Peter](http://www.peterbe.com/contact) and we can talk about putting up 
+logos and links to your company. 
 
 Python versions
 ---------------
@@ -221,3 +221,12 @@ To run `tox` you don't need to have all available Python versions installed beca
 Then simply start it with:
 
     tox
+
+
+Donations aka. the tip jar
+--------------------------
+
+If you enjoy, benefit and want premailer to continue to be an actively
+maintained project please consider supporting me on [Gratipay](https://gratipay.com/peterbe/).
+
+[![Gratipay](https://img.shields.io/gratipay/peterbe.svg)](https://gratipay.com/peterbe/)
