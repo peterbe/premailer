@@ -1,69 +1,74 @@
 premailer
 =========
 
-[![Travis](https://travis-ci.org/peterbe/premailer.png?branch=master)](https://travis-ci.org/peterbe/premailer)
+|Travis|
 
-[![Coverage Status](https://coveralls.io/repos/peterbe/premailer/badge.png?branch=master)](https://coveralls.io/r/peterbe/premailer?branch=master)
-
+|Coverage Status|
 
 Looking for sponsors
 --------------------
 
-This project is actively looking for corporate sponsorship. 
-If you want to help making this an active project consider 
-[pinging Peter](http://www.peterbe.com/contact) and we can talk about putting up 
-logos and links to your company. 
+This project is actively looking for corporate sponsorship. If you want
+to help making this an active project consider `pinging
+Peter <http://www.peterbe.com/contact>`__ and we can talk about putting
+up logos and links to your company.
 
 Python versions
 ---------------
 
-Our [tox.ini](https://github.com/peterbe/premailer/blob/master/tox.ini) makes sure premailer works in:
+Our
+`tox.ini <https://github.com/peterbe/premailer/blob/master/tox.ini>`__
+makes sure premailer works in:
 
-* Python 2.6
-* Python 2.7
-* Python 3.2
-* Python 3.3
-* Python 3.4
-* PyPy
+-  Python 2.6
+-  Python 2.7
+-  Python 3.2
+-  Python 3.3
+-  Python 3.4
+-  PyPy
 
 Turns CSS blocks into style attributes
 --------------------------------------
 
-When you send HTML emails you can't use style tags but instead you
-have to put inline `style` attributes on every element. So from this:
+When you send HTML emails you can't use style tags but instead you have
+to put inline ``style`` attributes on every element. So from this:
 
-```html
-<html>
-<style type="text/css">
-h1 { border:1px solid black }
-p { color:red;}
-</style>
-<h1 style="font-weight:bolder">Peter</h1>
-<p>Hej</p>
-</html>
-```
+.. code:: html
+
+    <html>
+    <style type="text/css">
+    h1 { border:1px solid black }
+    p { color:red;}
+    </style>
+    <h1 style="font-weight:bolder">Peter</h1>
+    <p>Hej</p>
+    </html>
 
 You want this:
 
-```html
-<html>
-<h1 style="font-weight:bolder; border:1px solid black">Peter</h1>
-<p style="color:red">Hej</p>
-</html>
-```
+.. code:: html
 
-premailer does this. It parses an HTML page, looks up `style` blocks
-and parses the CSS. It then uses the `lxml.html` parser to modify the
+    <html>
+    <h1 style="font-weight:bolder; border:1px solid black">Peter</h1>
+    <p style="color:red">Hej</p>
+    </html>
+
+premailer does this. It parses an HTML page, looks up ``style`` blocks
+and parses the CSS. It then uses the ``lxml.html`` parser to modify the
 DOM tree of the page accordingly.
 
 Getting started
 ---------------
 
-If you haven't already done so, install `premailer` first:
+If you haven't already done so, install ``premailer`` first:
+
+::
 
     $ pip install premailer
 
 Next, the most basic use is to use the shortcut function, like this:
+
+::
 
     >>> from premailer import transform
     >>> print transform("""
@@ -85,10 +90,13 @@ Next, the most basic use is to use the shortcut function, like this:
     </body>
     </html>
 
-For more advanced options, check out the code of the `Premailer` class
+For more advanced options, check out the code of the ``Premailer`` class
 and all its options in its constructor.
 
-You can also use premailer from the command line by using his main module.
+You can also use premailer from the command line by using his main
+module.
+
+::
 
     $ python -m premailer -h
     usage: python -m premailer [options]
@@ -125,6 +133,8 @@ You can also use premailer from the command line by using his main module.
 
 A basic example:
 
+::
+
     $ python -m premailer --base-url=http://google.com/ -f newsletter.html
     <html>
     <head><style>.heading { color:red; }</style></head>
@@ -132,6 +142,8 @@ A basic example:
     </html>
 
 The command line interface supports standard input.
+
+::
 
     $ echo '<style>.heading { color:red; }</style><h1 class="heading"><a href="/">Title</a></h1>' | python -m premailer --base-url=http://google.com/
     <html>
@@ -143,91 +155,103 @@ Turning relative URLs into absolute URLs
 ----------------------------------------
 
 Another thing premailer can do for you is to turn relative URLs (e.g.
-"/some/page.html" into "http://www.peterbe.com/some/page.html"). It
-does this to all `href` and `src` attributes that don't have a `://`
+"/some/page.html" into "http://www.peterbe.com/some/page.html"). It does
+this to all ``href`` and ``src`` attributes that don't have a ``://``
 part in it. For example, turning this:
 
-```html
-<html>
-<body>
-<a href="/">Home</a>
-<a href="page.html">Page</a>
-<a href="http://crosstips.org">External</a>
-<img src="/folder/">Folder</a>
-</body>
-</html>
-```
+.. code:: html
+
+    <html>
+    <body>
+    <a href="/">Home</a>
+    <a href="page.html">Page</a>
+    <a href="http://crosstips.org">External</a>
+    <img src="/folder/">Folder</a>
+    </body>
+    </html>
 
 Into this:
 
-```html
-<html>
-<body>
-<a href="http://www.peterbe.com/">Home</a>
-<a href="http://www.peterbe.com/page.html">Page</a>
-<a href="http://crosstips.org">External</a>
-<img src="http://www.peterbe.com/folder/">Folder</a>
-</body>
-</html>
-```
+.. code:: html
 
-by using `transform('...', base_url='http://www.peterbe.com/')`.
+    <html>
+    <body>
+    <a href="http://www.peterbe.com/">Home</a>
+    <a href="http://www.peterbe.com/page.html">Page</a>
+    <a href="http://crosstips.org">External</a>
+    <img src="http://www.peterbe.com/folder/">Folder</a>
+    </body>
+    </html>
 
-Ignore certain `<style>` or `<link>` tags
------------------------------------------
+by using ``transform('...', base_url='http://www.peterbe.com/')``.
+
+Ignore certain ``<style>`` or ``<link>`` tags
+---------------------------------------------
 
 Suppose you have a style tag that you don't want to have processed and
 transformed you can simply set a data attribute on the tag like:
 
-```html
-<head>
-<style>/* this gets processed */</style>
-<style data-premailer="ignore">/* this gets ignored */</style>
-</head>
-```
+.. code:: html
+
+    <head>
+    <style>/* this gets processed */</style>
+    <style data-premailer="ignore">/* this gets ignored */</style>
+    </head>
 
 That tag gets completely ignored except when the HTML is processed, the
-attribute `data-premailer` is removed.
+attribute ``data-premailer`` is removed.
 
-It works equally for a `<link>` tag like:
+It works equally for a ``<link>`` tag like:
 
-```html
-<head>
-<link rel="stylesheet" href="foo.css" data-premailer="ignore">
-</head>
-```
+.. code:: html
 
+    <head>
+    <link rel="stylesheet" href="foo.css" data-premailer="ignore">
+    </head>
 
 HTML attributes created additionally
 ------------------------------------
 
-Certain HTML attributes are also created on the HTML if the CSS
-contains any ones that are easily translated into HTML attributes. For
-example, if you have this CSS: `td { background-color:#eee; }` then
-this is transformed into `style="background-color:#eee"` AND as an
-HTML attribute `bgcolor="#eee"`.
+Certain HTML attributes are also created on the HTML if the CSS contains
+any ones that are easily translated into HTML attributes. For example,
+if you have this CSS: ``td { background-color:#eee; }`` then this is
+transformed into ``style="background-color:#eee"`` AND as an HTML
+attribute ``bgcolor="#eee"``.
 
 Having these extra attributes basically as a "back up" for really shit
 email clients that can't even take the style attributes. A lot of
-professional HTML newsletters such as Amazon's use this.
-You can disable some attributes in `disable_basic_attributes`
+professional HTML newsletters such as Amazon's use this. You can disable
+some attributes in ``disable_basic_attributes``
 
 Running tests with tox
 ----------------------
 
-To run `tox` you don't need to have all available Python versions installed because it will only work on those you have. To use `tox` first install it:
+To run ``tox`` you don't need to have all available Python versions
+installed because it will only work on those you have. To use ``tox``
+first install it:
+
+::
 
     pip install tox
 
 Then simply start it with:
 
-    tox
+::
 
+    tox
 
 Donations aka. the tip jar
 --------------------------
 
 If you enjoy, benefit and want premailer to continue to be an actively
-maintained project please consider supporting me on [Gratipay](https://gratipay.com/peterbe/).
+maintained project please consider supporting me on
+`Gratipay <https://gratipay.com/peterbe/>`__.
 
-[![Gratipay](https://img.shields.io/gratipay/peterbe.svg)](https://gratipay.com/peterbe/)
+|Gratipay|
+
+.. |Travis| image:: https://travis-ci.org/peterbe/premailer.png?branch=master
+   :target: https://travis-ci.org/peterbe/premailer
+.. |Coverage Status| image:: https://coveralls.io/repos/peterbe/premailer/badge.png?branch=master
+   :target: https://coveralls.io/r/peterbe/premailer?branch=master
+.. |Gratipay| image:: https://img.shields.io/gratipay/peterbe.svg
+   :target: https://gratipay.com/peterbe/
