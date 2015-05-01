@@ -157,7 +157,7 @@ class Premailer(object):
             a semicolon delimitted string like 'color: red; font-size: 12px'
             """
             return ';'.join(
-                u'{0}:{1}'.format(prop.name, prop.value)
+                '{0}:{1}'.format(prop.name, prop.value)
                 for prop in properties
             )
 
