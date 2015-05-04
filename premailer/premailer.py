@@ -417,6 +417,12 @@ class Premailer(object):
                         parent.attrib[attr].startswith('cid:')
                     ):
                         continue
+                    if parent.attrib[attr].startswith("//"):
+                        try:
+                            protocol = self.base_url.split("//")[0]
+                        except IndexError:
+                            protocol = "http"
+                        parent.attrib[attr] = protocol + parent.attrib[attr]
                     parent.attrib[attr] = urljoin(
                         self.base_url,
                         parent.attrib[attr].lstrip('/')
