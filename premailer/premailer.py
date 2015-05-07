@@ -417,10 +417,18 @@ class Premailer(object):
                         parent.attrib[attr].startswith('cid:')
                     ):
                         continue
-                    parent.attrib[attr] = urljoin(
+                    url = parent.attrib[attr]
+
+                    if not url.startswith("//"):
+                        url = url.lstrip('/')
+
+                    url = urljoin(
                         self.base_url,
-                        parent.attrib[attr].lstrip('/')
+                        url
                     )
+                    if url.startswith("//"):
+                        url = "http:" + url
+                    parent.attrib[attr] = url
 
         if hasattr(self.html, "getroottree"):
             return root

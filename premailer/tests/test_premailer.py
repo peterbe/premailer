@@ -2302,3 +2302,36 @@ sheet" type="text/css">
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
+
+    def test_links_without_protocol(self):
+        """If you the base URL is set to https://example.com and your html
+        contains <img src="//otherdomain.com/">... then the URL to point to
+        is "https://otherdomain.com/" not "https://example.com/file.css"
+        """
+        html = """<html>
+        <head>
+        </head>
+        <body>
+        <img src="//example.com">
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        </head>
+        <body>
+        <img src="{protocol}://example.com">
+        </body>
+        </html>"""
+
+        p = Premailer(html, base_url='https://www.peterbe.com')
+        result_html = p.transform()
+        compare_html(expect_html.format(protocol="https"), result_html)
+
+        p = Premailer(html, base_url='http://www.peterbe.com')
+        result_html = p.transform()
+        compare_html(expect_html.format(protocol="http"), result_html)
+
+        p = Premailer(html, base_url='www.peterbe.com')
+        result_html = p.transform()
+        compare_html(expect_html.format(protocol="http"), result_html)
