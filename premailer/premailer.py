@@ -403,7 +403,7 @@ class Premailer(object):
         #
         if self.base_url:
             if not urlparse(self.base_url).scheme:
-                raise ValueError('Base URL must start have a scheme')
+                raise ValueError('Base URL must have a scheme')
             for attr in ('href', 'src'):
                 for item in page.xpath("//@%s" % attr):
                     parent = item.getparent()
