@@ -17,7 +17,7 @@ if sys.version_info >= (3,):  # pragma: no cover
     # As in, Python 3
     from io import StringIO
     from urllib.request import urlopen
-    from urllib.parse import urljoin
+    from urllib.parse import urljoin, urlparse
     STR_TYPE = str
 else:  # Python 2
     try:
@@ -26,7 +26,7 @@ else:  # Python 2
         from StringIO import StringIO
         StringIO = StringIO  # shut up pyflakes
     from urllib2 import urlopen
-    from urlparse import urljoin
+    from urlparse import urljoin, urlparse
     STR_TYPE = basestring
 
 import cssutils
@@ -402,25 +402,23 @@ class Premailer(object):
         # URLs
         #
         if self.base_url:
-            if not self.base_url.endswith('/'):
-                self.base_url += '/'
+            if not urlparse(self.base_url).scheme:
+                raise ValueError('Base URL must start have a scheme')
             for attr in ('href', 'src'):
                 for item in page.xpath("//@%s" % attr):
                     parent = item.getparent()
+                    url = parent.attrib[attr]
                     if (
                         attr == 'href' and self.preserve_internal_links and
-                        parent.attrib[attr].startswith('#')
+                        url.startswith('#')
                     ):
                         continue
                     if (
                         attr == 'src' and self.preserve_inline_attachments and
-                        parent.attrib[attr].startswith('cid:')
+                        url.startswith('cid:')
                     ):
                         continue
-                    parent.attrib[attr] = urljoin(
-                        self.base_url,
-                        parent.attrib[attr].lstrip('/')
-                    )
+                    parent.attrib[attr] = urljoin(self.base_url, url)
 
         if hasattr(self.html, "getroottree"):
             return root

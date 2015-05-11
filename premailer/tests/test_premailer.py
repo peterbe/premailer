@@ -478,7 +478,6 @@ class Tests(unittest.TestCase):
         </head>
         <body>
         <img src="/images/foo.jpg">
-        <img src="/images/bar.gif">
         <img src="http://www.googe.com/photos/foo.jpg">
         <a href="/home">Home</a>
         <a href="http://www.peterbe.com">External</a>
@@ -494,10 +493,9 @@ class Tests(unittest.TestCase):
         <title>Title</title>
         </head>
         <body>
-        <img src="http://kungfupeople.com/base/images/foo.jpg">
-        <img src="http://kungfupeople.com/base/images/bar.gif">
+        <img src="http://kungfupeople.com/images/foo.jpg">
         <img src="http://www.googe.com/photos/foo.jpg">
-        <a href="http://kungfupeople.com/base/home">Home</a>
+        <a href="http://kungfupeople.com/home">Home</a>
         <a href="http://www.peterbe.com">External</a>
         <a href="http://www.peterbe.com/base/">External 2</a>
         <a href="http://kungfupeople.com/base/subpage">Subpage</a>
@@ -505,7 +503,7 @@ class Tests(unittest.TestCase):
         </body>
         </html>'''
 
-        p = Premailer(html, base_url='http://kungfupeople.com/base',
+        p = Premailer(html, base_url='http://kungfupeople.com/base/',
                       preserve_internal_links=True)
         result_html = p.transform()
 
@@ -2302,3 +2300,36 @@ sheet" type="text/css">
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
+
+    def test_links_without_protocol(self):
+        """If you the base URL is set to https://example.com and your html
+        contains <img src="//otherdomain.com/">... then the URL to point to
+        is "https://otherdomain.com/" not "https://example.com/file.css"
+        """
+        html = """<html>
+        <head>
+        </head>
+        <body>
+        <img src="//example.com">
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        </head>
+        <body>
+        <img src="{protocol}://example.com">
+        </body>
+        </html>"""
+
+        p = Premailer(html, base_url='https://www.peterbe.com')
+        result_html = p.transform()
+        compare_html(expect_html.format(protocol="https"), result_html)
+
+        p = Premailer(html, base_url='http://www.peterbe.com')
+        result_html = p.transform()
+        compare_html(expect_html.format(protocol="http"), result_html)
+
+        # Because you can't set a base_url without a full protocol
+        p = Premailer(html, base_url='www.peterbe.com')
+        assert_raises(ValueError, p.transform)
