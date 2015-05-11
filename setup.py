@@ -13,7 +13,7 @@ except ImportError:
 from setuptools import setup, find_packages
 
 
-README = os.path.join(os.path.dirname(__file__), 'README.md')
+README = os.path.join(os.path.dirname(__file__), 'README.rst')
 long_description = open(README).read().strip() + "\n\n"
 
 
