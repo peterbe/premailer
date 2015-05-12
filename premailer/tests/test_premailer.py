@@ -1881,6 +1881,50 @@ ent:"" !important;display:block !important}
 
         compare_html(expect_html, result_html)
 
+    def test_css_disable_leftover_css(self):
+        """Test handling css_text passed as a string when no <html> or
+        <head> is present"""
+
+        html = """<body>
+        <h1>Hello</h1>
+        <h2>Hello</h2>
+        <a href="">Hello</a>
+        </body>"""
+
+        expect_html = """<html>
+        <body>
+        <h1 style="color:brown">Hello</h1>
+        <h2 style="color:green">Hello</h2>
+        <a href="" style="color:pink">Hello</a>
+        </body>
+        </html>"""
+
+        css_text = """
+        h1 {
+            color: brown;
+        }
+        h2 {
+            color: green;
+        }
+        a {
+            color: pink;
+        }
+        @media all and (max-width: 320px) {
+            h1 {
+                color: black;
+            }
+        }
+        """
+
+        p = Premailer(
+            html,
+            strip_important=False,
+            css_text=css_text,
+            disable_leftover_css=True)
+        result_html = p.transform()
+
+        compare_html(expect_html, result_html)
+
     @staticmethod
     def mocked_urlopen(url):
         'The standard "response" from the "server".'

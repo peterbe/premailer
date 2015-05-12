@@ -113,7 +113,8 @@ class Premailer(object):
                  disable_validation=False,
                  cache_css_parsing=True,
                  cssutils_logging_handler=None,
-                 cssutils_logging_level=None):
+                 cssutils_logging_level=None,
+                 disable_leftover_css=False):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
@@ -139,6 +140,7 @@ class Premailer(object):
         self.disable_basic_attributes = disable_basic_attributes
         self.disable_validation = disable_validation
         self.cache_css_parsing = cache_css_parsing
+        self.disable_leftover_css = disable_leftover_css
 
         if cssutils_logging_handler:
             cssutils.log.addHandler(cssutils_logging_handler)
@@ -242,7 +244,6 @@ class Premailer(object):
                         len(rules)  # this is the rule's index number
                     )
                     rules.append((specificity, selector, bulk))
-
         return rules, leftover
 
     def transform(self, pretty_print=True, **kwargs):
@@ -271,7 +272,10 @@ class Premailer(object):
 
         assert page is not None
 
-        head = get_or_create_head(tree)
+        if self.disable_leftover_css:
+            head = None
+        else:
+            head = get_or_create_head(tree)
         #
         # style selectors
         #
@@ -553,7 +557,7 @@ class Premailer(object):
         """
         these_rules, these_leftover = self._parse_style_rules(css_text, index)
         rules.extend(these_rules)
-        if these_leftover or self.keep_style_tags:
+        if head is not None and (these_leftover or self.keep_style_tags):
             style = etree.Element('style')
             style.attrib['type'] = 'text/css'
             if self.keep_style_tags:
