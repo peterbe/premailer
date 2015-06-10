@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 import sys
 import re
 import unittest
+import logging
 from contextlib import contextmanager
 if sys.version_info >= (3, ):  # As in, Python 3
     from urllib.request import urlopen
@@ -2123,6 +2124,47 @@ ent:"" !important;display:block !important}
 
         p = Premailer(html, disable_validation=True)
         p.transform()  # it should just work
+
+    def test_capture_cssutils_logging(self):
+        """you can capture all the warnings, errors etc. from cssutils
+        with your own logging. """
+        html = """<!doctype html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Document</title>
+            <style>
+            @keyframes fadein {
+                from { opacity: 0; }
+                to   { opacity: 1; }
+            }
+            </style>
+        </head>
+        <body></body>
+        </html>"""
+
+        mylog = StringIO()
+        myhandler = logging.StreamHandler(mylog)
+        p = Premailer(
+            html,
+            cssutils_logging_handler=myhandler,
+        )
+        p.transform()  # it should work
+        eq_(
+            mylog.getvalue(),
+            'CSSStylesheet: Unknown @rule found. [2:13: @keyframes]\n'
+        )
+
+        # only log errors now
+        mylog = StringIO()
+        myhandler = logging.StreamHandler(mylog)
+        p = Premailer(
+            html,
+            cssutils_logging_handler=myhandler,
+            cssutils_logging_level=logging.ERROR,
+        )
+        p.transform()  # it should work
+        eq_(mylog.getvalue(), '')
 
     def test_type_test(self):
         """test the correct type is returned"""

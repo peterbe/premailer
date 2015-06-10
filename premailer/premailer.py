@@ -111,7 +111,9 @@ class Premailer(object):
                  base_path=None,
                  disable_basic_attributes=None,
                  disable_validation=False,
-                 cache_css_parsing=True):
+                 cache_css_parsing=True,
+                 cssutils_logging_handler=None,
+                 cssutils_logging_level=None):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
@@ -137,6 +139,11 @@ class Premailer(object):
         self.disable_basic_attributes = disable_basic_attributes
         self.disable_validation = disable_validation
         self.cache_css_parsing = cache_css_parsing
+
+        if cssutils_logging_handler:
+            cssutils.log.addHandler(cssutils_logging_handler)
+        if cssutils_logging_level:
+            cssutils.log.setLevel(cssutils_logging_level)
 
     def _parse_css_string(self, css_body, validate=True):
         if self.cache_css_parsing:
