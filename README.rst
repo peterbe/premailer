@@ -221,7 +221,38 @@ attribute ``bgcolor="#eee"``.
 Having these extra attributes basically as a "back up" for really shit
 email clients that can't even take the style attributes. A lot of
 professional HTML newsletters such as Amazon's use this. You can disable
-some attributes in ``disable_basic_attributes``
+some attributes in ``disable_basic_attributes``.
+
+
+Capturing logging from ``cssutils``
+-----------------------------------
+
+`cssutils <https://pypi.python.org/pypi/cssutils/>`__ is the library that
+``premailer`` uses to parse CSS. It will use the python ``logging`` module
+to mention all issues it has with parsing your CSS. If you want to capture
+this, you have to pass in ``cssutils_logging_handler`` and
+``cssutils_logging_level`` (optional). For example like this:
+
+.. code:: python
+
+    >>> import logging
+    >>> import premailer
+    >>> from io import StringIO
+    >>> mylog = StringIO()
+    >>> myhandler = logging.StreamHandler(mylog)
+    >>> p = premailer.Premailer("""
+    ...         <html>
+    ...         <style type="text/css">
+    ...         @keyframes foo { from { opacity: 0; } to { opacity: 1; } }
+    ...         </style>
+    ...         <p>Hej</p>
+    ...         </html>
+    ... """,
+    ... cssutils_logging_handler=myhandler,
+    ... cssutils_logging_level=logging.INFO)
+    >>> result = p.transform()
+    >>> mylog.getvalue()
+    'CSSStylesheet: Unknown @rule found. [2:1: @keyframes]\n'
 
 Running tests with tox
 ----------------------
