@@ -285,9 +285,9 @@ class Premailer(object):
 
         for element in CSSSelector('style,link[rel~=stylesheet]')(page):
             # If we have a media attribute whose value is anything other than
-            # 'screen', ignore the ruleset.
+            # 'all' or 'screen', ignore the ruleset.
             media = element.attrib.get('media')
-            if media and media != 'screen':
+            if media and media not in ('all', 'screen'):
                 continue
 
             data_attribute = element.attrib.get(self.attribute_name)
