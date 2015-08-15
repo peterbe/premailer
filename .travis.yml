@@ -13,6 +13,8 @@ cache:
 language: python
 
 before_install:
+  # twine is necessary so that travis can deploy
+  - travis_retry pip install twine
   - travis_retry pip install coverage tox coveralls
 
 install:
