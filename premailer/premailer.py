@@ -114,7 +114,8 @@ class Premailer(object):
                  cache_css_parsing=True,
                  cssutils_logging_handler=None,
                  cssutils_logging_level=None,
-                 disable_leftover_css=False):
+                 disable_leftover_css=False,
+                 align_floating_images=True):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
@@ -141,6 +142,7 @@ class Premailer(object):
         self.disable_validation = disable_validation
         self.cache_css_parsing = cache_css_parsing
         self.disable_leftover_css = disable_leftover_css
+        self.align_floating_images = align_floating_images
 
         if cssutils_logging_handler:
             cssutils.log.addHandler(cssutils_logging_handler)
@@ -408,6 +410,17 @@ class Premailer(object):
             for item in page.xpath('//@class'):
                 parent = item.getparent()
                 del parent.attrib['class']
+
+        # Add align attributes to images if they have a CSS float value of
+        # right or left. Outlook (both on desktop and on the web) are bad at
+        # understanding floats, but they do understand the HTML align attrib.
+        if self.align_floating_images:
+            for item in page.xpath('//img[@style]'):
+                image_css = cssutils.parseStyle(item.attrib['style'])
+                if image_css.float == 'right':
+                    item.attrib['align'] = 'right'
+                elif image_css.float == 'left':
+                    item.attrib['align'] = 'left'
 
         #
         # URLs
