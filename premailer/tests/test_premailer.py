@@ -2419,3 +2419,37 @@ sheet" type="text/css">
         # Because you can't set a base_url without a full protocol
         p = Premailer(html, base_url='www.peterbe.com')
         assert_raises(ValueError, p.transform)
+
+    def test_align_float_images(self):
+
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <style>
+        .floatright {
+            float: right;
+        }
+        </style>
+        </head>
+        <body>
+        <p><img src="/images/left.jpg" style="float: left"> text
+           <img src="/images/right.png" class="floatright"> text
+           <img src="/images/nofloat.gif"> text
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        <title>Title</title>
+        </head>
+        <body>
+        <p><img src="/images/left.jpg" style="float: left" align="left"> text
+           <img src="/images/right.png" style="float:right" align="right"> text
+           <img src="/images/nofloat.gif"> text
+        </p>
+        </body>
+        </html>"""
+
+        p = Premailer(html, align_floating_images=True)
+        result_html = p.transform()
+        compare_html(expect_html, result_html)
