@@ -143,6 +143,21 @@ class Tests(unittest.TestCase):
         for each in expect:
             ok_(each in result)
 
+    def test_merge_styles_with_unset(self):
+        inline_style = 'color: red'
+        new = 'font-size: 10px; font-size: unset; font-weight: bold'
+        expect = 'color:red;', 'font-weight:bold'
+        css_new = csstext_to_pairs(new)
+        result = merge_styles(
+            inline_style,
+            [css_new],
+            [''],
+            remove_unset_properties=True,
+        )
+        for each in expect:
+            ok_(each in result)
+        ok_('font-size' not in result)
+
     def test_basic_html(self):
         """test the simplest case"""
 
@@ -2451,5 +2466,38 @@ sheet" type="text/css">
         </html>"""
 
         p = Premailer(html, align_floating_images=True)
+        result_html = p.transform()
+        compare_html(expect_html, result_html)
+
+    def test_remove_unset_properties(self):
+        html = """<html>
+        <head>
+        <style>
+        div {
+            color: green;
+        }
+        span {
+            color: blue;
+        }
+        span.nocolor {
+            color: unset;
+        }
+        </style>
+        </head>
+        <body>
+        <div class="color"><span class="nocolor"></span></div>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        </head>
+        <body>
+        <div style="color:green"><span></span></div>
+        </body>
+        </html>"""
+
+        p = Premailer(html, remove_unset_properties=True)
+        self.assertTrue(p.remove_unset_properties)
         result_html = p.transform()
         compare_html(expect_html, result_html)

@@ -115,7 +115,8 @@ class Premailer(object):
                  cssutils_logging_handler=None,
                  cssutils_logging_level=None,
                  disable_leftover_css=False,
-                 align_floating_images=True):
+                 align_floating_images=True,
+                 remove_unset_properties=True):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
@@ -143,6 +144,7 @@ class Premailer(object):
         self.cache_css_parsing = cache_css_parsing
         self.disable_leftover_css = disable_leftover_css
         self.align_floating_images = align_floating_images
+        self.remove_unset_properties = remove_unset_properties
 
         if cssutils_logging_handler:
             cssutils.log.addHandler(cssutils_logging_handler)
@@ -396,9 +398,16 @@ class Premailer(object):
         # crucial when you have a lot of pseudo/classes
         # and a long list of elements
         for _, element in elements.items():
-            final_style = merge_styles(element['item'].attrib.get('style', ''),
-                                       element['style'], element['classes'])
-            element['item'].attrib['style'] = final_style
+            final_style = merge_styles(
+                element['item'].attrib.get('style', ''),
+                element['style'],
+                element['classes'],
+                remove_unset_properties=self.remove_unset_properties,
+            )
+            if final_style:
+                # final style could be empty string because of
+                # remove_unset_properties
+                element['item'].attrib['style'] = final_style
             self._style_to_basic_html_attributes(
                 element['item'],
                 final_style,
