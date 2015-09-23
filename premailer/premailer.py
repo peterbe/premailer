@@ -88,6 +88,9 @@ def _cache_parse_css_string(css_body, validate=True):
 _element_selector_regex = re.compile(r'(^|\s)\w')
 _cdata_regex = re.compile(r'\<\!\[CDATA\[(.*?)\]\]\>', re.DOTALL)
 _importants = re.compile('\s*!important')
+#: The short (3-digit) color codes that cause issues for IBM Notes
+_short_color_codes = re.compile(r'^#([0-9a-f])([0-9a-f])([0-9a-f])$', re.I)
+
 # These selectors don't apply to all elements. Rather, they specify
 # which elements to apply to.
 FILTER_PSEUDOSELECTORS = [':last-child', ':first-child', 'nth-child']
@@ -510,6 +513,17 @@ class Premailer(object):
 
         return css_body
 
+    @staticmethod
+    def six_color(color_value):
+        """Fix background colors for Lotus Notes
+
+        Notes which fails to handle three character ``bgcolor`` codes well.
+        see <https://github.com/peterbe/premailer/issues/114>"""
+
+        # Turn the color code from three to six digits
+        retval = _short_color_codes.sub(r'#\1\1\2\2\3\3', color_value)
+        return retval
+
     def _style_to_basic_html_attributes(self, element, style_content,
                                         force=False):
         """given an element and styles like
@@ -534,8 +548,13 @@ class Premailer(object):
                 attributes['align'] = value.strip()
             elif key == 'vertical-align':
                 attributes['valign'] = value.strip()
-            elif key == 'background-color':
-                attributes['bgcolor'] = value.strip()
+            elif ((key == 'background-color')
+                  and ('transparent' not in value.lower())):
+                # Only add the 'bgcolor' attribute if the value does not
+                # contain the word "transparent"; before we add it possibly
+                # correct the 3-digit color code to its 6-digit equivalent
+                # ("abc" to "aabbcc") so IBM Notes copes.
+                attributes['bgcolor'] = self.six_color(value.strip())
             elif key == 'width' or key == 'height':
                 value = value.strip()
                 if value.endswith('px'):
