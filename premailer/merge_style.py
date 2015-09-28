@@ -11,9 +11,13 @@ def csstext_to_pairs(csstext):
     # The lock is required to avoid ``cssutils`` concurrency
     # issues documented in issue #65
     with csstext_to_pairs._lock:
-        return sorted([(prop.name.strip(), prop.propertyValue.cssText.strip())
-                       for prop in cssutils.parseStyle(csstext)],
-                      key=itemgetter(0))
+        return sorted(
+            [
+                (prop.name.strip(), prop.propertyValue.cssText.strip())
+                for prop in cssutils.parseStyle(csstext)
+            ],
+            key=itemgetter(0)
+        )
 
 
 csstext_to_pairs._lock = threading.RLock()
