@@ -1,7 +1,5 @@
 from __future__ import absolute_import, unicode_literals
 import unittest
-import xml
-from nose.tools import raises
 from premailer.merge_style import csstext_to_pairs, merge_styles
 
 
@@ -14,9 +12,13 @@ class TestMergeStyle(unittest.TestCase):
         parsed_csstext = csstext_to_pairs(csstext)
         self.assertEqual(('font-size', '1px'), parsed_csstext[0])
 
-    @raises(xml.dom.SyntaxErr)
     def test_inline_invalid_syntax(self):
-        # inline shouldn't have those as I understand
-        # but keep the behaviour
+        # Invalid syntax does not raise
         inline = '{color:pink} :hover{color:purple} :active{color:red}'
         merge_styles(inline, [], [])
+
+    def test_important_rule(self):
+        # No exception after #133
+        csstext = 'font-size:1px !important'
+        parsed_csstext = csstext_to_pairs(csstext)
+        self.assertEqual(('font-size', '1px'), parsed_csstext[0])
