@@ -441,6 +441,8 @@ class Premailer(object):
                 for item in page.xpath("//@%s" % attr):
                     parent = item.getparent()
                     url = parent.attrib[attr]
+                    if parent.attrib.pop(self.attribute_name, None) == 'ignore':
+                        continue
                     if (
                         attr == 'href' and self.preserve_internal_links and
                         url.startswith('#')
