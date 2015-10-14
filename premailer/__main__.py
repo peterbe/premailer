@@ -134,12 +134,12 @@ def main(args):
         disable_basic_attributes=options.disable_basic_attributes,
         disable_validation=options.disable_validation
     )
-    
+
     output = p.transform(pretty_print=options.pretty)
     if hasattr(output, 'encode'):  # Python 2 compatability
         output = output.encode('utf-8')
     options.outfile.write(output)
-    
+
     return 0
 
 
