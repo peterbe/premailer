@@ -65,6 +65,12 @@ def main(args):
     )
 
     parser.add_argument(
+        "--capitalize-float-margin", default=False,
+        help="Capitalize float and margin properties for outlook.com compat.",
+        action="store_true", dest="capitalize_float_margin"
+    )
+
+    parser.add_argument(
         "--strip-important", default=False,
         help="Remove '!important' for all css declarations.",
         action="store_true", dest="strip_important"

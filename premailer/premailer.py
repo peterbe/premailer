@@ -85,8 +85,27 @@ def _cache_parse_css_string(css_body, validate=True):
     """
     return cssutils.parseString(css_body, validate=validate)
 
+
+def capitalize_float_margin(css_body):
+    """Capitalize float and margin CSS property names
+    """
+    def _capitalize_property(match):
+        return '{0}:{1}{2}'.format(
+            match.group('property').capitalize(),
+            match.group('value'),
+            match.group('terminator'))
+
+    return _lowercase_margin_float_rule.sub(_capitalize_property, css_body)
+
+
 _element_selector_regex = re.compile(r'(^|\s)\w')
 _cdata_regex = re.compile(r'\<\!\[CDATA\[(.*?)\]\]\>', re.DOTALL)
+_lowercase_margin_float_rule = re.compile(
+    r'''(?P<property>margin(-(top|bottom|left|right))?|float)
+        :
+        (?P<value>.*?)
+        (?P<terminator>$|;)''',
+    re.IGNORECASE | re.VERBOSE)
 _importants = re.compile('\s*!important')
 # These selectors don't apply to all elements. Rather, they specify
 # which elements to apply to.
@@ -104,6 +123,7 @@ class Premailer(object):
                  keep_style_tags=False,
                  include_star_selectors=False,
                  remove_classes=True,
+                 capitalize_float_margin=False,
                  strip_important=True,
                  external_styles=None,
                  css_text=None,
@@ -126,6 +146,7 @@ class Premailer(object):
         # this will always preserve the original css
         self.keep_style_tags = keep_style_tags
         self.remove_classes = remove_classes
+        self.capitalize_float_margin = capitalize_float_margin
         # whether to process or ignore selectors like '* { foo:bar; }'
         self.include_star_selectors = include_star_selectors
         if isinstance(external_styles, STR_TYPE):
@@ -419,6 +440,14 @@ class Premailer(object):
             for item in page.xpath('//@class'):
                 parent = item.getparent()
                 del parent.attrib['class']
+
+        # Capitalize Margin properties
+        # To fix weird outlook bug
+        # https://www.emailonacid.com/blog/article/email-development/outlook.com-does-support-margins
+        if self.capitalize_float_margin:
+            for item in page.xpath('//@style'):
+                mangled = capitalize_float_margin(item)
+                item.getparent().attrib['style'] = mangled
 
         # Add align attributes to images if they have a CSS float value of
         # right or left. Outlook (both on desktop and on the web) are bad at

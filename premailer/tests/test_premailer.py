@@ -828,6 +828,45 @@ ical-align:middle" bgcolor="red" valign="middle">Cell 2</td>
 
         compare_html(expect_html, result_html)
 
+    def test_uppercase_margin(self):
+        """Option to comply with outlook.com
+
+        https://emailonacid.com/blog/article/email-development/outlook.com-does-support-margins
+        """
+
+        html = """<html>
+<head>
+<title>Title</title>
+</head>
+<style>
+h1 {margin: 0}
+h2 {margin-top:0;margin-bottom:0;margin-left:0;margin-right:0}
+</style>
+<body>
+<h1>a</h1>
+<h2>
+b
+</h2>
+</body>
+</html>"""
+
+        expect_html = """<html>
+<head>
+<title>Title</title>
+</head>
+<body>
+<h1 style="Margin:0">a</h1>
+<h2 style="Margin-bottom:0; Margin-left:0; Margin-right:0; Margin-top:0">
+b
+</h2>
+</body>
+</html>"""
+
+        p = Premailer(html, capitalize_float_margin=True)
+        result_html = p.transform()
+
+        compare_html(expect_html, result_html)
+
     def test_strip_important(self):
         """Get rid of !important. Makes no sense inline."""
         html = """<html>
