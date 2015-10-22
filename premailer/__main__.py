@@ -117,8 +117,9 @@ def main(args):
 
     if options.outfile is not sys.stdout:
         options.outfile.close()
-        options.outfile = codecs.open(options.outfile.name, 'w',
-                                      encoding='UTF-8')
+        options.outfile = codecs.open(
+            options.outfile.name, 'w', encoding='UTF-8'
+        )
 
     html = options.infile.read()
     if hasattr(html, 'decode'):  # Forgive me: Python 2 compatability
