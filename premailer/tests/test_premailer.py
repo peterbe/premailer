@@ -2509,8 +2509,8 @@ sheet" type="text/css">
         self.assertEqual(e, r)
 
     def test_six_colour_transparent(self):
-        with self.assertRaises(TransparentIsNotAColour):
-            r = Premailer.six_colour('transparent')
+        self.assertRaises(TransparentIsNotAColour,
+                          Premailer.six_colour, 'transparent')
 
     def test_3_digit_colour_expand(self):
         'Are 3-digit colour values expanded into 6-digits for IBM Notes'
@@ -2522,7 +2522,9 @@ sheet" type="text/css">
   </style>
   <body>
     <h1>Colour test</h1>
-    <p>This is a test of colour handling.</p>
+    <p>
+      This is a test of colour handling.
+    </p>
   </body>
 </html>'''
         expect_html = """<html>
@@ -2530,7 +2532,9 @@ sheet" type="text/css">
   </head>
   <body style="background-color:#fe5" bgcolor="#ffee55">
     <h1 style="color:#f0df0d">Colour test</h1>
-    <p style="background-color:#123456" bgcolor="#123456">This is a test of colour handling.</p>
+    <p style="background-color:#123456" bgcolor="#123456">
+      This is a test of colour handling.
+    </p>
   </body>
 </html>"""
         p = Premailer(html, remove_unset_properties=True)

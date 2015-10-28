@@ -520,7 +520,7 @@ class Premailer(object):
 
         Notes which fails to handle three character ``bgcolor`` codes well.
         see <https://github.com/peterbe/premailer/issues/114>'''
-        
+
         shortCodes = re.compile(r'^#([0-9A-F])([0-9A-F])([0-9A-F])$', re.I)
         # double digits to enlongen color code
         retval = shortCodes.sub(r'#\1\1\2\2\3\3', colourValue)
