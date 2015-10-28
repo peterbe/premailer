@@ -1389,3 +1389,53 @@ def test_external_styles_and_links():
     result_html = whitespace_between_tags.sub('><', result_html).strip()
 
     eq_(expect_html, result_html)
+
+
+def test_not_loading_external_links():
+    """Test ignoring stylesheets via link tags"""
+    if not etree:
+        # can't test it
+        return
+
+    html = """<html>
+    <head>
+    <title>Title</title>
+    <style type="text/css">
+    h1 { color:red; }
+    h3 { color:yellow; }
+    </style>
+    <link href="premailer/test-external-links.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+    h1 { color:orange; }
+    </style>
+    </head>
+    <body>
+    <h1>Hello</h1>
+    <h2>World</h2>
+    <h3>Test</h3>
+    <a href="#">Link</a>
+    </body>
+    </html>"""
+
+    expect_html = """<html>
+    <head>
+    <title>Title</title>
+    <link href="premailer/test-external-links.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+    <h1 style="color:orange">Hello</h1>
+    <h2>World</h2>
+    <h3 style="color:yellow">Test</h3>
+    <a href="#">Link</a>
+    </body>
+    </html>"""
+
+    p = Premailer(html,
+        strip_important=False,
+        load_external=False)
+    result_html = p.transform()
+
+    expect_html = whitespace_between_tags.sub('><', expect_html).strip()
+    result_html = whitespace_between_tags.sub('><', result_html).strip()
+
+    eq_(expect_html, result_html)

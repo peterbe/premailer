@@ -108,7 +108,8 @@ class Premailer(object):
                  strip_important=True,
                  external_styles=None,
                  method="html",
-                 base_path=None):
+                 base_path=None,
+                 load_external=True):
         self.html = html
         self.base_url = base_url
         self.preserve_internal_links = preserve_internal_links
@@ -124,6 +125,7 @@ class Premailer(object):
         self.strip_important = strip_important
         self.method = method
         self.base_path = base_path
+        self.load_external = load_external
 
     def _parse_style_rules(self, css_body, ruleset_index):
         leftover = []
@@ -201,6 +203,9 @@ class Premailer(object):
             if is_style:
                 css_body = element.text
             else:
+                if not self.load_external:
+                    continue
+
                 href = element.attrib.get('href')
                 if not href:
                     continue
@@ -235,7 +240,7 @@ class Premailer(object):
             elif not self.keep_style_tags or not is_style:
                 parent_of_element.remove(element)
 
-        if self.external_styles:
+        if self.load_external and self.external_styles:
             for stylefile in self.external_styles:
                 css_body = self._load_external(stylefile)
                 these_rules, these_leftover = self._parse_style_rules(css_body, index)
