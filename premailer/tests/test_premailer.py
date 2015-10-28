@@ -22,6 +22,7 @@ from premailer.premailer import (
     merge_styles,
     csstext_to_pairs,
     ExternalNotFoundError,
+    TransparentIsNotAColour,
 )
 from premailer.__main__ import main
 import premailer.premailer  # lint:ok
@@ -2502,11 +2503,21 @@ sheet" type="text/css">
         result_html = p.transform()
         compare_html(expect_html, result_html)
 
-    def test_3_digit_color_expand(self):
+    def test_six_colour(self):
+        r = Premailer.six_colour('#cde')
+        e = '#ccddee'
+        self.assertEqual(e, r)
+
+    def test_six_colour_transparent(self):
+        with self.assertRaises(TransparentIsNotAColour):
+            r = Premailer.six_colour('transparent')
+
+    def test_3_digit_colour_expand(self):
         'Are 3-digit colour values expanded into 6-digits for IBM Notes'
         html = '''<html>
   <style>
-    p {background: #333;}
+    body {background-color: #fe5;}
+    p {background-color: #123456;}
     h1 {color: #f0df0d;}
   </style>
   <body>
@@ -2517,15 +2528,11 @@ sheet" type="text/css">
         expect_html = """<html>
   <head>
   </head>
-  <body>
+  <body style="background-color:#fe5" bgcolor="#ffee55">
     <h1 style="color:#f0df0d">Colour test</h1>
-    <p style="background:#333333">This is a test of colour handling.</p>
+    <p style="background-color:#123456" bgcolor="#123456">This is a test of colour handling.</p>
   </body>
 </html>"""
         p = Premailer(html, remove_unset_properties=True)
         result_html = p.transform()
         compare_html(expect_html, result_html)
-
-    def test_6_digit_color(self):
-        'Are 6-digit colour values left as-is'
-        self.assertTrue(False)
