@@ -518,14 +518,14 @@ class Premailer(object):
         return css_body
 
     @staticmethod
-    def six_color(colorValue):
+    def six_color(color_value):
         '''Fix background colors for Lotus Notes
 
         Notes which fails to handle three character ``bgcolor`` codes well.
         see <https://github.com/peterbe/premailer/issues/114>'''
 
-        # double digits to enlongen color code
-        retval = _short_color_codes.sub(r'#\1\1\2\2\3\3', colorValue)
+        # Turn the color code from three to six digits
+        retval = _short_color_codes.sub(r'#\1\1\2\2\3\3', color_value)
 
         # Drop "transparent" bgcolor values entirely
         # The space at the start of the RE is deliberate
