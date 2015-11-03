@@ -92,6 +92,9 @@ def _cache_parse_css_string(css_body, validate=True):
 _element_selector_regex = re.compile(r'(^|\s)\w')
 _cdata_regex = re.compile(r'\<\!\[CDATA\[(.*?)\]\]\>', re.DOTALL)
 _importants = re.compile('\s*!important')
+#: The short (3-digit) color codes that cause issues for IBM Notes
+_short_color_codes = re.compile(r'^#([0-9A-F])([0-9A-F])([0-9A-F])$', re.I)
+
 # These selectors don't apply to all elements. Rather, they specify
 # which elements to apply to.
 FILTER_PSEUDOSELECTORS = [':last-child', ':first-child', 'nth-child']
@@ -521,9 +524,8 @@ class Premailer(object):
         Notes which fails to handle three character ``bgcolor`` codes well.
         see <https://github.com/peterbe/premailer/issues/114>'''
 
-        short_codes = re.compile(r'^#([0-9A-F])([0-9A-F])([0-9A-F])$', re.I)
         # double digits to enlongen color code
-        retval = short_codes.sub(r'#\1\1\2\2\3\3', colorValue)
+        retval = _short_color_codes.sub(r'#\1\1\2\2\3\3', colorValue)
 
         # Drop "transparent" bgcolor values entirely
         # The space at the start of the RE is deliberate
