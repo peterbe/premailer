@@ -527,7 +527,9 @@ class Premailer(object):
         # Turn the color code from three to six digits
         retval = _short_color_codes.sub(r'#\1\1\2\2\3\3', color_value)
 
-        # Drop "transparent" bgcolor values entirely
+        # "Transparent" color values are interpreted by IBM Notes as black.
+        # Raise an error so the calling code can decide what to do. (Probably
+        # drop the color entirely and hope.)
         if 'transparent' in retval.lower():
             raise TransparentIsNotAColor(retval)
         return retval
