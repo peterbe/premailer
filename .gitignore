@@ -8,3 +8,4 @@ premailer/gorunsettings.py
 .DS_Store
 .coverage
 .tox
+/htmlcov/
