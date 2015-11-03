@@ -528,9 +528,7 @@ class Premailer(object):
         retval = _short_color_codes.sub(r'#\1\1\2\2\3\3', color_value)
 
         # Drop "transparent" bgcolor values entirely
-        # The space at the start of the RE is deliberate
-        transparent_color = re.compile(r'transparent', re.I)
-        if transparent_color.match(retval):
+        if 'transparent' in retval.lower():
             raise TransparentIsNotAColor(retval)
         return retval
 
