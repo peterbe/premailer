@@ -521,14 +521,14 @@ class Premailer(object):
         Notes which fails to handle three character ``bgcolor`` codes well.
         see <https://github.com/peterbe/premailer/issues/114>'''
 
-        shortCodes = re.compile(r'^#([0-9A-F])([0-9A-F])([0-9A-F])$', re.I)
+        short_codes = re.compile(r'^#([0-9A-F])([0-9A-F])([0-9A-F])$', re.I)
         # double digits to enlongen color code
-        retval = shortCodes.sub(r'#\1\1\2\2\3\3', colorValue)
+        retval = short_codes.sub(r'#\1\1\2\2\3\3', colorValue)
 
         # Drop "transparent" bgcolor values entirely
         # The space at the start of the RE is deliberate
-        transparentColor = re.compile(r'transparent', re.I)
-        if transparentColor.match(retval):
+        transparent_color = re.compile(r'transparent', re.I)
+        if transparent_color.match(retval):
             raise TransparentIsNotAColor(retval)
         return retval
 
