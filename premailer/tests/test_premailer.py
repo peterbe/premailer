@@ -22,7 +22,7 @@ from premailer.premailer import (
     merge_styles,
     csstext_to_pairs,
     ExternalNotFoundError,
-    TransparentIsNotAColour,
+    TransparentIsNotAColor,
 )
 from premailer.__main__ import main
 import premailer.premailer  # lint:ok
@@ -2503,17 +2503,17 @@ sheet" type="text/css">
         result_html = p.transform()
         compare_html(expect_html, result_html)
 
-    def test_six_colour(self):
-        r = Premailer.six_colour('#cde')
+    def test_six_color(self):
+        r = Premailer.six_color('#cde')
         e = '#ccddee'
         self.assertEqual(e, r)
 
-    def test_six_colour_transparent(self):
-        self.assertRaises(TransparentIsNotAColour,
-                          Premailer.six_colour, 'transparent')
+    def test_six_color_transparent(self):
+        self.assertRaises(TransparentIsNotAColor,
+                          Premailer.six_color, 'transparent')
 
-    def test_3_digit_colour_expand(self):
-        'Are 3-digit colour values expanded into 6-digits for IBM Notes'
+    def test_3_digit_color_expand(self):
+        'Are 3-digit color values expanded into 6-digits for IBM Notes'
         html = '''<html>
   <style>
     body {background-color: #fe5;}
@@ -2521,9 +2521,9 @@ sheet" type="text/css">
     h1 {color: #f0df0d;}
   </style>
   <body>
-    <h1>Colour test</h1>
+    <h1>color test</h1>
     <p>
-      This is a test of colour handling.
+      This is a test of color handling.
     </p>
   </body>
 </html>'''
@@ -2531,9 +2531,9 @@ sheet" type="text/css">
   <head>
   </head>
   <body style="background-color:#fe5" bgcolor="#ffee55">
-    <h1 style="color:#f0df0d">Colour test</h1>
+    <h1 style="color:#f0df0d">color test</h1>
     <p style="background-color:#123456" bgcolor="#123456">
-      This is a test of colour handling.
+      This is a test of color handling.
     </p>
   </body>
 </html>"""

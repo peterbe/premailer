@@ -46,7 +46,7 @@ class ExternalNotFoundError(ValueError):
     pass
 
 
-class TransparentIsNotAColour(ValueError):
+class TransparentIsNotAColor(ValueError):
     pass
 
 
@@ -515,21 +515,21 @@ class Premailer(object):
         return css_body
 
     @staticmethod
-    def six_colour(colourValue):
-        '''Fix background colours for Lotus Notes
+    def six_color(colorValue):
+        '''Fix background colors for Lotus Notes
 
         Notes which fails to handle three character ``bgcolor`` codes well.
         see <https://github.com/peterbe/premailer/issues/114>'''
 
         shortCodes = re.compile(r'^#([0-9A-F])([0-9A-F])([0-9A-F])$', re.I)
         # double digits to enlongen color code
-        retval = shortCodes.sub(r'#\1\1\2\2\3\3', colourValue)
+        retval = shortCodes.sub(r'#\1\1\2\2\3\3', colorValue)
 
         # Drop "transparent" bgcolor values entirely
         # The space at the start of the RE is deliberate
         transparentColor = re.compile(r'transparent', re.I)
         if transparentColor.match(retval):
-            raise TransparentIsNotAColour(retval)
+            raise TransparentIsNotAColor(retval)
         return retval
 
     def _style_to_basic_html_attributes(self, element, style_content,
@@ -558,11 +558,11 @@ class Premailer(object):
                 attributes['valign'] = value.strip()
             elif key == 'background-color':
                 try:
-                    sixColour = self.six_colour(value.strip())
-                except TransparentIsNotAColour:
+                    sixcolor = self.six_color(value.strip())
+                except TransparentIsNotAColor:
                     pass
                 else:
-                    attributes['bgcolor'] = sixColour
+                    attributes['bgcolor'] = sixcolor
             elif key == 'width' or key == 'height':
                 value = value.strip()
                 if value.endswith('px'):
