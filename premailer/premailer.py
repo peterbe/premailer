@@ -46,10 +46,6 @@ class ExternalNotFoundError(ValueError):
     pass
 
 
-class TransparentIsNotAColor(ValueError):
-    pass
-
-
 def make_important(bulk):
     """makes every property in a string !important.
     """
@@ -526,12 +522,6 @@ class Premailer(object):
 
         # Turn the color code from three to six digits
         retval = _short_color_codes.sub(r'#\1\1\2\2\3\3', color_value)
-
-        # "Transparent" color values are interpreted by IBM Notes as black.
-        # Raise an error so the calling code can decide what to do. (Probably
-        # drop the color entirely and hope.)
-        if 'transparent' in retval.lower():
-            raise TransparentIsNotAColor(retval)
         return retval
 
     def _style_to_basic_html_attributes(self, element, style_content,
@@ -558,17 +548,13 @@ class Premailer(object):
                 attributes['align'] = value.strip()
             elif key == 'vertical-align':
                 attributes['valign'] = value.strip()
-            elif key == 'background-color':
-                try:
-                    six_color = self.six_color(value.strip())
-                except TransparentIsNotAColor:
-                    # The color "transparent" is interpreted by IBM Notes as
-                    # black, so just ignore the color and hope. The right thing
-                    # to do is render the element in an actual browser and
-                    # figure out what color is actually beneath this element.
-                    pass
-                else:
-                    attributes['bgcolor'] = six_color
+            elif ((key == 'background-color') 
+                  and ('transparent' not in value.lower())):
+                # Only add the 'bgcolor' attribute if the value does not 
+                # contain the word "transparent"; before we add it possibly
+                # correct the 3-digit color code to its 6-digit equivalent
+                # ("abc" to "aabbcc") so IBM Notes copes.
+                attributes['bgcolor'] = self.six_color(value.strip())
             elif key == 'width' or key == 'height':
                 value = value.strip()
                 if value.endswith('px'):

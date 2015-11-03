@@ -22,7 +22,6 @@ from premailer.premailer import (
     merge_styles,
     csstext_to_pairs,
     ExternalNotFoundError,
-    TransparentIsNotAColor,
 )
 from premailer.__main__ import main
 import premailer.premailer  # lint:ok
@@ -2507,10 +2506,6 @@ sheet" type="text/css">
         r = Premailer.six_color('#cde')
         e = '#ccddee'
         self.assertEqual(e, r)
-
-    def test_six_color_transparent(self):
-        self.assertRaises(TransparentIsNotAColor,
-                          Premailer.six_color, 'transparent')
 
     def test_3_digit_color_expand(self):
         'Are 3-digit color values expanded into 6-digits for IBM Notes'
