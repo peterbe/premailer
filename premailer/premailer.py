@@ -93,7 +93,7 @@ _element_selector_regex = re.compile(r'(^|\s)\w')
 _cdata_regex = re.compile(r'\<\!\[CDATA\[(.*?)\]\]\>', re.DOTALL)
 _importants = re.compile('\s*!important')
 #: The short (3-digit) color codes that cause issues for IBM Notes
-_short_color_codes = re.compile(r'^#([0-9A-F])([0-9A-F])([0-9A-F])$', re.I)
+_short_color_codes = re.compile(r'^#([0-9a-f])([0-9a-f])([0-9a-f])$', re.I)
 
 # These selectors don't apply to all elements. Rather, they specify
 # which elements to apply to.
