@@ -2509,7 +2509,7 @@ sheet" type="text/css">
 
     def test_3_digit_color_expand(self):
         'Are 3-digit color values expanded into 6-digits for IBM Notes'
-        html = '''<html>
+        html = """<html>
     <style>
         body {background-color: #fe5;}
         p {background-color: #123456;}
@@ -2521,7 +2521,7 @@ sheet" type="text/css">
             This is a test of color handling.
         </p>
     </body>
-</html>'''
+</html>"""
         expect_html = """<html>
     <head>
     </head>
