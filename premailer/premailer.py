@@ -560,11 +560,15 @@ class Premailer(object):
                 attributes['valign'] = value.strip()
             elif key == 'background-color':
                 try:
-                    sixcolor = self.six_color(value.strip())
+                    six_color = self.six_color(value.strip())
                 except TransparentIsNotAColor:
+                    # The color "transparent" is interpreted by IBM Notes as
+                    # black, so just ignore the color and hope. The right thing
+                    # to do is render the element in an actual browser and
+                    # figure out what color is actually beneath this element.
                     pass
                 else:
-                    attributes['bgcolor'] = sixcolor
+                    attributes['bgcolor'] = six_color
             elif key == 'width' or key == 'height':
                 value = value.strip()
                 if value.endswith('px'):
