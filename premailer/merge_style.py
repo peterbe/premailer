@@ -7,6 +7,7 @@ except ImportError:  # pragma: no cover
     # some old python 2.6 thing then, eh?
     from ordereddict import OrderedDict
 
+
 def csstext_to_pairs(csstext):
     """
     csstext_to_pairs takes css text and make it to list of
