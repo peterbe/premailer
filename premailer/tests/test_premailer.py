@@ -2246,7 +2246,7 @@ ent:"" !important;display:block !important}
 
         p = Premailer(html)
         result = p.transform()
-        eq_(type(result), type(u""))
+        eq_(type(result), type(""))
 
         html = fromstring(html)
         etree_type = type(html)
