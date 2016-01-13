@@ -2501,3 +2501,37 @@ sheet" type="text/css">
         self.assertTrue(p.remove_unset_properties)
         result_html = p.transform()
         compare_html(expect_html, result_html)
+
+    def test_six_color(self):
+        r = Premailer.six_color('#cde')
+        e = '#ccddee'
+        self.assertEqual(e, r)
+
+    def test_3_digit_color_expand(self):
+        'Are 3-digit color values expanded into 6-digits for IBM Notes'
+        html = """<html>
+    <style>
+        body {background-color: #fe5;}
+        p {background-color: #123456;}
+        h1 {color: #f0df0d;}
+    </style>
+    <body>
+        <h1>color test</h1>
+        <p>
+            This is a test of color handling.
+        </p>
+    </body>
+</html>"""
+        expect_html = """<html>
+    <head>
+    </head>
+    <body style="background-color:#fe5" bgcolor="#ffee55">
+        <h1 style="color:#f0df0d">color test</h1>
+        <p style="background-color:#123456" bgcolor="#123456">
+            This is a test of color handling.
+        </p>
+    </body>
+</html>"""
+        p = Premailer(html, remove_unset_properties=True)
+        result_html = p.transform()
+        compare_html(expect_html, result_html)
