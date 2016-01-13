@@ -282,7 +282,7 @@ maintained project please consider supporting me on
 
 .. |Travis| image:: https://travis-ci.org/peterbe/premailer.png?branch=master
    :target: https://travis-ci.org/peterbe/premailer
-.. |Coverage Status| image:: https://coveralls.io/repos/peterbe/premailer/badge.png?branch=master
-   :target: https://coveralls.io/r/peterbe/premailer?branch=master
+.. |Coverage Status| image:: https://coveralls.io/repos/peterbe/premailer/badge.svg?branch=master&service=github
+   :target: https://coveralls.io/github/peterbe/premailer?branch=master
 .. |Gratipay| image:: https://img.shields.io/gratipay/peterbe.svg
    :target: https://gratipay.com/peterbe/
