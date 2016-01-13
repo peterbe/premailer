@@ -136,7 +136,8 @@ def main(args):
     )
 
     output = p.transform(pretty_print=options.pretty)
-    if type(output) == str and sys.version_info.major < 3:  # Python 2 compatability
+    # Python 2 compatibility hack
+    if type(output) == str and sys.version_info.major < 3:
         output = unicode(output, 'utf-8')
     options.outfile.write(output)
 
