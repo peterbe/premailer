@@ -1,4 +1,5 @@
 from __future__ import absolute_import, unicode_literals
+import os
 import sys
 import re
 import unittest
@@ -1468,6 +1469,23 @@ ground:red}/*]]>*/</style>
         result_html = out.getvalue().strip()
 
         compare_html(expect_html, result_html)
+
+    def test_command_line_fileinput_from_stdin_with_unicode_to_output(self):
+        html = '<style>h1 { color:red; }</style><h1>\xc2\xa9 Apple Inc.</h1>'
+        expect_html = """
+        <html>
+        <head></head>
+        <body><h1 style="color:red">\xc2\xa9 Apple Inc.</h1></body>
+        </html>
+        """
+
+        output = 'out-test'
+        with provide_input(html) as (out, err):
+            main(['-o', output])
+        with open(output, 'r') as result:
+            result_html = result.read().strip()
+            os.remove(output)
+            compare_html(expect_html, result_html)
 
     def test_command_line_fileinput_from_argument(self):
         with captured_output() as (out, err):
