@@ -27,7 +27,7 @@ else:  # Python 2
         StringIO = StringIO  # shut up pyflakes
     from urllib2 import urlopen
     from urlparse import urljoin, urlparse
-    STR_TYPE = basestring
+    STR_TYPE = basestring  # NOQA
 
 import cssutils
 from lxml import etree
@@ -634,4 +634,4 @@ if __name__ == '__main__':  # pragma: no cover
         </body>
         </html>"""
     p = Premailer(html)
-    print (p.transform())
+    print(p.transform())

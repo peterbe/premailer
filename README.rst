@@ -25,6 +25,7 @@ makes sure premailer works in:
 -  Python 3.2
 -  Python 3.3
 -  Python 3.4
+-  Python 3.5
 -  PyPy
 
 Turns CSS blocks into style attributes
