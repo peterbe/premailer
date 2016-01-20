@@ -28,7 +28,6 @@ env:
   - TOX_ENV=flake8
   - TOX_ENV=py26
   - TOX_ENV=py27
-  - TOX_ENV=py32
   - TOX_ENV=py33
   - TOX_ENV=py34
   - TOX_ENV=py35
