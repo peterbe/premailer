@@ -20,13 +20,17 @@ before_install:
 install:
   - travis_retry python setup.py install
 
+# See https://github.com/travis-ci/travis-ci/issues/4794
+# and https://github.com/audreyr/cookiecutter/pull/540/files
+python: 3.5
+
 env:
   - TOX_ENV=flake8
   - TOX_ENV=py26
   - TOX_ENV=py27
-  - TOX_ENV=py32
   - TOX_ENV=py33
   - TOX_ENV=py34
+  - TOX_ENV=py35
   - TOX_ENV=pypy
 
 script:
