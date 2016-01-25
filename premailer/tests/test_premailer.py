@@ -1480,12 +1480,14 @@ ground:red}/*]]>*/</style>
         """
 
         output = 'out-test'
-        with provide_input(html) as (out, err):
-            main(['-o', output])
-        with open(output, 'r') as result:
-            result_html = result.read().strip()
+        try:
+            with provide_input(html) as (out, err):
+                main(['-o', output])
+            with open(output, 'r') as result:
+                result_html = result.read().strip()
+                compare_html(expect_html, result_html)
+        finally:
             os.remove(output)
-            compare_html(expect_html, result_html)
 
     def test_command_line_fileinput_from_argument(self):
         with captured_output() as (out, err):

@@ -115,8 +115,6 @@ def main(args):
         )
 
     html = options.infile.read()
-    if hasattr(html, 'decode'):  # Forgive me: Python 2 compatability
-        html = html.decode('utf-8')
 
     p = Premailer(
         html=html,
@@ -134,13 +132,9 @@ def main(args):
         disable_basic_attributes=options.disable_basic_attributes,
         disable_validation=options.disable_validation
     )
-
     output = p.transform(pretty_print=options.pretty)
-    # Python 2 compatibility hack
-    if type(output) == str and sys.version_info.major < 3:
-        output = unicode(output, 'utf-8')
+    print(type(output))
     options.outfile.write(output)
-
     return 0
 
 
