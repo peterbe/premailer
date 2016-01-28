@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 import sys
 import re
@@ -2224,6 +2225,23 @@ ent:"" !important;display:block !important}
         )
         p.transform()  # it should work
         eq_(mylog.getvalue(), '')
+
+    def test_unicode_crescent_moon_0x1f319(self):
+        html = '''<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+            Dear Skyelar 🌙,
+</body>
+</html>
+'''
+        p = Premailer(html)
+
+        # Calling transform should not mangle
+        # the unicode character 🌙
+        mojibake = p.transform()
+        compare_html(mojibake, html)
 
     def test_type_test(self):
         """test the correct type is returned"""
