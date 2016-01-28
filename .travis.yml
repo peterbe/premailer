@@ -1,59 +1,21 @@
-# https://travis-ci.org/peterbe/premailer
-
-# This indicates to Travis that we will not use or need sudo
-# so that we can benefit from and use the cache->directories
-# directive.
-sudo: no
-
+language: python
+python: 2.7
+sudo: false
 os:
   - linux
   - osx
-
-env: PIP_DOWNLOAD_CACHE="pip_cache"
-cache:
-    directories:
-        - pip_cache
-
-language: python
-
-before_install:
-  # twine is necessary so that travis can deploy
-  - travis_retry pip install twine
-  - travis_retry pip install tox coveralls
-
-install:
-  - travis_retry python setup.py install
-
-# See https://github.com/travis-ci/travis-ci/issues/4794
-# and https://github.com/audreyr/cookiecutter/pull/540/files
-# TODO: Temporarily changed back to 2.7 to see if OSX installs most of these
-python: 2.7
-
 env:
-  - TOX_ENV=flake8
+  - TOX_ENV=lint
   - TOX_ENV=py26
   - TOX_ENV=py27
+  - TOX_ENV=pypy
+  - TOX_ENV=py32
   - TOX_ENV=py33
   - TOX_ENV=py34
-  - TOX_ENV=py35
-  - TOX_ENV=pypy
+  - TOX_ENV=docs
+
+install:
+  - pip install tox
 
 script:
   - tox -e $TOX_ENV
-
-after_success:
-  # Report coverage results to coveralls.io
-  - coveralls
-
-deploy:
-  provider: pypi
-  user: peterbe
-  password:
-    secure: mdzD1SHDQ84ZK8tVXdF2LuMsws7it/7foompnuNUTQSVaKdjaHpwTYQtmdLUX0Jv54Plx4861GWNf6CD5IVfU7G8R2Ls/5/tQECFG01AspGz23lL1PxUg9tpNm+LPkQtkJzvS3f4i6/mODnKcoaSnhL63JuGaUNa72B1yBaN4hY=
-  on:
-    repo: peterbe/premailer
-  distributions: "sdist bdist_wheel"
-
-notifications:
-  email:
-    on_success: never
