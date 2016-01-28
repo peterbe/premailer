@@ -26,7 +26,8 @@ install:
 
 # See https://github.com/travis-ci/travis-ci/issues/4794
 # and https://github.com/audreyr/cookiecutter/pull/540/files
-python: 3.5
+# TODO: Temporarily changed back to 2.7 to see if OSX installs most of these
+python: 2.7
 
 env:
   - TOX_ENV=flake8
