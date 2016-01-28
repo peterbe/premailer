@@ -5,6 +5,10 @@
 # directive.
 sudo: no
 
+os:
+  - linux
+  - osx
+
 env: PIP_DOWNLOAD_CACHE="pip_cache"
 cache:
     directories:
