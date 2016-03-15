@@ -1,8 +1,5 @@
 from __future__ import absolute_import, unicode_literals, print_function
-from io import BytesIO  # Yes, there is an io module in Python 2
-import cgi
 import codecs
-import gzip
 import operator
 import os
 import re
@@ -16,7 +13,6 @@ import sys
 if sys.version_info >= (3,):  # pragma: no cover
     # As in, Python 3
     from io import StringIO
-    from urllib.request import urlopen
     from urllib.parse import urljoin, urlparse
     STR_TYPE = str
 else:  # Python 2
@@ -25,11 +21,11 @@ else:  # Python 2
     except ImportError:  # pragma: no cover
         from StringIO import StringIO
         StringIO = StringIO  # shut up pyflakes
-    from urllib2 import urlopen
     from urlparse import urljoin, urlparse
     STR_TYPE = basestring  # NOQA
 
 import cssutils
+import requests
 from lxml import etree
 from lxml.cssselect import CSSSelector
 from premailer.merge_style import merge_styles, csstext_to_pairs
@@ -473,16 +469,7 @@ class Premailer(object):
             return out
 
     def _load_external_url(self, url):
-        r = urlopen(url)
-        _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
-        encoding = params.get('charset', 'utf-8')
-        if 'gzip' in r.info().get('Content-Encoding', ''):
-            buf = BytesIO(r.read())
-            f = gzip.GzipFile(fileobj=buf)
-            out = f.read().decode(encoding)
-        else:
-            out = r.read().decode(encoding)
-        return out
+        return requests.get(url).text
 
     def _load_external(self, url):
         """loads an external stylesheet from a remote url or local path

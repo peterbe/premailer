@@ -32,6 +32,7 @@ install_requires = [
     'lxml',
     'cssselect',
     'cssutils',
+    'requests',
 ]
 if sys.version_info >= (2, 6) and sys.version_info <= (2, 7):
     # Python 2.6 is the oldest version we support and it
