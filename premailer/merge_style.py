@@ -1,6 +1,11 @@
 import cssutils
 import threading
 from operator import itemgetter
+try:
+    from collections import OrderedDict
+except ImportError:  # pragma: no cover
+    # some old python 2.6 thing then, eh?
+    from ordereddict import OrderedDict
 
 
 def csstext_to_pairs(csstext):
@@ -49,9 +54,9 @@ def merge_styles(
             str: the final style
     """
     # building classes
-    styles = {'': {}}
+    styles = OrderedDict([('', OrderedDict())])
     for pc in set(classes):
-        styles[pc] = {}
+        styles[pc] = OrderedDict()
 
     for i, style in enumerate(new_styles):
         for k, v in style:
@@ -71,7 +76,7 @@ def merge_styles(
             # Remove rules that we were going to have value 'unset' because
             # they effectively are the same as not saying anything about the
             # property when inlined
-            kv = dict(
+            kv = OrderedDict(
                 (k, v) for (k, v) in kv.items() if not v.lower() == 'unset'
             )
         if not kv:
@@ -80,12 +85,12 @@ def merge_styles(
             pseudo_styles.append(
                 '%s{%s}' % (
                     pseudoclass,
-                    '; '.join('%s:%s' % (k, v) for k, v in sorted(kv.items()))
+                    '; '.join('%s:%s' % (k, v) for k, v in kv.items())
                 )
             )
         else:
             normal_styles.append('; '.join(
-                '%s:%s' % (k, v) for k, v in sorted(kv.items())
+                '%s:%s' % (k, v) for k, v in kv.items()
             ))
 
     if pseudo_styles:

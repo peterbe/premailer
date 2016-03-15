@@ -102,7 +102,7 @@ class Tests(unittest.TestCase):
     def test_merge_styles_basic(self):
         inline_style = 'font-size:1px; color: red'
         new = 'font-size:2px; font-weight: bold'
-        expect = 'color:red;', 'font-size:1px;', 'font-weight:bold'
+        expect = 'font-size:1px;', 'font-weight:bold;', 'color:red'
         result = merge_styles(inline_style, [csstext_to_pairs(new)], [''])
         for each in expect:
             ok_(each in result)
@@ -146,7 +146,7 @@ class Tests(unittest.TestCase):
     def test_merge_styles_with_unset(self):
         inline_style = 'color: red'
         new = 'font-size: 10px; font-size: unset; font-weight: bold'
-        expect = 'color:red;', 'font-weight:bold'
+        expect = 'font-weight:bold;', 'color:red'
         css_new = csstext_to_pairs(new)
         result = merge_styles(
             inline_style,
@@ -632,11 +632,11 @@ ple.com/bg.png); color:#123; font-family:Omerta">
             'Paragraph</p>'
         self.fragment_in_html(e, result_html, True)
 
-        e = 'style="{border:1px solid green; color:red}'
+        e = 'style="{color:red; border:1px solid green}'
         self.fragment_in_html(e, result_html)
         e = ' :visited{border:1px solid green}'
         self.fragment_in_html(e, result_html)
-        e = ' :hover{border:1px solid green; text-decoration:none}'
+        e = ' :hover{text-decoration:none; border:1px solid green}'
         self.fragment_in_html(e, result_html)
 
     def test_css_with_pseudoclasses_excluded(self):
@@ -666,7 +666,7 @@ a:visited {border:1px solid green}p::first-letter {float:left;font-size:300%}
 </style>
 </head>
 <body>
-<a href="#" style="border:1px solid green; color:red">Page</a>
+<a href="#" style="color:red; border:1px solid green">Page</a>
 <p>Paragraph</p>
 </body>
 </html>"""
@@ -1196,7 +1196,7 @@ ical-align:middle" bgcolor="red" valign="middle">Cell 2</td>
         <head>
         </head>
         <body>
-        <div id="identified" style="color:blue; font-size:22px"></div>
+        <div id="identified" style="font-size:22px; color:blue"></div>
         </body>
         </html>"""
 
