@@ -9,8 +9,7 @@ if sys.version_info >= (3, ):  # As in, Python 3
 else:  # Python 2
     from urllib2 import urlopen
     urlopen = urlopen  # shut up pyflakes
-from io import BytesIO, StringIO  # Yes, the is an io lib in py2.x
-import gzip
+from io import StringIO  # Yes, the is an io lib in py2.x
 
 from nose.tools import eq_, ok_, assert_raises
 import mock
@@ -53,31 +52,10 @@ def provide_input(content):
         sys.stdin = StringIO(content)
 
 
-class MockResponse:
+class MockResponse(object):
 
-    def __init__(self, content, gzip=False):
-        self.content = content
-        self.headers = {}
-        self.gzip = gzip
-
-    def info(self):
-        if self.gzip:
-            return {'Content-Encoding': 'gzip'}
-        else:
-            return {}
-
-    def read(self):
-        if self.gzip:
-            out = BytesIO()
-            # If we didn't have to support python 2.6 we could instead do:
-            #   with gzip.GzipFile(fileobj=out, mode="w") as f:
-            #       ...
-            f = gzip.GzipFile(fileobj=out, mode="w")
-            f.write(self.content)
-            f.close()
-            return out.getvalue()
-        else:
-            return self.content
+    def __init__(self, content):
+        self.text = content
 
 
 def compare_html(one, two):
@@ -1768,29 +1746,17 @@ ent:"" !important;display:block !important}
 
         compare_html(expect_html, result_html)
 
-    @mock.patch('premailer.premailer.urlopen')
-    def test_load_external_url(self, mocked_url_open):
+    @mock.patch('premailer.premailer.requests')
+    def test_load_external_url(self, mocked_requests):
         'Test premailer.premailer.Premailer._load_external_url'
-        faux_response = b'This is not a response'
+        faux_response = 'This is not a response'
         faux_uri = 'https://example.com/site.css'
-        mocked_url_open.return_value = MockResponse(faux_response)
+        mocked_requests.get.return_value = MockResponse(faux_response)
         p = premailer.premailer.Premailer('<p>A paragraph</p>')
         r = p._load_external_url(faux_uri)
 
-        mocked_url_open.assert_called_once_with(faux_uri)
-        eq_(faux_response.decode('utf-8'), r)
-
-    @mock.patch('premailer.premailer.urlopen')
-    def test_load_external_url_gzip(self, mocked_url_open):
-        'Test premailer.premailer.Premailer._load_external_url with gzip'
-        faux_response = b'This is not a response'
-        faux_uri = 'http://example.com/site.css'
-        mocked_url_open.return_value = MockResponse(faux_response, True)
-        p = premailer.premailer.Premailer('<p>A paragraph</p>')
-        r = p._load_external_url(faux_uri)
-
-        mocked_url_open.assert_called_once_with(faux_uri)
-        eq_(faux_response.decode('utf-8'), r)
+        mocked_requests.get.assert_called_once_with(faux_uri)
+        eq_(faux_response, r)
 
     def test_css_text(self):
         """Test handling css_text passed as a string"""

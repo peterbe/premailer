@@ -36,6 +36,10 @@ env:
 script:
   - tox -e $TOX_ENV
 
+branches:
+  only:
+  - master
+
 after_success:
   # Report coverage results to coveralls.io
   - coveralls
