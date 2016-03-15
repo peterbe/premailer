@@ -96,6 +96,115 @@ _short_color_codes = re.compile(r'^#([0-9a-f])([0-9a-f])([0-9a-f])$', re.I)
 FILTER_PSEUDOSELECTORS = [':last-child', ':first-child', 'nth-child']
 
 
+def open_data_url(url):
+    """Decode URLs with the 'data' scheme. urllib can handle them
+    in Python 2, but that is broken in Python 3.
+    Inspired from Python 2.7.2’s urllib.py.
+    """
+    # syntax of data URLs:
+    # dataurl   := "data:" [ mediatype ] [ ";base64" ] "," data
+    # mediatype := [ type "/" subtype ] *( ";" parameter )
+    # data      := *urlchar
+    # parameter := attribute "=" value
+    try:
+        header, data = url.split(',', 1)
+    except ValueError:
+        raise IOError('bad data URL')
+    header = header[5:]  # len('data:') == 5
+    if header:
+        semi = header.rfind(';')
+        if semi >= 0 and '=' not in header[semi:]:
+            content_type = header[:semi]
+            encoding = header[semi + 1:]
+        else:
+            content_type = header
+            encoding = ''
+        message = parse_email('Content-type: ' + content_type)
+        mime_type = message.get_content_type()
+        charset = message.get_content_charset()
+    else:
+        mime_type = 'text/plain'
+        charset = 'US-ASCII'
+        encoding = ''
+
+    data = unquote_to_bytes(data)
+    if encoding == 'base64':
+        data = safe_base64_decode(data)
+
+    return dict(string=data, mime_type=mime_type, encoding=charset,
+                redirected_url=url)
+
+
+try:
+    import requests
+except ImportError:
+    def _default_url_fetcher(url, content_type):
+        if not UNICODE_SCHEME_RE.match(url):
+            raise ValueError('Not an absolute URI: %r' % url)
+
+        url = iri_to_uri(url)
+        response = urlopen(Request(url, headers=HTTP_HEADERS))
+        result = dict(redirected_url=response.geturl(),
+                      mime_type=urllib_get_content_type(response),
+                      encoding=urllib_get_charset(response),
+                      filename=urllib_get_filename(response))
+        content_encoding = response.info().get('Content-Encoding')
+        if content_encoding == 'gzip':
+            if StreamingGzipFile is None:
+                result['string'] = gzip.GzipFile(
+                    fileobj=io.BytesIO(response.read())).read()
+                response.close()
+            else:
+                result['file_obj'] = StreamingGzipFile(fileobj=response)
+        elif content_encoding == 'deflate':
+            data = response.read()
+            try:
+                result['string'] = zlib.decompress(data)
+            except zlib.error:
+                # Try without zlib header or checksum
+                result['string'] = zlib.decompress(data, -15)
+        else:
+            result['file_obj'] = response
+        return result
+else:
+    session = requests.Session()
+    def _default_url_fetcher(url, content_type):
+        resp = session.get(url, headers={'accept': content_type}, stream=True)
+        return {
+            'file_obj': resp.raw,
+            'encoding': resp.encoding,
+        }
+
+
+
+def default_url_fetcher(url, content_type):
+    """Fetch an external resource such as an image or stylesheet.
+    Another callable with the same signature can be given as the
+    :obj:`url_fetcher` argument to :class:`HTML` or :class:`CSS`.
+    (See :ref:`url-fetchers`.)
+    :type url: Unicode string
+    :param url: The URL of the resource to fetch
+    :raises: any exception to indicate failure. Failures are logged
+        as warnings, with the string representation of the exception
+        in the message.
+    :returns: In case of success, a dict with the following keys:
+        * One of ``string`` (a byte string) or ``file_obj``
+          (a file-like object)
+        * Optionally: ``encoding``, a character encoding extracted eg. from a
+          *charset* parameter in a *Content-Type* header
+        If a ``file_obj`` key is given, it is the caller’s responsability
+        to call ``file_obj.close()``.
+    """
+    if url.lower().startswith('data:'):
+        return open_data_url(url)
+
+    return _default_url_fetcher(
+        url=url,
+        content_type=content_type,
+    )
+
+
+
 class Premailer(object):
 
     attribute_name = 'data-premailer'
@@ -315,7 +424,11 @@ class Premailer(object):
                 css_body = element.text
             else:
                 href = element.attrib.get('href')
-                css_body = self._load_external(href)
+                content_type = element.attrib.get('type', 'text/css')
+                css_body = self._load_external(
+                    url=href,
+                    content_type=content_type
+                )
 
             these_rules, these_leftover = self._parse_style_rules(
                 css_body, index
@@ -472,29 +585,31 @@ class Premailer(object):
                 out = _importants.sub('', out)
             return out
 
-    def _load_external_url(self, url):
-        r = urlopen(url)
-        _, params = cgi.parse_header(r.headers.get('Content-Type', ''))
-        encoding = params.get('charset', 'utf-8')
-        if 'gzip' in r.info().get('Content-Encoding', ''):
-            buf = BytesIO(r.read())
-            f = gzip.GzipFile(fileobj=buf)
-            out = f.read().decode(encoding)
+    def _load_external_url(self, url, content_type):
+        result = self.url_fetcher(
+            url,
+            content_type,
+        )
+        encoding = result.get('encoding', 'utf-8')
+
+        string = result.get('string')
+        if string is not None:
+            return string.decode(encoding)
+
         else:
-            out = r.read().decode(encoding)
-        return out
+            file_obj = result['file_obj']
+            try:
+                return file_obj.read().decode(encoding)
+            finally:
+                file_obj.close()
 
     def _load_external(self, url):
         """loads an external stylesheet from a remote url or local path
         """
-        if url.startswith('//'):
-            # then we have to rely on the base_url
-            if self.base_url and 'https://' in self.base_url:
-                url = 'https:' + url
-            else:
-                url = 'http:' + url
+        url = urljoin(self.base_url, url)
+        parsed_url = urlparse(url)
 
-        if url.startswith('http://') or url.startswith('https://'):
+        if parsed_url.scheme in ['http', 'https':
             css_body = self._load_external_url(url)
         else:
             stylefile = url
