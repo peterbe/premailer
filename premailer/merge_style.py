@@ -8,6 +8,13 @@ except ImportError:  # pragma: no cover
     from ordereddict import OrderedDict
 
 
+def format_value(prop):
+    if prop.priority == "important":
+        return prop.propertyValue.cssText.strip() + ' !important'
+    else:
+        return prop.propertyValue.cssText.strip()
+
+
 def csstext_to_pairs(csstext):
     """
     csstext_to_pairs takes css text and make it to list of
@@ -18,7 +25,7 @@ def csstext_to_pairs(csstext):
     with csstext_to_pairs._lock:
         return sorted(
             [
-                (prop.name.strip(), prop.propertyValue.cssText.strip())
+                (prop.name.strip(), format_value(prop))
                 for prop in cssutils.parseStyle(csstext)
             ],
             key=itemgetter(0)

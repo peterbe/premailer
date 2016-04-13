@@ -185,12 +185,18 @@ class Premailer(object):
         The bulk of the rule should not end in a semicolon.
         """
 
+        def format_css_property(prop):
+            if self.strip_important or prop.priority != 'important':
+                return '{0}:{1}'.format(prop.name, prop.value)
+            else:
+                return '{0}:{1} !important'.format(prop.name, prop.value)
+
         def join_css_properties(properties):
             """ Accepts a list of cssutils Property objects and returns
             a semicolon delimitted string like 'color: red; font-size: 12px'
             """
             return ';'.join(
-                '{0}:{1}'.format(prop.name, prop.value)
+                format_css_property(prop)
                 for prop in properties
             )
 

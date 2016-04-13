@@ -2540,3 +2540,34 @@ sheet" type="text/css">
         p = Premailer(html, remove_unset_properties=True)
         result_html = p.transform()
         compare_html(expect_html, result_html)
+
+    def test_inline_important(self):
+        'Are !important tags preserved inline.'
+
+        html = """<html>
+<head>
+  <title></title>
+</head>
+<body>
+  <style type="text/css">.something { display:none !important; }</style>
+  <div class="something">blah</div>
+</body>
+</html>"""
+
+        expect_html = """<html>
+<head>
+  <title></title>
+</head>
+<body>
+  <style type="text/css">.something { display:none !important; }</style>
+  <div class="something" style="display:none !important">blah</div>
+</body>
+</html>"""
+        p = Premailer(
+            html,
+            remove_classes=False,
+            keep_style_tags=True,
+            strip_important=False
+        )
+        result_html = p.transform()
+        compare_html(expect_html, result_html)
