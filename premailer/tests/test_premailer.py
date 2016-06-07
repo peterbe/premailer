@@ -170,6 +170,37 @@ class Tests(unittest.TestCase):
 
         compare_html(expect_html, result_html)
 
+    def test_remove_classes(self):
+        """test the simplest case"""
+
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        .stuff {
+            color: red;
+        }
+        </style>
+        </head>
+        <body>
+        <p class="stuff"><strong>Yes!</strong></p>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        <title>Title</title>
+        </head>
+        <body>
+        <p style="color:red"><strong>Yes!</strong></p>
+        </body>
+        </html>"""
+
+        p = Premailer(html, remove_classes=True)
+        result_html = p.transform()
+
+        compare_html(expect_html, result_html)
+
     def test_basic_html_shortcut_function(self):
         """test the plain transform function"""
         html = """<html>
