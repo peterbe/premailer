@@ -1088,7 +1088,7 @@ b
         <head>
         </head>
         <body>
-        <div style="color:red"></div>
+        <div class="example" style="color:red"></div>
         </body>
         </html>"""
 
@@ -1118,7 +1118,7 @@ b
         <head>
         </head>
         <body>
-        <div style="color:green"></div>
+        <div class="example" style="color:green"></div>
         </body>
         </html>"""
 
@@ -1148,7 +1148,7 @@ b
         <head>
         </head>
         <body>
-        <div style="color:green"></div>
+        <div class="example" style="color:green"></div>
         </body>
         </html>"""
 
@@ -1178,7 +1178,7 @@ b
         <head>
         </head>
         <body>
-        <div id="identified" style="color:green"></div>
+        <div class="example" id="identified" style="color:green"></div>
         </body>
         </html>"""
 
@@ -1195,7 +1195,7 @@ b
             color: blue !important;
             font-size: 12px;
         }
-        #identified {
+        #id {
             color: green;
             font-size: 22px;
         }
@@ -1205,17 +1205,17 @@ b
         </style>
         </head>
         <body>
-        <div class="example makeblue" id="identified"></div>
+        <div class="example makeblue" id="id"></div>
         </body>
         </html>"""
 
         expect_html = """<html>
-        <head>
-        </head>
-        <body>
-        <div id="identified" style="font-size:22px; color:blue"></div>
-        </body>
-        </html>"""
+<head>
+</head>
+<body>
+<div class="example makeblue" id="id" style="font-size:22px; color:blue"></div>
+</body>
+</html>"""
 
         p = Premailer(html)
         result_html = p.transform()
@@ -1285,7 +1285,7 @@ ration:none">Yes!</strong></p>
         <title>Title</title>
         </head>
         <body>
-        <h1 style="color:green">Hi!</h1>
+        <h1 class="foo" style="color:green">Hi!</h1>
         </body>
         </html>"""
 
@@ -2395,7 +2395,7 @@ sheet" type="text/css">
         <head>
         </head>
         <body>
-        <div style="color:green; font-size:10px"></div>
+        <div class="color example" style="color:green; font-size:10px"></div>
         </body>
         </html>"""
 
@@ -2453,22 +2453,22 @@ sheet" type="text/css">
         </head>
         <body>
         <p><img src="/images/left.jpg" style="float: left"> text
-           <img src="/images/right.png" class="floatright"> text
+           <img src="/r.png" class="floatright"> text
            <img src="/images/nofloat.gif"> text
         </body>
         </html>"""
 
         expect_html = """<html>
-        <head>
-        <title>Title</title>
-        </head>
-        <body>
-        <p><img src="/images/left.jpg" style="float: left" align="left"> text
-           <img src="/images/right.png" style="float:right" align="right"> text
-           <img src="/images/nofloat.gif"> text
-        </p>
-        </body>
-        </html>"""
+<head>
+<title>Title</title>
+</head>
+<body>
+<p><img src="/images/left.jpg" style="float: left" align="left"> text
+   <img src="/r.png" class="floatright" style="float:right" align="right"> text
+   <img src="/images/nofloat.gif"> text
+</p>
+</body>
+</html>"""
 
         p = Premailer(html, align_floating_images=True)
         result_html = p.transform()
@@ -2498,7 +2498,8 @@ sheet" type="text/css">
         <head>
         </head>
         <body>
-        <div style="color:green"><span></span></div>
+        <div class="color" style="color:green"><span class="nocolor"></span>
+        </div>
         </body>
         </html>"""
 

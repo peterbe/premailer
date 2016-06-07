@@ -121,7 +121,7 @@ class Premailer(object):
                  exclude_pseudoclasses=True,
                  keep_style_tags=False,
                  include_star_selectors=False,
-                 remove_classes=True,
+                 remove_classes=False,
                  capitalize_float_margin=False,
                  strip_important=True,
                  external_styles=None,
