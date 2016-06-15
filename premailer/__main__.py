@@ -1,4 +1,7 @@
 from __future__ import absolute_import, unicode_literals
+
+import random
+import string
 import sys
 import argparse
 
@@ -112,6 +115,11 @@ def main(args):
         action="store_true",
         help="Pretty-print the outputted HTML.",
     )
+    
+    parser.add_argument(
+        "--preserve", action="append",
+        help="Token to preserve from xml/html encoding."
+    )
 
     options = parser.parse_args(args)
 
@@ -123,6 +131,13 @@ def main(args):
     html = options.infile.read()
     if hasattr(html, 'decode'):  # Forgive me: Python 2 compatability
         html = html.decode('utf-8')
+        
+    replacements = {}
+    if options.preserve:
+        for token in options.preserve:
+            replacement = ''.join(random.choice(string.ascii_letters) for _ in range(32))
+            replacements[replacement] = token
+            html = html.replace(token, replacement)
 
     p = Premailer(
         html=html,
@@ -140,7 +155,14 @@ def main(args):
         disable_basic_attributes=options.disable_basic_attributes,
         disable_validation=options.disable_validation
     )
-    options.outfile.write(p.transform(pretty_print=options.pretty))
+    
+    inlined = p.transform(pretty_print=options.pretty)
+
+    if options.preserve:
+        for replacement, token in replacements.items():
+            inlined = inlined.replace(replacement, token)
+
+    options.outfile.write(inlined)
     return 0
 
 
