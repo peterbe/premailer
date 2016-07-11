@@ -113,6 +113,11 @@ def main(args):
         help="Pretty-print the outputted HTML.",
     )
 
+    parser.add_argument(
+        "--encoding", default='utf-8',
+        help="Output encoding. The default is utf-8",
+    )
+
     options = parser.parse_args(args)
 
     if options.disable_basic_attributes:
@@ -140,7 +145,10 @@ def main(args):
         disable_basic_attributes=options.disable_basic_attributes,
         disable_validation=options.disable_validation
     )
-    options.outfile.write(p.transform(pretty_print=options.pretty))
+    options.outfile.write(p.transform(
+        encoding=options.encoding,
+        pretty_print=options.pretty
+    ))
     return 0
 
 
