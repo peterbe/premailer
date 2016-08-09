@@ -145,10 +145,15 @@ def main(args):
         disable_basic_attributes=options.disable_basic_attributes,
         disable_validation=options.disable_validation
     )
-    options.outfile.write(p.transform(
+    
+    transformed = p.transform(
         encoding=options.encoding,
         pretty_print=options.pretty
-    ))
+    )
+    
+    // python 2 support for no-ascii characters
+    options.outfile.write(transformed.encode(options.encoding))
+
     return 0
 
 
