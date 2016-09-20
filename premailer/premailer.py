@@ -504,7 +504,10 @@ class Premailer(object):
             return out
 
     def _load_external_url(self, url):
-        return requests.get(url).text
+        r = requests.get(url)
+        if r.status_code == 400:
+            raise ExternalNotFoundError(url)
+        return r.text
 
     def _load_external(self, url):
         """loads an external stylesheet from a remote url or local path
