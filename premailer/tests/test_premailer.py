@@ -1829,7 +1829,7 @@ ent:"" !important;display:block !important}
         mocked_requests.get.assert_called_once_with(faux_uri)
         eq_(faux_response, r)
 
-    @mock.path('premailer.premailer.requests')
+    @mock.patch('premailer.premailer.requests')
     def test_load_external_url_w_404(self, mocked_requests):
         'Test premailer.premailer.Premailer._load_external_url with a 404'
         faux_response = 'This is not a response'
