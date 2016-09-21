@@ -505,7 +505,7 @@ class Premailer(object):
 
     def _load_external_url(self, url):
         r = requests.get(url)
-        if r.status_code == 400:
+        if r.status_code == 404:
             raise ExternalNotFoundError(url)
         return r.text
 
