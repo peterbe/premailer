@@ -837,6 +837,25 @@ ical-align:middle" bgcolor="red" valign="middle">Cell 2</td>
 
         compare_html(expect_html, result_html)
 
+    def test_tel_url(self):
+        """if you use URL with tel: protocol, it should stay as tel:
+        when baseurl is used
+        """
+
+        html = """<html>
+        <head>
+        <title>Title</title>
+        </head>
+        <body>
+        <a href="tel:202-555-0113">202-555-0113</a>
+        </body>
+        </html>"""
+
+        p = Premailer(html, base_url='http://kungfupeople.com')
+        result_html = p.transform()
+
+        compare_html(result_html, html)
+
     def test_uppercase_margin(self):
         """Option to comply with outlook.com
 
