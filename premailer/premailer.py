@@ -485,6 +485,8 @@ class Premailer(object):
                         url.startswith('cid:')
                     ):
                         continue
+                    if attr == 'href' and url.startswith('tel:'):
+                        continue
                     parent.attrib[attr] = urljoin(self.base_url, url)
 
         if hasattr(self.html, "getroottree"):
