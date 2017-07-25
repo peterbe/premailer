@@ -2622,3 +2622,53 @@ sheet" type="text/css">
         )
         result_html = p.transform()
         compare_html(expect_html, result_html)
+
+    def test_pseudo_selectors_without_selector(self):
+        """Happens when you have pseudo selectors without an actual selector.
+        Which means it's not possible to find it in the DOM.
+
+        For example:
+
+           <style>
+           :before{box-sizing:inherit}
+           </style>
+
+        Semantic-UI uses this in its normalizer.
+
+        Original issue: https://github.com/peterbe/premailer/issues/184
+        """
+
+        html = """
+            <html>
+            <style>
+                 *,:after,:before{box-sizing:inherit}
+                h1{ border: 1px solid blue}
+                h1:hover {border: 1px solid green}
+
+            </style>
+            <h1>Hey</h1>
+            </html>
+        """
+
+        expect_html = """
+<html>
+    <head>
+    <style>
+         *,:after,:before{box-sizing:inherit}
+        h1{ border: 1px solid blue}
+        h1:hover {border: 1px solid green}
+
+    </style>
+    </head>
+    <body>
+    <h1 style="{border:1px solid blue} :hover{border:1px solid green}">Hey</h1>
+    </body>
+</html>
+        """
+        p = Premailer(
+            html,
+            exclude_pseudoclasses=False,
+            keep_style_tags=True,
+        )
+        result_html = p.transform()
+        compare_html(expect_html, result_html)
