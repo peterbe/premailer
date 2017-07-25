@@ -250,6 +250,9 @@ class Premailer(object):
                     continue
                 elif '*' in selector and not self.include_star_selectors:
                     continue
+                elif selector.startswith(':'):
+                    continue
+
                 # Crudely calculate specificity
                 id_count = selector.count('#')
                 class_count = selector.count('.')
@@ -274,6 +277,7 @@ class Premailer(object):
                         len(rules)  # this is the rule's index number
                     )
                     rules.append((specificity, selector, bulk))
+
         return rules, leftover
 
     def transform(self, pretty_print=True, **kwargs):
@@ -401,6 +405,7 @@ class Premailer(object):
             else:
                 selector = new_selector
 
+            assert selector
             sel = CSSSelector(selector)
             items = sel(page)
             if len(items):
