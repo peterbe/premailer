@@ -140,9 +140,9 @@ class Premailer(object):
         self.html = html
         self.base_url = base_url
 
-        # if base_url is specified, premailer will transform all URLs by joining
-        # them with the base_url. Setting preserve_internal_links to True
-        # will disable this behavior for links to named anchors. Setting
+        # if base_url is specified, premailer will transform all URLs by
+        # joining them with the base_url. Setting preserve_internal_links to
+        # True will disable this behavior for links to named anchors. Setting
         # preserve_inline_attachments to True will disable this behavior for
         # any links with cid: scheme. Setting preserve_all_links to True will
         # disable this behavior altogether.
