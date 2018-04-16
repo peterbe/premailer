@@ -574,6 +574,49 @@ ple.com/bg.png); color:#123; font-family:Omerta">
 
         compare_html(expect_html, result_html)
 
+    def test_base_url_ignore_links(self):
+        """if you leave some URLS as /foo, set base_url to
+        'http://www.google.com' and set disable_link_rewrites to True, the URLS
+        should not be changed.
+        """
+
+        html = '''<html>
+        <head>
+        <title>Title</title>
+        </head>
+        <body>
+        <img src="/images/foo.jpg">
+        <img src="http://www.googe.com/photos/foo.jpg">
+        <a href="/home">Home</a>
+        <a href="http://www.peterbe.com">External</a>
+        <a href="http://www.peterbe.com/base/">External 2</a>
+        <a href="subpage">Subpage</a>
+        <a href="#internal_link">Internal Link</a>
+        </body>
+        </html>
+        '''
+
+        expect_html = '''<html>
+        <head>
+        <title>Title</title>
+        </head>
+        <body>
+        <img src="/images/foo.jpg">
+        <img src="http://www.googe.com/photos/foo.jpg">
+        <a href="/home">Home</a>
+        <a href="http://www.peterbe.com">External</a>
+        <a href="http://www.peterbe.com/base/">External 2</a>
+        <a href="subpage">Subpage</a>
+        <a href="#internal_link">Internal Link</a>
+        </body>
+        </html>'''
+
+        p = Premailer(html, base_url='http://kungfupeople.com/base/',
+                      disable_link_rewrites=True)
+        result_html = p.transform()
+
+        compare_html(expect_html, result_html)
+
     def test_shortcut_function(self):
         # you don't have to use this approach:
         #   from premailer import Premailer

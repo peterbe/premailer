@@ -116,6 +116,7 @@ class Premailer(object):
     attribute_name = 'data-premailer'
 
     def __init__(self, html, base_url=None,
+                 disable_link_rewrites=False,
                  preserve_internal_links=False,
                  preserve_inline_attachments=True,
                  exclude_pseudoclasses=True,
@@ -138,6 +139,17 @@ class Premailer(object):
                  remove_unset_properties=True):
         self.html = html
         self.base_url = base_url
+
+        # If base_url is specified, it is used for loading external stylesheets
+        # via relative URLs.
+        #
+        # Also, if base_url is specified, premailer will transform all URLs by
+        # joining them with the base_url. Setting preserve_internal_links to
+        # True will disable this behavior for links to named anchors. Setting
+        # preserve_inline_attachments to True will disable this behavior for
+        # any links with cid: scheme. Setting disable_link_rewrites to True
+        # will disable this behavior altogether.
+        self.disable_link_rewrites = disable_link_rewrites
         self.preserve_internal_links = preserve_internal_links
         self.preserve_inline_attachments = preserve_inline_attachments
         self.exclude_pseudoclasses = exclude_pseudoclasses
@@ -473,7 +485,7 @@ class Premailer(object):
         #
         # URLs
         #
-        if self.base_url:
+        if self.base_url and not self.disable_link_rewrites:
             if not urlparse(self.base_url).scheme:
                 raise ValueError('Base URL must have a scheme')
             for attr in ('href', 'src'):
