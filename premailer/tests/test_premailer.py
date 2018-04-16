@@ -576,7 +576,7 @@ ple.com/bg.png); color:#123; font-family:Omerta">
 
     def test_base_url_ignore_links(self):
         """if you leave some URLS as /foo, set base_url to
-        'http://www.google.com' and set preserve_all_links to True, the URLS
+        'http://www.google.com' and set disable_link_rewrites to True, the URLS
         should not be changed.
         """
 
@@ -612,7 +612,7 @@ ple.com/bg.png); color:#123; font-family:Omerta">
         </html>'''
 
         p = Premailer(html, base_url='http://kungfupeople.com/base/',
-                      preserve_all_links=True)
+                      disable_link_rewrites=True)
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
