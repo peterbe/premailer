@@ -329,7 +329,11 @@ class Premailer(object):
         rules = []
         index = 0
 
-        for element in CSSSelector('style,link[rel~=stylesheet]')(page):
+        selectors = [
+            'style:not([data-premailer="ignore"])',
+            'link[rel~=stylesheet]:not([data-premailer="ignore"])'
+        ]
+        for element in CSSSelector(','.join(selectors))(page):
             # If we have a media attribute whose value is anything other than
             # 'all' or 'screen', ignore the ruleset.
             media = element.attrib.get('media')
