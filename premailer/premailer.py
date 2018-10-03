@@ -63,7 +63,7 @@ def get_or_create_head(root):
 
 
 @function_cache()
-def _cache_parse_css_string(css_body, validate=True):
+def _parse_css_string(css_body, validate=True):
     """
         This function will cache the result from cssutils
         It is a big gain when number of rules is big
@@ -211,11 +211,6 @@ class Premailer(object):
         if cssutils_logging_level:
             cssutils.log.setLevel(cssutils_logging_level)
 
-    def _parse_css_string(self, css_body, validate=True):
-        return _cache_parse_css_string(
-            css_body, validate=validate,
-            max_cache_entries=self.cache_css_parsing_size)
-
     def _parse_style_rules(self, css_body, ruleset_index):
         """Returns a list of rules to apply to this doc and a list of rules
         that won't be used because e.g. they are pseudoclasses. Rules
@@ -244,9 +239,10 @@ class Premailer(object):
         # empty string
         if not css_body:
             return rules, leftover
-        sheet = self._parse_css_string(
+        sheet = _parse_css_string(
             css_body,
-            validate=not self.disable_validation
+            validate=not self.disable_validation,
+            max_cache_entries=self.cache_css_parsing_size
         )
         for rule in sheet:
             # handle media rule
