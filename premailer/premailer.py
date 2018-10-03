@@ -137,28 +137,46 @@ class Premailer(object):
                  disable_leftover_css=False,
                  align_floating_images=True,
                  remove_unset_properties=True):
+
+        '''
+        Initializes the premailer class.
+
+        TODO: document the rest of options
+
+        base_url: Specifies base URL for loading external stylesheets via
+            relative URLs.
+
+            If base_url is True, premailer will transform all URLs by
+            joining them with the base_url.
+
+        preserve_internal_links: If specified, the URL transforming behavior
+            enabled by setting base_url to True will be disabled for links to
+            named anchors.
+
+        preserve_inline_attachments: If specified, the URL transforming
+            behavior enabled by setting base_url to True will be disabled for
+            any links with cid: scheme.
+
+        disable_link_rewrites: If specified, the URL transforming behavior
+            enabled by setting base_url to True will be disabled altogether.
+
+        keep_style_tags: Specifies whether to delete the <style> tag once
+            it's been processed. If True, all original css will be
+            preserved.
+
+        include_star_selectors: Specifies whether to process or ignore
+            selectors like '* { foo:bar; }'
+        '''
+
         self.html = html
         self.base_url = base_url
-
-        # If base_url is specified, it is used for loading external stylesheets
-        # via relative URLs.
-        #
-        # Also, if base_url is specified, premailer will transform all URLs by
-        # joining them with the base_url. Setting preserve_internal_links to
-        # True will disable this behavior for links to named anchors. Setting
-        # preserve_inline_attachments to True will disable this behavior for
-        # any links with cid: scheme. Setting disable_link_rewrites to True
-        # will disable this behavior altogether.
         self.disable_link_rewrites = disable_link_rewrites
         self.preserve_internal_links = preserve_internal_links
         self.preserve_inline_attachments = preserve_inline_attachments
         self.exclude_pseudoclasses = exclude_pseudoclasses
-        # whether to delete the <style> tag once it's been processed
-        # this will always preserve the original css
         self.keep_style_tags = keep_style_tags
         self.remove_classes = remove_classes
         self.capitalize_float_margin = capitalize_float_margin
-        # whether to process or ignore selectors like '* { foo:bar; }'
         self.include_star_selectors = include_star_selectors
         if isinstance(external_styles, STR_TYPE):
             external_styles = [external_styles]
