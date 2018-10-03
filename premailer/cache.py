@@ -1,18 +1,6 @@
 import functools
 
 
-class _HashedSeq(list):
-    # # From CPython
-    __slots__ = 'hashvalue'
-
-    def __init__(self, tup, hash=hash):
-        self[:] = tup
-        self.hashvalue = hash(tup)
-
-    def __hash__(self):
-        return self.hashvalue
-
-
 def function_cache():
     """
         function_cache is a decorator for caching function call.
@@ -49,13 +37,19 @@ def function_cache():
             if max_cache_entries == 0:
                 return func(*args, **kwargs)
 
-            keys = args
+            keys = []
+            for arg in args:
+                if isinstance(arg, list):
+                    keys.append(tuple(arg))
+                else:
+                    keys.append(arg)
+
             if kwargs:
                 sorted_items = sorted(kwargs.items())
                 for item in sorted_items:
-                    keys += item
+                    keys.append(item)
 
-            hashed = hash(_HashedSeq(keys))
+            hashed = hash(tuple(keys))
             result = cache.get(hashed, sentinel)
             if result is sentinel:
                 result = func(*args, **kwargs)
