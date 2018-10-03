@@ -49,13 +49,25 @@ def make_important(bulk):
                     for p in bulk.split(';'))
 
 
-def get_or_create_head(root):
+@function_cache()
+def _create_cssselector(selector):
+    return CSSSelector(selector)
+
+
+def get_or_create_head(root, max_cache_entries):
     """Ensures that `root` contains a <head> element and returns it.
     """
-    head = CSSSelector('head')(root)
+    head = _create_cssselector(
+        'head', max_cache_entries=max_cache_entries
+    )(root)
+
     if not head:
         head = etree.Element('head')
-        body = CSSSelector('body')(root)[0]
+
+        body = _create_cssselector(
+            'body', max_cache_entries=max_cache_entries
+        )(root)[0]
+
         body.getparent().insert(0, head)
         return head
     else:
@@ -344,7 +356,10 @@ class Premailer(object):
         if self.disable_leftover_css:
             head = None
         else:
-            head = get_or_create_head(tree)
+            head = get_or_create_head(
+                tree, max_cache_entries=self.cache_css_parsing_size
+            )
+
         #
         # style selectors
         #
@@ -352,7 +367,8 @@ class Premailer(object):
         rules = []
         index = 0
 
-        for element in CSSSelector('style,link[rel~=stylesheet]')(page):
+        selector = _create_cssselector('style,link[rel~=stylesheet]')(page)
+        for element in selector:
             # If we have a media attribute whose value is anything other than
             # 'all' or 'screen', ignore the ruleset.
             media = element.attrib.get('media')
@@ -441,8 +457,7 @@ class Premailer(object):
                 selector = new_selector
 
             assert selector
-            sel = CSSSelector(selector)
-            items = sel(page)
+            items = _create_cssselector(selector)(page)
             if len(items):
                 # same so process it first
                 processed_style = csstext_to_pairs(
