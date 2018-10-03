@@ -34,6 +34,24 @@ class TestCache(unittest.TestCase):
 
         self.assertEqual(test['call_count'], 13)
 
+    def test_does_not_clear_cache_on_off(self):
+        test = {'call_count': 0}
+
+        def test_func(*args, **kwargs):
+            test['call_count'] += 1
+
+        cache_decorator = function_cache()
+        wrapper = cache_decorator(test_func)
+        wrapper(1, 1, t=1, max_cache_entries=2)
+        wrapper(1, 2, t=1, max_cache_entries=2)
+        # turn off
+        wrapper(1, 3, t=1, max_cache_entries=2)
+        # call 10 more times
+        for _ in range(10):
+            wrapper(1, 2, t=1, max_cache_entries=2)
+
+        self.assertEqual(test['call_count'], 3)
+
     def test_cache_hit(self):
         test = {'call_count': 0}
 
