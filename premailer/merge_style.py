@@ -1,5 +1,7 @@
+from __future__ import absolute_import
 import cssutils
 import threading
+from premailer.cache import function_cache
 from operator import itemgetter
 try:
     from collections import OrderedDict
@@ -15,6 +17,7 @@ def format_value(prop):
         return prop.propertyValue.cssText.strip()
 
 
+@function_cache()
 def csstext_to_pairs(csstext):
     """
     csstext_to_pairs takes css text and make it to list of

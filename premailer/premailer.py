@@ -445,7 +445,9 @@ class Premailer(object):
             items = sel(page)
             if len(items):
                 # same so process it first
-                processed_style = csstext_to_pairs(style)
+                processed_style = csstext_to_pairs(
+                    style, max_cache_entries=self.cache_css_parsing_size
+                )
 
                 for item in items:
                     item_id = id(item)
