@@ -94,6 +94,29 @@ def _parse_css_string(css_body, validate=True):
     return cssutils.parseString(css_body, validate=validate)
 
 
+@function_cache()
+def _css_rules_to_string(rules):
+    """given a list of css rules returns a css string
+    """
+    lines = []
+    for item in rules:
+        if isinstance(item, tuple):
+            k, v = item
+            lines.append('%s {%s}' % (k, make_important(v)))
+        # media rule
+        else:
+            for rule in item.cssRules:
+                if isinstance(rule, cssutils.css.csscomment.CSSComment):
+                    continue
+                for key in rule.style.keys():
+                    rule.style[key] = (
+                        rule.style.getPropertyValue(key, False),
+                        '!important'
+                    )
+            lines.append(item.cssText)
+    return '\n'.join(lines)
+
+
 def capitalize_float_margin(css_body):
     """Capitalize float and margin CSS property names
     """
@@ -145,6 +168,8 @@ class Premailer(object):
                  disable_validation=False,
                  cache_css_parsing=True,
                  cache_css_parsing_size=1000,
+                 cache_css_output=True,
+                 cache_css_output_size=1000,
                  cssutils_logging_handler=None,
                  cssutils_logging_level=None,
                  disable_leftover_css=False,
@@ -184,6 +209,11 @@ class Premailer(object):
 
         cache_css_parsing_size: Specifies the size for various CSS parsing
             caches. If set to None, the size of the caches will not be limited.
+
+        cache_css_output: Specifies whether to cache the CSS output results.
+
+        cache_css_output_size: Specifies the size for various CSS output
+            caches. If set to None, the size of the caches will not be limited.
         '''
 
         self.html = html
@@ -213,6 +243,10 @@ class Premailer(object):
         self.cache_css_parsing_size = cache_css_parsing_size
         if cache_css_parsing is False:
             self.cache_css_parsing_size = 0
+
+        self.cache_css_output_size = cache_css_output_size
+        if cache_css_output is False:
+            self.cache_css_output_size = 0
 
         self.disable_leftover_css = disable_leftover_css
         self.align_floating_images = align_floating_images
@@ -410,7 +444,10 @@ class Premailer(object):
                 if self.keep_style_tags:
                     style.text = css_body
                 else:
-                    style.text = self._css_rules_to_string(these_leftover)
+                    style.text = _css_rules_to_string(
+                        these_leftover,
+                        max_cache_entries=self.cache_css_output_size
+                    )
                 if self.method == 'xml':
                     style.text = etree.CDATA(style.text)
 
@@ -653,27 +690,6 @@ class Premailer(object):
                 continue
             element.attrib[key] = value
 
-    def _css_rules_to_string(self, rules):
-        """given a list of css rules returns a css string
-        """
-        lines = []
-        for item in rules:
-            if isinstance(item, tuple):
-                k, v = item
-                lines.append('%s {%s}' % (k, make_important(v)))
-            # media rule
-            else:
-                for rule in item.cssRules:
-                    if isinstance(rule, cssutils.css.csscomment.CSSComment):
-                        continue
-                    for key in rule.style.keys():
-                        rule.style[key] = (
-                            rule.style.getPropertyValue(key, False),
-                            '!important'
-                        )
-                lines.append(item.cssText)
-        return '\n'.join(lines)
-
     def _process_css_text(self, css_text, index, rules, head):
         """processes the given css_text by adding rules that can be
         in-lined to the given rules list and adding any that cannot
@@ -687,7 +703,10 @@ class Premailer(object):
             if self.keep_style_tags:
                 style.text = css_text
             else:
-                style.text = self._css_rules_to_string(these_leftover)
+                style.text = _css_rules_to_string(
+                    these_leftover,
+                    max_cache_entries=self.cache_css_output_size
+                )
             head.append(style)
 
 

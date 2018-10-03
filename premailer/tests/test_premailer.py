@@ -2467,7 +2467,7 @@ sheet" type="text/css">
         result_html = p.transform()
         compare_html(expect_html, result_html)
 
-    def test_turnoff_cache_works_as_expected(self):
+    def test_turnoff_parsing_cache_works_as_expected(self):
         html = """<html>
         <head>
         <style>
@@ -2494,6 +2494,39 @@ sheet" type="text/css">
 
         p = Premailer(html, cache_css_parsing=False)
         self.assertEqual(p.cache_css_parsing_size, 0)
+        # run one time first
+        p.transform()
+        result_html = p.transform()
+
+        compare_html(expect_html, result_html)
+
+    def test_turnoff_output_cache_works_as_expected(self):
+        html = """<html>
+        <head>
+        <style>
+        .color {
+            color: green;
+        }
+        div.example {
+            font-size: 10px;
+        }
+        </style>
+        </head>
+        <body>
+        <div class="color example"></div>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        </head>
+        <body>
+        <div class="color example" style="color:green; font-size:10px"></div>
+        </body>
+        </html>"""
+
+        p = Premailer(html, cache_css_output=False)
+        self.assertEqual(p.cache_css_output_size, 0)
         # run one time first
         p.transform()
         result_html = p.transform()
