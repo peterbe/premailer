@@ -184,10 +184,12 @@ class Premailer(object):
             cssutils.log.setLevel(cssutils_logging_level)
 
     def _parse_css_string(self, css_body, validate=True):
+        max_cache_entries = 0
         if self.cache_css_parsing:
-            return _cache_parse_css_string(css_body, validate=validate)
+            max_cache_entries = 1000
 
-        return cssutils.parseString(css_body, validate=validate)
+        return _cache_parse_css_string(css_body, validate=validate,
+                                       max_cache_entries=max_cache_entries)
 
     def _parse_style_rules(self, css_body, ruleset_index):
         """Returns a list of rules to apply to this doc and a list of rules
