@@ -132,6 +132,7 @@ class Premailer(object):
                  disable_basic_attributes=None,
                  disable_validation=False,
                  cache_css_parsing=True,
+                 cache_css_parsing_size=1000,
                  cssutils_logging_handler=None,
                  cssutils_logging_level=None,
                  disable_leftover_css=False,
@@ -166,6 +167,11 @@ class Premailer(object):
 
         include_star_selectors: Specifies whether to process or ignore
             selectors like '* { foo:bar; }'
+
+        cache_css_parsing: Specifies whether to cache the CSS parsing results.
+
+        cache_css_parsing_size: Specifies the size for various CSS parsing
+            caches. If set to None, the size of the caches will not be limited.
         '''
 
         self.html = html
@@ -191,7 +197,11 @@ class Premailer(object):
             disable_basic_attributes = []
         self.disable_basic_attributes = disable_basic_attributes
         self.disable_validation = disable_validation
-        self.cache_css_parsing = cache_css_parsing
+
+        self.cache_css_parsing_size = cache_css_parsing_size
+        if cache_css_parsing is False:
+            self.cache_css_parsing_size = 0
+
         self.disable_leftover_css = disable_leftover_css
         self.align_floating_images = align_floating_images
         self.remove_unset_properties = remove_unset_properties
@@ -202,12 +212,9 @@ class Premailer(object):
             cssutils.log.setLevel(cssutils_logging_level)
 
     def _parse_css_string(self, css_body, validate=True):
-        max_cache_entries = 0
-        if self.cache_css_parsing:
-            max_cache_entries = 1000
-
-        return _cache_parse_css_string(css_body, validate=validate,
-                                       max_cache_entries=max_cache_entries)
+        return _cache_parse_css_string(
+            css_body, validate=validate,
+            max_cache_entries=self.cache_css_parsing_size)
 
     def _parse_style_rules(self, css_body, ruleset_index):
         """Returns a list of rules to apply to this doc and a list of rules

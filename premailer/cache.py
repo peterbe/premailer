@@ -43,7 +43,7 @@ def function_cache():
                 not isinstance(max_cache_entries, int)
             ):
                 raise TypeError(
-                    'Expected expected_max_entries to be an integer or None'
+                    'Expected max_cache_entries to be an integer or None'
                 )
 
             if max_cache_entries == 0:

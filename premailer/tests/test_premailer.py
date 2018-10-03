@@ -2493,7 +2493,7 @@ sheet" type="text/css">
         </html>"""
 
         p = Premailer(html, cache_css_parsing=False)
-        self.assertFalse(p.cache_css_parsing)
+        self.assertEqual(p.cache_css_parsing_size, 0)
         # run one time first
         p.transform()
         result_html = p.transform()
