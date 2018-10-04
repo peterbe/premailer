@@ -71,24 +71,58 @@ Next, the most basic use is to use the shortcut function, like this:
 ::
 
     >>> from premailer import transform
-    >>> print transform("""
+    >>> print(transform("""
     ...         <html>
     ...         <style type="text/css">
     ...         h1 { border:1px solid black }
     ...         p { color:red;}
     ...         p::first-letter { float:left; }
     ...         </style>
+    ...         <style type="text/css" data-premailer="ignore">
+    ...         h1 { color:blue; }
+    ...         </style>
     ...         <h1 style="font-weight:bolder">Peter</h1>
     ...         <p>Hej</p>
     ...         </html>
-    ... """)
+    ... """, base_url=None))
     <html>
-    <head></head>
+    <head>
+        <style type="text/css">p::first-letter {float:left}</style>
+        <style type="text/css">
+        h1 { color:blue; }
+        </style>
+    </head>
     <body>
-        <h1 style="font-weight:bolder; border:1px solid black">Peter</h1>
+        <h1 style="border:1px solid black; font-weight:bolder">Peter</h1>
         <p style="color:red">Hej</p>
     </body>
     </html>
+
+The `transform` shortcut method transforms the given HTML using the defaults for all options:
+
+::
+
+    disable_link_rewrites=False, # Allow link rewrites (e.g. using base_url)
+    preserve_internal_links=False, # Do not preserve links to named anchors when using base_url
+    preserve_inline_attachments=True, # Preserve links with cid: scheme when base_url is specified
+    exclude_pseudoclasses=True, # Ignore pseudoclasses when processing styles
+    keep_style_tags=False, # Discard original style tag
+    include_star_selectors=False, # Ignore star selectors when processing styles
+    remove_classes=False, # Leave class attributes on HTML elements
+    capitalize_float_margin=False, # Do not capitalize float and margin properties
+    strip_important=True, # Remove !important from property values
+    external_styles=None, # Optional list of URLs to load and parse
+    css_text=None, # Optional CSS text to parse
+    method="html", # Parse input as HTML (as opposed to "xml")
+    base_path=None, # Optional base path to stylesheet in your file system
+    disable_basic_attributes=None, # Optional list of attribute names to preserve on HTML elements
+    disable_validation=False, # Validate CSS when parsing it with cssutils
+    cache_css_parsing=True, # Do cache parsed output for CSS
+    cssutils_logging_handler=None, # See "Capturing logging from cssutils" below
+    cssutils_logging_level=None,
+    disable_leftover_css=False, # Output CSS that was not inlined into the HEAD
+    align_floating_images=True, # Add align attribute for floated images
+    remove_unset_properties=True # Remove CSS properties if their value is unset when merged
 
 For more advanced options, check out the code of the ``Premailer`` class
 and all its options in its constructor.
