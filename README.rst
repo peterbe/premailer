@@ -84,7 +84,7 @@ Next, the most basic use is to use the shortcut function, like this:
     ...         <h1 style="font-weight:bolder">Peter</h1>
     ...         <p>Hej</p>
     ...         </html>
-    ... """, base_url=None))
+    ... """))
     <html>
     <head>
         <style type="text/css">p::first-letter {float:left}</style>
@@ -102,6 +102,7 @@ The ``transform`` shortcut function transforms the given HTML using the defaults
 
 ::
 
+    base_url=None, # Optional URL prepended to all relative links (both stylesheets and internal)
     disable_link_rewrites=False, # Allow link rewrites (e.g. using base_url)
     preserve_internal_links=False, # Do not preserve links to named anchors when using base_url
     preserve_inline_attachments=True, # Preserve links with cid: scheme when base_url is specified
