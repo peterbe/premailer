@@ -232,6 +232,43 @@ class Tests(unittest.TestCase):
         result_html = transform(html)
         compare_html(expect_html, result_html)
 
+    def test_kwargs_html_shortcut_function(self):
+        """test the transform function with kwargs passed"""
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1, h2 { color:red; }
+        strong {
+            text-decoration:none
+            }
+        </style>
+        </head>
+        <body>
+        <h1>Hi!</h1>
+        <p><strong>Yes!</strong></p>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1, h2 { color:red; }
+        strong {
+            text-decoration:none
+            }
+        </style>
+        </head>
+        <body>
+        <h1 style="color:red">Hi!</h1>
+        <p><strong style="text-decoration:none">Yes!</strong></p>
+        </body>
+        </html>"""
+
+        result_html = transform(html, keep_style_tags=True)
+        compare_html(expect_html, result_html)
+
     def test_empty_style_tag(self):
         """empty style tag"""
 
