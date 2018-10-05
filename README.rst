@@ -98,7 +98,7 @@ Next, the most basic use is to use the shortcut function, like this:
     </body>
     </html>
 
-The `transform` shortcut method transforms the given HTML using the defaults for all options:
+The ``transform`` shortcut function transforms the given HTML using the defaults for all options:
 
 ::
 
