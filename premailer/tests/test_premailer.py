@@ -617,36 +617,6 @@ ple.com/bg.png); color:#123; font-family:Omerta">
 
         compare_html(expect_html, result_html)
 
-    def test_shortcut_function(self):
-        # you don't have to use this approach:
-        #   from premailer import Premailer
-        #   p = Premailer(html, base_url=base_url)
-        #   print p.transform()
-        # You can do it this way:
-        #   from premailer import transform
-        #   print transform(html, base_url=base_url)
-
-        html = '''<html>
-        <head>
-        <style type="text/css">h1{color:#123}</style>
-        </head>
-        <body>
-        <h1>Hi!</h1>
-        </body>
-        </html>'''
-
-        expect_html = '''<html>
-        <head></head>
-        <body>
-        <h1 style="color:#123">Hi!</h1>
-        </body>
-        </html>'''
-
-        p = Premailer(html)
-        result_html = p.transform()
-
-        compare_html(expect_html, result_html)
-
     def fragment_in_html(self, fragment, html, fullMessage=False):
         if fullMessage:
             message = '"{0}" not in\n{1}'.format(fragment, html)
