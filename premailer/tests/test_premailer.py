@@ -232,6 +232,43 @@ class Tests(unittest.TestCase):
         result_html = transform(html)
         compare_html(expect_html, result_html)
 
+    def test_kwargs_html_shortcut_function(self):
+        """test the transform function with kwargs passed"""
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1, h2 { color:red; }
+        strong {
+            text-decoration:none
+            }
+        </style>
+        </head>
+        <body>
+        <h1>Hi!</h1>
+        <p><strong>Yes!</strong></p>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1, h2 { color:red; }
+        strong {
+            text-decoration:none
+            }
+        </style>
+        </head>
+        <body>
+        <h1 style="color:red">Hi!</h1>
+        <p><strong style="text-decoration:none">Yes!</strong></p>
+        </body>
+        </html>"""
+
+        result_html = transform(html, keep_style_tags=True)
+        compare_html(expect_html, result_html)
+
     def test_empty_style_tag(self):
         """empty style tag"""
 
@@ -613,36 +650,6 @@ ple.com/bg.png); color:#123; font-family:Omerta">
 
         p = Premailer(html, base_url='http://kungfupeople.com/base/',
                       disable_link_rewrites=True)
-        result_html = p.transform()
-
-        compare_html(expect_html, result_html)
-
-    def test_shortcut_function(self):
-        # you don't have to use this approach:
-        #   from premailer import Premailer
-        #   p = Premailer(html, base_url=base_url)
-        #   print p.transform()
-        # You can do it this way:
-        #   from premailer import transform
-        #   print transform(html, base_url=base_url)
-
-        html = '''<html>
-        <head>
-        <style type="text/css">h1{color:#123}</style>
-        </head>
-        <body>
-        <h1>Hi!</h1>
-        </body>
-        </html>'''
-
-        expect_html = '''<html>
-        <head></head>
-        <body>
-        <h1 style="color:#123">Hi!</h1>
-        </body>
-        </html>'''
-
-        p = Premailer(html)
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
