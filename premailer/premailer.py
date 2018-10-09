@@ -62,10 +62,10 @@ def make_important(bulk):
 def get_or_create_head(root):
     """Ensures that `root` contains a <head> element and returns it.
     """
-    head = CSSSelector("head")(root)
+    head = _create_cssselector('head')(root)
     if not head:
-        head = etree.Element("head")
-        body = CSSSelector("body")(root)[0]
+        head = etree.Element('head')
+        body = _create_cssselector('body')(root)[0]
         body.getparent().insert(0, head)
         return head
     else:
@@ -90,6 +90,11 @@ def _cache_parse_css_string(css_body, validate=True):
 
     """
     return cssutils.parseString(css_body, validate=validate)
+
+
+@function_cache()
+def _create_cssselector(selector):
+    return CSSSelector(selector)
 
 
 def capitalize_float_margin(css_body):
@@ -337,7 +342,9 @@ class Premailer(object):
         rules = []
         index = 0
 
-        for element in CSSSelector("style,link[rel~=stylesheet]")(page):
+        for element in _create_cssselector(
+            'style,link[rel~=stylesheet]'
+        )(page):
             # If we have a media attribute whose value is anything other than
             # 'all' or 'screen', ignore the ruleset.
             media = element.attrib.get("media")
@@ -422,7 +429,7 @@ class Premailer(object):
                 selector = new_selector
 
             assert selector
-            sel = CSSSelector(selector)
+            sel = _create_cssselector(selector)
             items = sel(page)
             if len(items):
                 # same so process it first

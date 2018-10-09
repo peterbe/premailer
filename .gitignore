@@ -9,3 +9,4 @@ premailer/gorunsettings.py
 .coverage
 .tox
 /htmlcov/
+.eggs
