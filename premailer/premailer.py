@@ -651,8 +651,8 @@ class Premailer(object):
             head.append(style)
 
 
-def transform(html, **kwargs):
-    return Premailer(html, **kwargs).transform()
+def transform(html, pretty_print=False, **kwargs):
+    return Premailer(html, **kwargs).transform(pretty_print=pretty_print)
 
 
 if __name__ == '__main__':  # pragma: no cover
