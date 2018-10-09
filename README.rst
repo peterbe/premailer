@@ -20,11 +20,10 @@ Our
 `tox.ini <https://github.com/peterbe/premailer/blob/master/tox.ini>`__
 makes sure premailer works in:
 
--  Python 2.6
 -  Python 2.7
--  Python 3.3
 -  Python 3.4
 -  Python 3.5
+-  Python 3.6
 -  PyPy
 
 Turns CSS blocks into style attributes
