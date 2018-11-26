@@ -10,7 +10,7 @@ Looking for sponsors
 
 This project is actively looking for corporate sponsorship. If you want
 to help making this an active project consider `pinging
-Peter <http://www.peterbe.com/contact>`__ and we can talk about putting
+Peter <https://www.peterbe.com/contact>`__ and we can talk about putting
 up logos and links to your company.
 
 Python versions
