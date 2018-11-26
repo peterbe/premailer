@@ -27,7 +27,7 @@ install:
 matrix:
   include:
     - python: "3.6"
-      env: TOX_ENV=flake8
+      env: TOX_ENV=lint
     - python: "2.7"
       env: TOX_ENV=py27
     - python: "3.4"
