@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from io import StringIO  # Yes, the is an io lib in py2.x
 
 from lxml.etree import XMLSyntaxError, fromstring
-
+from requests.exceptions import HTTPError
 import mock
 import premailer.premailer  # lint:ok
 from nose.tools import assert_raises, eq_, ok_
@@ -56,8 +56,21 @@ def provide_input(content):
 
 
 class MockResponse(object):
-    def __init__(self, content):
+    def __init__(self, content, status_code=200):
         self.text = content
+        self.status_code = status_code
+
+    def raise_for_status(self):
+        http_error_msg = ""
+
+        if 400 <= self.status_code < 500:
+            http_error_msg = "Client Error: %s" % (self.status_code,)
+
+        elif 500 <= self.status_code < 600:
+            http_error_msg = "Server Error: %s" % (self.status_code,)
+
+        if http_error_msg:
+            raise HTTPError(http_error_msg, response=self)
 
 
 def compare_html(one, two):
@@ -1958,6 +1971,15 @@ ent:"" !important;display:block !important}
 
         mocked_requests.get.assert_called_once_with(faux_uri)
         eq_(faux_response, r)
+
+    @mock.patch("premailer.premailer.requests")
+    def test_load_external_url_404(self, mocked_requests):
+        "Test premailer.premailer.Premailer._load_external_url"
+        faux_response = "This is not a response"
+        faux_uri = "https://example.com/site.css"
+        mocked_requests.get.return_value = MockResponse(faux_response, status_code=404)
+        p = premailer.premailer.Premailer("<p>A paragraph</p>")
+        assert_raises(HTTPError, p._load_external_url, faux_uri)
 
     def test_css_text(self):
         """Test handling css_text passed as a string"""
