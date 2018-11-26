@@ -50,16 +50,3 @@ branches:
 after_success:
   # Report coverage results to coveralls.io
   - coveralls
-
-deploy:
-  provider: pypi
-  user: peterbe
-  password:
-    secure: mdzD1SHDQ84ZK8tVXdF2LuMsws7it/7foompnuNUTQSVaKdjaHpwTYQtmdLUX0Jv54Plx4861GWNf6CD5IVfU7G8R2Ls/5/tQECFG01AspGz23lL1PxUg9tpNm+LPkQtkJzvS3f4i6/mODnKcoaSnhL63JuGaUNa72B1yBaN4hY=
-  on:
-    repo: peterbe/premailer
-  distributions: "sdist bdist_wheel"
-
-notifications:
-  email:
-    on_success: never
