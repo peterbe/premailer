@@ -62,10 +62,10 @@ def make_important(bulk):
 def get_or_create_head(root):
     """Ensures that `root` contains a <head> element and returns it.
     """
-    head = CSSSelector("head")(root)
+    head = _create_cssselector("head")(root)
     if not head:
         head = etree.Element("head")
-        body = CSSSelector("body")(root)[0]
+        body = _create_cssselector("body")(root)[0]
         body.getparent().insert(0, head)
         return head
     else:
@@ -90,6 +90,11 @@ def _cache_parse_css_string(css_body, validate=True):
 
     """
     return cssutils.parseString(css_body, validate=validate)
+
+
+@function_cache()
+def _create_cssselector(selector):
+    return CSSSelector(selector)
 
 
 def capitalize_float_margin(css_body):
@@ -130,7 +135,7 @@ class Premailer(object):
 
     def __init__(
         self,
-        html,
+        html=None,
         base_url=None,
         disable_link_rewrites=False,
         preserve_internal_links=False,
@@ -303,10 +308,16 @@ class Premailer(object):
 
         return rules, leftover
 
-    def transform(self, pretty_print=True, **kwargs):
+    def transform(self, html=None, pretty_print=True, **kwargs):
         """change the self.html and return it with CSS turned into style
         attributes.
         """
+        if html is not None:
+            if self.html is not None:
+                raise TypeError("Can't pass html argument twice")
+            self.html = html
+        elif self.html is None:
+            raise TypeError("must pass html as first argument")
         if hasattr(self.html, "getroottree"):
             # skip the next bit
             root = self.html.getroottree()
@@ -337,7 +348,7 @@ class Premailer(object):
         rules = []
         index = 0
 
-        for element in CSSSelector("style,link[rel~=stylesheet]")(page):
+        for element in _create_cssselector("style,link[rel~=stylesheet]")(page):
             # If we have a media attribute whose value is anything other than
             # 'all' or 'screen', ignore the ruleset.
             media = element.attrib.get("media")
@@ -422,7 +433,7 @@ class Premailer(object):
                 selector = new_selector
 
             assert selector
-            sel = CSSSelector(selector)
+            sel = _create_cssselector(selector)
             items = sel(page)
             if len(items):
                 # same so process it first
@@ -654,7 +665,7 @@ class Premailer(object):
 
 
 def transform(html, pretty_print=False, **kwargs):
-    return Premailer(html, **kwargs).transform(pretty_print=pretty_print)
+    return Premailer(**kwargs).transform(html, pretty_print=pretty_print)
 
 
 if __name__ == "__main__":  # pragma: no cover

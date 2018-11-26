@@ -161,10 +161,46 @@ class Tests(unittest.TestCase):
         </body>
         </html>"""
 
-        p = Premailer(html)
-        result_html = p.transform()
+        p = Premailer()
+        result_html = p.transform(html)
 
         compare_html(expect_html, result_html)
+
+    def test_basic_html_argument_wrong(self):
+        """It used to be that you'd do:
+
+            instance = Premailer(html, **options)
+            print(instance.transform())
+
+        But the new way is:
+
+            instance = Premailer(**options)
+            print(instance.transform(html))
+
+        This test checks the handling for the backwards compatability checks.
+        """
+
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1, h2 { color:red; }
+        strong {
+            text-decoration:none
+            }
+        </style>
+        </head>
+        <body>
+        <h1>Hi!</h1>
+        <p><strong>Yes!</strong></p>
+        </body>
+        </html>"""
+
+        p = Premailer(html)
+        assert_raises(TypeError, p.transform, html)
+
+        p = Premailer()
+        assert_raises(TypeError, p.transform)
 
     def test_remove_classes(self):
         """test the simplest case"""
