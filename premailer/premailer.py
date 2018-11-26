@@ -624,7 +624,10 @@ class Premailer(object):
             # media rule
             else:
                 for rule in item.cssRules:
-                    if isinstance(rule, (cssutils.css.csscomment.CSSComment, cssutils.css.cssunknownrule.CSSUnknownRule)):
+                    if isinstance(rule, (
+                        cssutils.css.csscomment.CSSComment,
+                        cssutils.css.cssunknownrule.CSSUnknownRule
+                    )):
                         continue
                     for key in rule.style.keys():
                         rule.style[key] = (
