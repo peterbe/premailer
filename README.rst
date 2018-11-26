@@ -1,9 +1,11 @@
 premailer
 =========
 
-|Travis|
+.. image:: https://travis-ci.org/peterbe/premailer.svg?branch=master
+    :target: https://travis-ci.org/peterbe/premailer
 
-|Coverage Status|
+.. image:: https://badge.fury.io/py/premailer.svg
+    :target: https://pypi.python.org/pypi/premailer
 
 Looking for sponsors
 --------------------
