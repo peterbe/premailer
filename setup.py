@@ -19,7 +19,7 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 
-install_requires = ["lxml", "cssselect", "cssutils", "requests", 'cachetools']
+install_requires = ["lxml", "cssselect", "cssutils", "requests", "cachetools"]
 
 if sys.version_info >= (2, 6) and sys.version_info <= (2, 7):
     # Python 2.6 is the oldest version we support and it
