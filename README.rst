@@ -288,35 +288,57 @@ this, you have to pass in ``cssutils_logging_handler`` and
     >>> mylog.getvalue()
     'CSSStylesheet: Unknown @rule found. [2:1: @keyframes]\n'
 
-Running tests with tox
-----------------------
+Getting debugging
+-----------------
 
-To run ``tox`` you don't need to have all available Python versions
-installed because it will only work on those you have. To use ``tox``
-first install it:
+First clone the code and create whatever virtualenv you need, then run:
 
-::
+.. code:: bash
 
-    pip install tox
+    pip install -e ".[dev]"
 
-Then simply start it with:
 
-::
+Then to run the tests, run:
+
+.. code:: bash
 
     tox
 
-Donations aka. the tip jar
---------------------------
+This will run the *whole test suite* for every possible version of Python
+it can find on your system. To run the tests more incrementally, open
+up the ``tox.ini`` and see how it works.
 
-If you enjoy, benefit and want premailer to continue to be an actively
-maintained project please consider supporting me on
-`Gratipay <https://gratipay.com/peterbe/>`__.
+Code style is all black
+-----------------------
 
-|Gratipay|
+All code has to be formatted with `Black <https://pypi.org/project/black/>`_
+and the best tool for checking this is
+`therapist <https://pypi.org/project/therapist/>`_ since it can help you run
+all, help you fix things, and help you make sure linting is passing before
+you git commit. This project also uses ``flake8`` to check other things
+Black can't check.
 
-.. |Travis| image:: https://travis-ci.org/peterbe/premailer.png?branch=master
-   :target: https://travis-ci.org/peterbe/premailer
-.. |Coverage Status| image:: https://coveralls.io/repos/peterbe/premailer/badge.svg?branch=master&service=github
-   :target: https://coveralls.io/github/peterbe/premailer?branch=master
-.. |Gratipay| image:: https://img.shields.io/gratipay/peterbe.svg
-   :target: https://gratipay.com/peterbe/
+To check linting with ``tox`` use:
+
+.. code:: bash
+
+    tox -e lint
+
+To install the ``therapist`` pre-commit hook simply run:
+
+.. code:: bash
+
+    therapist install
+
+When you run ``therapist run`` it will only check the files you've touched.
+To run it for all files use:
+
+.. code:: bash
+
+    therapist run --use-tracked-files
+
+And to fix all/any issues run:
+
+.. code:: bash
+
+    therapist run --use-tracked-files --fix

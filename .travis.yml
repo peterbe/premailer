@@ -5,28 +5,26 @@
 # directive.
 sudo: no
 
-env: PIP_DOWNLOAD_CACHE="pip_cache"
-cache:
-    directories:
-        - pip_cache
-
 language: python
 
-before_install:
-  # twine is necessary so that travis can deploy
-  - travis_retry pip install twine
-  - travis_retry pip install tox coveralls
+cache: pip
+
+# before_install:
+#   # twine is necessary so that travis can deploy
+#   - travis_retry pip install twine coveralls
 
 install:
-  - travis_retry python setup.py install
+  - travis_retry pip install tox-travis
+  # coveralls is unique to Travis. It's not something you run locally, like tox.
+  - travis_retry pip install coveralls
 
 # pypy is not installed on trusty-based containers by default.
 # See https://github.com/travis-ci/travis-ci/issues/6865
 
 matrix:
   include:
-    - python: "3.5"
-      env: TOX_ENV=flake8
+    - python: "3.6"
+      env: TOX_ENV=lint
     - python: "2.7"
       env: TOX_ENV=py27
     - python: "3.4"
@@ -44,21 +42,8 @@ script:
 
 branches:
   only:
-  - master
+    - master
 
 after_success:
   # Report coverage results to coveralls.io
   - coveralls
-
-deploy:
-  provider: pypi
-  user: peterbe
-  password:
-    secure: mdzD1SHDQ84ZK8tVXdF2LuMsws7it/7foompnuNUTQSVaKdjaHpwTYQtmdLUX0Jv54Plx4861GWNf6CD5IVfU7G8R2Ls/5/tQECFG01AspGz23lL1PxUg9tpNm+LPkQtkJzvS3f4i6/mODnKcoaSnhL63JuGaUNa72B1yBaN4hY=
-  on:
-    repo: peterbe/premailer
-  distributions: "sdist bdist_wheel"
-
-notifications:
-  email:
-    on_success: never

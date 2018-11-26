@@ -1,32 +1,35 @@
 from __future__ import absolute_import, unicode_literals
-import sys
-import re
-import unittest
+
 import logging
+import re
+import sys
+import unittest
 from contextlib import contextmanager
-if sys.version_info >= (3, ):  # As in, Python 3
+from io import StringIO  # Yes, the is an io lib in py2.x
+
+from lxml.etree import XMLSyntaxError, fromstring
+
+import mock
+import premailer.premailer  # lint:ok
+from nose.tools import assert_raises, eq_, ok_
+from premailer.__main__ import main
+from premailer.premailer import (
+    ExternalNotFoundError,
+    Premailer,
+    csstext_to_pairs,
+    merge_styles,
+    transform,
+)
+
+if sys.version_info >= (3,):  # As in, Python 3
     from urllib.request import urlopen
 else:  # Python 2
     from urllib2 import urlopen
+
     urlopen = urlopen  # shut up pyflakes
-from io import StringIO  # Yes, the is an io lib in py2.x
-
-from nose.tools import eq_, ok_, assert_raises
-import mock
-from lxml.etree import fromstring, XMLSyntaxError
-
-from premailer.premailer import (
-    transform,
-    Premailer,
-    merge_styles,
-    csstext_to_pairs,
-    ExternalNotFoundError,
-)
-from premailer.__main__ import main
-import premailer.premailer  # lint:ok
 
 
-whitespace_between_tags = re.compile('>\s*<')
+whitespace_between_tags = re.compile(r">\s*<")
 
 
 @contextmanager
@@ -53,7 +56,6 @@ def provide_input(content):
 
 
 class MockResponse(object):
-
     def __init__(self, content):
         self.text = content
 
@@ -61,10 +63,10 @@ class MockResponse(object):
 def compare_html(one, two):
     one = one.strip()
     two = two.strip()
-    one = whitespace_between_tags.sub('>\n<', one)
-    two = whitespace_between_tags.sub('>\n<', two)
-    one = one.replace('><', '>\n<')
-    two = two.replace('><', '>\n<')
+    one = whitespace_between_tags.sub(">\n<", one)
+    two = whitespace_between_tags.sub(">\n<", two)
+    one = one.replace("><", ">\n<")
+    two = two.replace("><", ">\n<")
     for i, line in enumerate(one.splitlines()):
         other = two.splitlines()[i]
         if line.lstrip() != other.lstrip():
@@ -72,22 +74,21 @@ def compare_html(one, two):
 
 
 class Tests(unittest.TestCase):
-
     def shortDescription(self):
         # most annoying thing in the world about nose
         pass
 
     def test_merge_styles_basic(self):
-        inline_style = 'font-size:1px; color: red'
-        new = 'font-size:2px; font-weight: bold'
-        expect = 'font-size:1px;', 'font-weight:bold;', 'color:red'
-        result = merge_styles(inline_style, [csstext_to_pairs(new)], [''])
+        inline_style = "font-size:1px; color: red"
+        new = "font-size:2px; font-weight: bold"
+        expect = "font-size:1px;", "font-weight:bold;", "color:red"
+        result = merge_styles(inline_style, [csstext_to_pairs(new)], [""])
         for each in expect:
             ok_(each in result)
 
     def test_merge_styles_with_class(self):
-        inline_style = 'color:red; font-size:1px;'
-        new, class_ = 'font-size:2px; font-weight: bold', ':hover'
+        inline_style = "color:red; font-size:1px;"
+        new, class_ = "font-size:2px; font-weight: bold", ":hover"
 
         # because we're dealing with dicts (random order) we have to
         # test carefully.
@@ -95,46 +96,41 @@ class Tests(unittest.TestCase):
         #  {color:red; font-size:1px} :hover{font-size:2px; font-weight:bold}
 
         result = merge_styles(inline_style, [csstext_to_pairs(new)], [class_])
-        ok_(result.startswith('{'))
-        ok_(result.endswith('}'))
-        ok_(' :hover{' in result)
-        split_regex = re.compile('{([^}]+)}')
+        ok_(result.startswith("{"))
+        ok_(result.endswith("}"))
+        ok_(" :hover{" in result)
+        split_regex = re.compile("{([^}]+)}")
         eq_(len(split_regex.findall(result)), 2)
-        expect_first = 'color:red', 'font-size:1px'
-        expect_second = 'font-weight:bold', 'font-size:2px'
+        expect_first = "color:red", "font-size:1px"
+        expect_second = "font-weight:bold", "font-size:2px"
         for each in expect_first:
             ok_(each in split_regex.findall(result)[0])
         for each in expect_second:
             ok_(each in split_regex.findall(result)[1])
 
     def test_merge_styles_non_trivial(self):
-        inline_style = (
-            'background-image:url("data:image/png;base64,iVBORw0KGg")'
-        )
-        new = 'font-size:2px; font-weight: bold'
+        inline_style = 'background-image:url("data:image/png;base64,iVBORw0KGg")'
+        new = "font-size:2px; font-weight: bold"
         expect = (
             'background-image:url("data:image/png;base64,iVBORw0KGg")',
-            'font-size:2px;',
-            'font-weight:bold'
+            "font-size:2px;",
+            "font-weight:bold",
         )
-        result = merge_styles(inline_style, [csstext_to_pairs(new)], [''])
+        result = merge_styles(inline_style, [csstext_to_pairs(new)], [""])
         for each in expect:
             ok_(each in result)
 
     def test_merge_styles_with_unset(self):
-        inline_style = 'color: red'
-        new = 'font-size: 10px; font-size: unset; font-weight: bold'
-        expect = 'font-weight:bold;', 'color:red'
+        inline_style = "color: red"
+        new = "font-size: 10px; font-size: unset; font-weight: bold"
+        expect = "font-weight:bold;", "color:red"
         css_new = csstext_to_pairs(new)
         result = merge_styles(
-            inline_style,
-            [css_new],
-            [''],
-            remove_unset_properties=True,
+            inline_style, [css_new], [""], remove_unset_properties=True
         )
         for each in expect:
             ok_(each in result)
-        ok_('font-size' not in result)
+        ok_("font-size" not in result)
 
     def test_basic_html(self):
         """test the simplest case"""
@@ -405,9 +401,10 @@ class Tests(unittest.TestCase):
         compare_html(expect_html, result_html)
 
     def test_parse_style_rules(self):
-        p = Premailer('html')  # won't need the html
+        p = Premailer("html")  # won't need the html
         func = p._parse_style_rules
-        rules, leftover = func("""
+        rules, leftover = func(
+            """
         h1, h2 { color:red; }
         /* ignore
             this */
@@ -416,7 +413,9 @@ class Tests(unittest.TestCase):
             }
         ul li {  list-style: 2px; }
         a:hover { text-decoration: underline }
-        """, 0)
+        """,
+            0,
+        )
 
         # 'rules' is a list, turn it into a dict for
         # easier assertion testing
@@ -426,44 +425,50 @@ class Tests(unittest.TestCase):
             rules_dict[k] = v
             rules_specificity[k] = specificity
 
-        ok_('h1' in rules_dict)
-        ok_('h2' in rules_dict)
-        ok_('strong' in rules_dict)
-        ok_('ul li' in rules_dict)
+        ok_("h1" in rules_dict)
+        ok_("h2" in rules_dict)
+        ok_("strong" in rules_dict)
+        ok_("ul li" in rules_dict)
 
-        eq_(rules_dict['h1'], 'color:red')
-        eq_(rules_dict['h2'], 'color:red')
-        eq_(rules_dict['strong'], 'text-decoration:none')
-        eq_(rules_dict['ul li'], 'list-style:2px')
-        ok_('a:hover' not in rules_dict)
+        eq_(rules_dict["h1"], "color:red")
+        eq_(rules_dict["h2"], "color:red")
+        eq_(rules_dict["strong"], "text-decoration:none")
+        eq_(rules_dict["ul li"], "list-style:2px")
+        ok_("a:hover" not in rules_dict)
 
         # won't need the html
-        p = Premailer('html', exclude_pseudoclasses=True)
+        p = Premailer("html", exclude_pseudoclasses=True)
         func = p._parse_style_rules
-        rules, leftover = func("""
+        rules, leftover = func(
+            """
         ul li {  list-style: 2px; }
         a:hover { text-decoration: underline }
-        """, 0)
+        """,
+            0,
+        )
 
         eq_(len(rules), 1)
         specificity, k, v = rules[0]
-        eq_(k, 'ul li')
-        eq_(v, 'list-style:2px')
+        eq_(k, "ul li")
+        eq_(v, "list-style:2px")
 
         eq_(len(leftover), 1)
         k, v = leftover[0]
-        eq_((k, v), ('a:hover', 'text-decoration:underline'), (k, v))
+        eq_((k, v), ("a:hover", "text-decoration:underline"), (k, v))
 
     def test_precedence_comparison(self):
-        p = Premailer('html')  # won't need the html
-        rules, leftover = p._parse_style_rules("""
+        p = Premailer("html")  # won't need the html
+        rules, leftover = p._parse_style_rules(
+            """
         #identified { color:blue; }
         h1, h2 { color:red; }
         ul li {  list-style: 2px; }
         li.example { color:green; }
         strong { text-decoration:none }
         div li.example p.sample { color:black; }
-        """, 0)
+        """,
+            0,
+        )
 
         # 'rules' is a list, turn it into a dict for
         # easier assertion testing
@@ -472,22 +477,23 @@ class Tests(unittest.TestCase):
             rules_specificity[k] = specificity
 
         # Last in file wins
-        ok_(rules_specificity['h1'] < rules_specificity['h2'])
+        ok_(rules_specificity["h1"] < rules_specificity["h2"])
         # More elements wins
-        ok_(rules_specificity['strong'] < rules_specificity['ul li'])
+        ok_(rules_specificity["strong"] < rules_specificity["ul li"])
         # IDs trump everything
-        ok_(rules_specificity['div li.example p.sample'] <
-            rules_specificity['#identified'])
+        ok_(
+            rules_specificity["div li.example p.sample"]
+            < rules_specificity["#identified"]
+        )
 
         # Classes trump multiple elements
-        ok_(rules_specificity['ul li'] <
-            rules_specificity['li.example'])
+        ok_(rules_specificity["ul li"] < rules_specificity["li.example"])
 
     def test_base_url_fixer(self):
         """if you leave some URLS as /foo and set base_url to
         'http://www.google.com' the URLS become 'http://www.google.com/foo'
         """
-        html = '''<html>
+        html = """<html>
         <head>
         <title>Title</title>
         </head>
@@ -502,9 +508,9 @@ class Tests(unittest.TestCase):
         <a href="#internal_link">Internal Link</a>
         </body>
         </html>
-        '''
+        """
 
-        expect_html = '''<html>
+        expect_html = """<html>
         <head>
         <title>Title</title>
         </head>
@@ -518,12 +524,10 @@ class Tests(unittest.TestCase):
         <a href="http://kungfupeople.com/subpage">Subpage</a>
         <a href="#internal_link">Internal Link</a>
         </body>
-        </html>'''
+        </html>"""
 
         p = Premailer(
-            html,
-            base_url='http://kungfupeople.com',
-            preserve_internal_links=True
+            html, base_url="http://kungfupeople.com", preserve_internal_links=True
         )
         result_html = p.transform()
 
@@ -534,7 +538,7 @@ class Tests(unittest.TestCase):
         'http://www.google.com' the URLS become 'http://www.google.com/foo'
         """
 
-        html = '''<html>
+        html = """<html>
         <head>
         <title>Title</title>
         </head>
@@ -548,9 +552,9 @@ class Tests(unittest.TestCase):
         <a href="#internal_link">Internal Link</a>
         </body>
         </html>
-        '''
+        """
 
-        expect_html = '''<html>
+        expect_html = """<html>
         <head>
         <title>Title</title>
         </head>
@@ -563,10 +567,11 @@ class Tests(unittest.TestCase):
         <a href="http://kungfupeople.com/base/subpage">Subpage</a>
         <a href="#internal_link">Internal Link</a>
         </body>
-        </html>'''
+        </html>"""
 
-        p = Premailer(html, base_url='http://kungfupeople.com/base/',
-                      preserve_internal_links=True)
+        p = Premailer(
+            html, base_url="http://kungfupeople.com/base/", preserve_internal_links=True
+        )
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
@@ -604,7 +609,9 @@ class Tests(unittest.TestCase):
 ple.com/bg.png); color:#123; font-family:Omerta">
         <h1>Hi!</h1>
         </body>
-        </html>""".replace('exam\nple', 'example')
+        </html>""".replace(
+            "exam\nple", "example"
+        )
 
         p = Premailer(html)
         result_html = p.transform()
@@ -617,7 +624,7 @@ ple.com/bg.png); color:#123; font-family:Omerta">
         should not be changed.
         """
 
-        html = '''<html>
+        html = """<html>
         <head>
         <title>Title</title>
         </head>
@@ -631,9 +638,9 @@ ple.com/bg.png); color:#123; font-family:Omerta">
         <a href="#internal_link">Internal Link</a>
         </body>
         </html>
-        '''
+        """
 
-        expect_html = '''<html>
+        expect_html = """<html>
         <head>
         <title>Title</title>
         </head>
@@ -646,10 +653,11 @@ ple.com/bg.png); color:#123; font-family:Omerta">
         <a href="subpage">Subpage</a>
         <a href="#internal_link">Internal Link</a>
         </body>
-        </html>'''
+        </html>"""
 
-        p = Premailer(html, base_url='http://kungfupeople.com/base/',
-                      disable_link_rewrites=True)
+        p = Premailer(
+            html, base_url="http://kungfupeople.com/base/", disable_link_rewrites=True
+        )
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
@@ -664,7 +672,7 @@ ple.com/bg.png); color:#123; font-family:Omerta">
     def test_css_with_pseudoclasses_included(self):
         "Pick up the pseudoclasses too and include them"
 
-        html = '''<html>
+        html = """<html>
         <head>
         <style type="text/css">
         a.special:link { text-decoration:none; }
@@ -680,22 +688,21 @@ ple.com/bg.png); color:#123; font-family:Omerta">
         <a href="#">Page</a>
         <p>Paragraph</p>
         </body>
-        </html>'''
+        </html>"""
 
         p = Premailer(html, exclude_pseudoclasses=False)
         result_html = p.transform()
         # because we're dealing with random dicts here we can't predict what
         # order the style attribute will be written in so we'll look for
         # things manually.
-        e = '<p style="::first-letter{float:left; font-size:300%}">'\
-            'Paragraph</p>'
+        e = '<p style="::first-letter{float:left; font-size:300%}">' "Paragraph</p>"
         self.fragment_in_html(e, result_html, True)
 
         e = 'style="{color:red; border:1px solid green}'
         self.fragment_in_html(e, result_html)
-        e = ' :visited{border:1px solid green}'
+        e = " :visited{border:1px solid green}"
         self.fragment_in_html(e, result_html)
-        e = ' :hover{text-decoration:none; border:1px solid green}'
+        e = " :hover{text-decoration:none; border:1px solid green}"
         self.fragment_in_html(e, result_html)
 
     def test_css_with_pseudoclasses_excluded(self):
@@ -733,11 +740,11 @@ a:visited {border:1px solid green}p::first-letter {float:left;font-size:300%}
         p = Premailer(html, exclude_pseudoclasses=True)
         result_html = p.transform()
 
-        expect_html = whitespace_between_tags.sub('><', expect_html).strip()
-        result_html = whitespace_between_tags.sub('><', result_html).strip()
+        expect_html = whitespace_between_tags.sub("><", expect_html).strip()
+        result_html = whitespace_between_tags.sub("><", result_html).strip()
 
-        expect_html = re.sub('}\s+', '}', expect_html)
-        result_html = result_html.replace('}\n', '}')
+        expect_html = re.sub(r"}\s+", "}", expect_html)
+        result_html = result_html.replace("}\n", "}")
 
         eq_(expect_html, result_html)
         # XXX
@@ -780,13 +787,15 @@ ical-align:middle" bgcolor="red" valign="middle">Cell 2</td>
           </tr>
         </table>
         </body>
-        </html>""".replace('vert\nical', 'vertical')
+        </html>""".replace(
+            "vert\nical", "vertical"
+        )
 
         p = Premailer(html, exclude_pseudoclasses=True)
         result_html = p.transform()
 
-        expect_html = re.sub('}\s+', '}', expect_html)
-        result_html = result_html.replace('}\n', '}')
+        expect_html = re.sub(r"}\s+", "}", expect_html)
+        result_html = result_html.replace("}\n", "}")
 
         compare_html(expect_html, result_html)
 
@@ -831,12 +840,12 @@ ical-align:middle" bgcolor="red" valign="middle">Cell 2</td>
         p = Premailer(
             html,
             exclude_pseudoclasses=True,
-            disable_basic_attributes=['align', 'width', 'height']
+            disable_basic_attributes=["align", "width", "height"],
         )
         result_html = p.transform()
 
-        expect_html = re.sub('}\s+', '}', expect_html)
-        result_html = result_html.replace('}\n', '}')
+        expect_html = re.sub(r"}\s+", "}", expect_html)
+        result_html = result_html.replace("}\n", "}")
 
         compare_html(expect_html, result_html)
 
@@ -844,20 +853,24 @@ ical-align:middle" bgcolor="red" valign="middle">Cell 2</td>
         # stupidity test
         import os
 
-        html_file = os.path.join('premailer', 'tests',
-                                 'test-apple-newsletter.html')
+        html_file = os.path.join("premailer", "tests", "test-apple-newsletter.html")
         html = open(html_file).read()
 
-        p = Premailer(html, exclude_pseudoclasses=False,
-                      keep_style_tags=True,
-                      strip_important=False)
+        p = Premailer(
+            html,
+            exclude_pseudoclasses=False,
+            keep_style_tags=True,
+            strip_important=False,
+        )
         result_html = p.transform()
-        ok_('<html>' in result_html)
-        ok_('<style media="only screen and (max-device-width: 480px)" '
+        ok_("<html>" in result_html)
+        ok_(
+            '<style media="only screen and (max-device-width: 480px)" '
             'type="text/css">\n'
-            '* {line-height: normal !important; '
-            '-webkit-text-size-adjust: 125%}\n'
-            '</style>' in result_html)
+            "* {line-height: normal !important; "
+            "-webkit-text-size-adjust: 125%}\n"
+            "</style>" in result_html
+        )
 
     def test_mailto_url(self):
         """if you use URL with mailto: protocol, they should stay as mailto:
@@ -882,7 +895,7 @@ ical-align:middle" bgcolor="red" valign="middle">Cell 2</td>
         </body>
         </html>"""
 
-        p = Premailer(html, base_url='http://kungfupeople.com')
+        p = Premailer(html, base_url="http://kungfupeople.com")
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
@@ -901,7 +914,7 @@ ical-align:middle" bgcolor="red" valign="middle">Cell 2</td>
         </body>
         </html>"""
 
-        p = Premailer(html, base_url='http://kungfupeople.com')
+        p = Premailer(html, base_url="http://kungfupeople.com")
         result_html = p.transform()
 
         compare_html(result_html, html)
@@ -1357,7 +1370,9 @@ b
         <p style="font-size:120%"><strong style="text-deco
 ration:none">Yes!</strong></p>
         </body>
-        </html>""".replace('deco\nration', 'decoration')
+        </html>""".replace(
+            "deco\nration", "decoration"
+        )
 
         p = Premailer(html)
         result_html = p.transform()
@@ -1441,7 +1456,9 @@ ration:none">Yes!</strong></p>
         <p style="font-size:16px"><strong style="text-deco
 ration:none">Yes!</strong></p>
         </body>
-        </html>""".replace('deco\nration', 'decoration')
+        </html>""".replace(
+            "deco\nration", "decoration"
+        )
 
         p = Premailer(html)
         result_html = p.transform()
@@ -1479,9 +1496,7 @@ ration:none">Yes!</strong></p>
         </body>
         </html>"""
 
-        p = Premailer(html,
-                      keep_style_tags=True,
-                      strip_important=False)
+        p = Premailer(html, keep_style_tags=True, strip_important=False)
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
@@ -1533,10 +1548,7 @@ ration:none">Yes!</strong></p>
         """
 
         p = Premailer(html, method="xml")
-        assert_raises(
-            XMLSyntaxError,
-            p.transform,
-        )
+        assert_raises(XMLSyntaxError, p.transform)
 
     def test_xml_cdata(self):
         """Test that CDATA is set correctly on remaining styles"""
@@ -1564,7 +1576,9 @@ ground:red}/*]]>*/</style>
         <span><a>Test</a></span>
         </body>
         </html>
-        """.replace('back\nground', 'background')
+        """.replace(
+            "back\nground", "background"
+        )
 
         p = Premailer(html, method="xml")
         result_html = p.transform()
@@ -1572,7 +1586,7 @@ ground:red}/*]]>*/</style>
         compare_html(expect_html, result_html)
 
     def test_command_line_fileinput_from_stdin(self):
-        html = '<style>h1 { color:red; }</style><h1>Title</h1>'
+        html = "<style>h1 { color:red; }</style><h1>Title</h1>"
         expect_html = """
         <html>
         <head></head>
@@ -1588,29 +1602,35 @@ ground:red}/*]]>*/</style>
 
     def test_command_line_fileinput_from_argument(self):
         with captured_output() as (out, err):
-            main([
-                '-f',
-                'premailer/tests/test-apple-newsletter.html',
-                '--disable-basic-attributes=bgcolor'
-            ])
+            main(
+                [
+                    "-f",
+                    "premailer/tests/test-apple-newsletter.html",
+                    "--disable-basic-attributes=bgcolor",
+                ]
+            )
 
         result_html = out.getvalue().strip()
 
-        ok_('<html>' in result_html)
-        ok_('<style media="only screen and (max-device-width: 480px)" '
+        ok_("<html>" in result_html)
+        ok_(
+            '<style media="only screen and (max-device-width: 480px)" '
             'type="text/css">\n'
-            '* {line-height: normal !important; '
-            '-webkit-text-size-adjust: 125%}\n'
-            '</style>' in result_html)
+            "* {line-height: normal !important; "
+            "-webkit-text-size-adjust: 125%}\n"
+            "</style>" in result_html
+        )
 
     def test_command_line_preserve_style_tags(self):
         with captured_output() as (out, err):
-            main([
-                '-f',
-                'premailer/tests/test-issue78.html',
-                '--preserve-style-tags',
-                '--external-style=premailer/tests/test-external-styles.css',
-            ])
+            main(
+                [
+                    "-f",
+                    "premailer/tests/test-issue78.html",
+                    "--preserve-style-tags",
+                    "--external-style=premailer/tests/test-external-styles.css",
+                ]
+            )
 
         result_html = out.getvalue().strip()
 
@@ -1663,17 +1683,23 @@ ation/rss+xml" title="RSS" href="/rss.xml">
 or:purple}">html</a></p>
         </body>
         </html>
-        """.replace('col\nor', 'color').replace('applic\nation', 'application')
+        """.replace(
+            "col\nor", "color"
+        ).replace(
+            "applic\nation", "application"
+        )
 
         compare_html(expect_html, result_html)
 
         # for completeness, test it once without
         with captured_output() as (out, err):
-            main([
-                '-f',
-                'premailer/tests/test-issue78.html',
-                '--external-style=premailer/tests/test-external-styles.css',
-            ])
+            main(
+                [
+                    "-f",
+                    "premailer/tests/test-issue78.html",
+                    "--external-style=premailer/tests/test-external-styles.css",
+                ]
+            )
 
         result_html = out.getvalue().strip()
         expect_html = """
@@ -1698,7 +1724,11 @@ ation/rss+xml" title="RSS" href="/rss.xml">
 lor:purple}">html</a></p>
         </body>
         </html>
-        """.replace('co\nlor', 'color').replace('applic\nation', 'application')
+        """.replace(
+            "co\nlor", "color"
+        ).replace(
+            "applic\nation", "application"
+        )
 
         compare_html(expect_html, result_html)
 
@@ -1709,12 +1739,14 @@ lor:purple}">html</a></p>
 
         import threading
         import logging
+
         THREADS = 30
         REPEATS = 100
 
         class RepeatMergeStylesThread(threading.Thread):
             """The thread is instantiated by test and run multiple
             times in parallel."""
+
             exc = None
 
             def __init__(self, old, new, class_):
@@ -1732,18 +1764,14 @@ lor:purple}">html</a></p>
                         logging.exception("Exception in thread %s", self.name)
                         self.exc = e
 
-        inline_style = 'background-color:#ffffff;'
-        new = 'background-color:#dddddd;'
-        class_ = ''
+        inline_style = "background-color:#ffffff;"
+        new = "background-color:#dddddd;"
+        class_ = ""
 
         # start multiple threads concurrently; each
         # calls merge_styles many times
         threads = [
-            RepeatMergeStylesThread(
-                inline_style,
-                [csstext_to_pairs(new)],
-                [class_]
-            )
+            RepeatMergeStylesThread(inline_style, [csstext_to_pairs(new)], [class_])
             for _ in range(0, THREADS)
         ]
         for t in threads:
@@ -1782,8 +1810,10 @@ ation/rss+xml" title="RSS" href="/rss.xml">
         <a href="#">Link</a>
         </body>
         </html>""".replace(
-            'applic\naction', 'application'
-        ).replace('style\nsheet', 'stylesheet')
+            "applic\naction", "application"
+        ).replace(
+            "style\nsheet", "stylesheet"
+        )
 
         expect_html = """<html>
         <head>
@@ -1798,12 +1828,11 @@ ation/rss+xml" title="RSS" href="/rss.xml">
         <h3 style="color:yellow">Test</h3>
         <a href="#" style="color:pink">Link</a>
         </body>
-        </html>""".replace('applic\naction', 'application')
-
-        p = Premailer(
-            html,
-            strip_important=False
+        </html>""".replace(
+            "applic\naction", "application"
         )
+
+        p = Premailer(html, strip_important=False)
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
@@ -1831,14 +1860,8 @@ ation/rss+xml" title="RSS" href="/rss.xml">
         </body>
         </html>"""
 
-        p = Premailer(
-            html,
-            strip_important=False
-        )
-        assert_raises(
-            ExternalNotFoundError,
-            p.transform,
-        )
+        p = Premailer(html, strip_important=False)
+        assert_raises(ExternalNotFoundError, p.transform)
 
     def test_external_styles_and_links(self):
         """Test loading stylesheets via both the 'external_styles'
@@ -1874,24 +1897,27 @@ ent:"" !important;display:block !important}
         <h2 style="color:green">Hello</h2>
         <a href="" style="color:pink">Hello</a>
         </body>
-        </html>""".replace('cont\nent', 'content')
+        </html>""".replace(
+            "cont\nent", "content"
+        )
 
         p = Premailer(
             html,
             strip_important=False,
-            external_styles='test-external-styles.css',
-            base_path='premailer/tests/')
+            external_styles="test-external-styles.css",
+            base_path="premailer/tests/",
+        )
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
 
-    @mock.patch('premailer.premailer.requests')
+    @mock.patch("premailer.premailer.requests")
     def test_load_external_url(self, mocked_requests):
-        'Test premailer.premailer.Premailer._load_external_url'
-        faux_response = 'This is not a response'
-        faux_uri = 'https://example.com/site.css'
+        "Test premailer.premailer.Premailer._load_external_url"
+        faux_response = "This is not a response"
+        faux_uri = "https://example.com/site.css"
         mocked_requests.get.return_value = MockResponse(faux_response)
-        p = premailer.premailer.Premailer('<p>A paragraph</p>')
+        p = premailer.premailer.Premailer("<p>A paragraph</p>")
         r = p._load_external_url(faux_uri)
 
         mocked_requests.get.assert_called_once_with(faux_uri)
@@ -1943,10 +1969,7 @@ ent:"" !important;display:block !important}
 
         """
 
-        p = Premailer(
-            html,
-            strip_important=False,
-            css_text=[css_text])
+        p = Premailer(html, strip_important=False, css_text=[css_text])
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
@@ -1993,10 +2016,7 @@ ent:"" !important;display:block !important}
         }
         """
 
-        p = Premailer(
-            html,
-            strip_important=False,
-            css_text=css_text)
+        p = Premailer(html, strip_important=False, css_text=css_text)
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
@@ -2037,10 +2057,8 @@ ent:"" !important;display:block !important}
         """
 
         p = Premailer(
-            html,
-            strip_important=False,
-            css_text=css_text,
-            disable_leftover_css=True)
+            html, strip_important=False, css_text=css_text, disable_leftover_css=True
+        )
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
@@ -2048,16 +2066,16 @@ ent:"" !important;display:block !important}
     @staticmethod
     def mocked_urlopen(url):
         'The standard "response" from the "server".'
-        retval = ''
-        if 'style1.css' in url:
+        retval = ""
+        if "style1.css" in url:
             retval = "h1 { color: brown }"
-        elif 'style2.css' in url:
+        elif "style2.css" in url:
             retval = "h2 { color: pink }"
-        elif 'style3.css' in url:
+        elif "style3.css" in url:
             retval = "h3 { color: red }"
         return retval
 
-    @mock.patch.object(Premailer, '_load_external_url')
+    @mock.patch.object(Premailer, "_load_external_url")
     def test_external_styles_on_http(self, mocked_pleu):
         """Test loading styles that are genuinely external"""
 
@@ -2080,9 +2098,11 @@ ent:"" !important;display:block !important}
         # Expected values are tuples of the positional values (as another
         # tuple) and the ketword arguments (which are all null), hence the
         # following Lisp-like explosion of brackets and commas.
-        expected_args = [(('https://www.com/style1.css',),),
-                         (('http://www.com/style2.css',),),
-                         (('http://www.com/style3.css',),)]
+        expected_args = [
+            (("https://www.com/style1.css",),),
+            (("http://www.com/style2.css",),),
+            (("http://www.com/style3.css",),),
+        ]
         eq_(expected_args, mocked_pleu.call_args_list)
 
         expect_html = """<html>
@@ -2096,7 +2116,7 @@ ent:"" !important;display:block !important}
         </html>"""
         compare_html(expect_html, result_html)
 
-    @mock.patch.object(Premailer, '_load_external_url')
+    @mock.patch.object(Premailer, "_load_external_url")
     def test_external_styles_on_https(self, mocked_pleu):
         """Test loading styles that are genuinely external"""
 
@@ -2114,12 +2134,14 @@ ent:"" !important;display:block !important}
         </html>"""
 
         mocked_pleu.side_effect = self.mocked_urlopen
-        p = Premailer(html, base_url='https://www.peterbe.com')
+        p = Premailer(html, base_url="https://www.peterbe.com")
         result_html = p.transform()
 
-        expected_args = [(('https://www.com/style1.css',),),
-                         (('https://www.com/style2.css',),),
-                         (('https://www.peterbe.com/style3.css',),)]
+        expected_args = [
+            (("https://www.com/style1.css",),),
+            (("https://www.com/style2.css",),),
+            (("https://www.peterbe.com/style3.css",),),
+        ]
         eq_(expected_args, mocked_pleu.call_args_list)
         expect_html = """<html>
         <head>
@@ -2132,7 +2154,7 @@ ent:"" !important;display:block !important}
         </html>"""
         compare_html(expect_html, result_html)
 
-    @mock.patch.object(Premailer, '_load_external_url')
+    @mock.patch.object(Premailer, "_load_external_url")
     def test_external_styles_with_base_url(self, mocked_pleu):
         """Test loading styles that are genuinely external if you use
         the base_url"""
@@ -2146,9 +2168,9 @@ ent:"" !important;display:block !important}
         </body>
         </html>"""
         mocked_pleu.return_value = "h1 { color: brown }"
-        p = Premailer(html, base_url='http://www.peterbe.com/')
+        p = Premailer(html, base_url="http://www.peterbe.com/")
         result_html = p.transform()
-        expected_args = [(('http://www.peterbe.com/style.css',),), ]
+        expected_args = [(("http://www.peterbe.com/style.css",),)]
         eq_(expected_args, mocked_pleu.call_args_list)
 
         expect_html = """<html>
@@ -2213,7 +2235,7 @@ ent:"" !important;display:block !important}
 
         p = Premailer(html, disable_validation=True)
         result_html = p.transform()
-        ok_('/* comment */' in result_html)
+        ok_("/* comment */" in result_html)
 
     def test_unknown_in_media_queries(self):
         """CSS unknown rule inside a media query block should not be a problem
@@ -2236,7 +2258,7 @@ ent:"" !important;display:block !important}
 
         p = Premailer(html, disable_validation=True)
         result_html = p.transform()
-        ok_('/* unknown rule */' in result_html)
+        ok_("/* unknown rule */" in result_html)
 
     def test_fontface_selectors_with_no_selectortext(self):
         """
@@ -2332,14 +2354,10 @@ ent:"" !important;display:block !important}
 
         mylog = StringIO()
         myhandler = logging.StreamHandler(mylog)
-        p = Premailer(
-            html,
-            cssutils_logging_handler=myhandler,
-        )
+        p = Premailer(html, cssutils_logging_handler=myhandler)
         p.transform()  # it should work
         eq_(
-            mylog.getvalue(),
-            'CSSStylesheet: Unknown @rule found. [2:13: @keyframes]\n'
+            mylog.getvalue(), "CSSStylesheet: Unknown @rule found. [2:13: @keyframes]\n"
         )
 
         # only log errors now
@@ -2351,7 +2369,7 @@ ent:"" !important;display:block !important}
             cssutils_logging_level=logging.ERROR,
         )
         p.transform()  # it should work
-        eq_(mylog.getvalue(), '')
+        eq_(mylog.getvalue(), "")
 
     def test_type_test(self):
         """test the correct type is returned"""
@@ -2421,7 +2439,7 @@ ent:"" !important;display:block !important}
         result_html = p.transform()
         compare_html(expect_html, result_html)
 
-    @mock.patch('premailer.premailer.warnings')
+    @mock.patch("premailer.premailer.warnings")
     def test_ignore_some_incorrectly(self, warnings_mock):
         """You can put `data-premailer="ignore"` but if the attribute value
         is something we don't recognize you get a warning"""
@@ -2491,7 +2509,9 @@ sheet" type="text/css">
 <body>
 <h1 style="color:blue">Hello</h1>
 </body>
-</html>""".replace('style\nsheet', 'stylesheet')
+</html>""".replace(
+            "style\nsheet", "stylesheet"
+        )
 
         p = Premailer(html, disable_validation=True)
         result_html = p.transform()
@@ -2551,16 +2571,16 @@ sheet" type="text/css">
         </body>
         </html>"""
 
-        p = Premailer(html, base_url='https://www.peterbe.com')
+        p = Premailer(html, base_url="https://www.peterbe.com")
         result_html = p.transform()
         compare_html(expect_html.format(protocol="https"), result_html)
 
-        p = Premailer(html, base_url='http://www.peterbe.com')
+        p = Premailer(html, base_url="http://www.peterbe.com")
         result_html = p.transform()
         compare_html(expect_html.format(protocol="http"), result_html)
 
         # Because you can't set a base_url without a full protocol
-        p = Premailer(html, base_url='www.peterbe.com')
+        p = Premailer(html, base_url="www.peterbe.com")
         assert_raises(ValueError, p.transform)
 
     def test_align_float_images(self):
@@ -2632,12 +2652,12 @@ sheet" type="text/css">
         compare_html(expect_html, result_html)
 
     def test_six_color(self):
-        r = Premailer.six_color('#cde')
-        e = '#ccddee'
+        r = Premailer.six_color("#cde")
+        e = "#ccddee"
         self.assertEqual(e, r)
 
     def test_3_digit_color_expand(self):
-        'Are 3-digit color values expanded into 6-digits for IBM Notes'
+        "Are 3-digit color values expanded into 6-digits for IBM Notes"
         html = """<html>
     <style>
         body {background-color: #fe5;}
@@ -2666,7 +2686,7 @@ sheet" type="text/css">
         compare_html(expect_html, result_html)
 
     def test_inline_important(self):
-        'Are !important tags preserved inline.'
+        "Are !important tags preserved inline."
 
         html = """<html>
 <head>
@@ -2688,10 +2708,7 @@ sheet" type="text/css">
 </body>
 </html>"""
         p = Premailer(
-            html,
-            remove_classes=False,
-            keep_style_tags=True,
-            strip_important=False
+            html, remove_classes=False, keep_style_tags=True, strip_important=False
         )
         result_html = p.transform()
         compare_html(expect_html, result_html)
@@ -2738,10 +2755,6 @@ sheet" type="text/css">
     </body>
 </html>
         """
-        p = Premailer(
-            html,
-            exclude_pseudoclasses=False,
-            keep_style_tags=True,
-        )
+        p = Premailer(html, exclude_pseudoclasses=False, keep_style_tags=True)
         result_html = p.transform()
         compare_html(expect_html, result_html)

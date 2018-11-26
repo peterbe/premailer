@@ -1,37 +1,45 @@
-from __future__ import absolute_import, unicode_literals, print_function
+from __future__ import absolute_import, print_function, unicode_literals
+
 import codecs
 import operator
 import os
 import re
+import sys
 import warnings
+
+import cssutils
+import requests
+from lxml import etree
+from lxml.cssselect import CSSSelector
+
+from premailer.cache import function_cache
+from premailer.merge_style import csstext_to_pairs, merge_styles
+
 try:
     from collections import OrderedDict
 except ImportError:  # pragma: no cover
     # some old python 2.6 thing then, eh?
     from ordereddict import OrderedDict
-import sys
+
 if sys.version_info >= (3,):  # pragma: no cover
     # As in, Python 3
     from io import StringIO
     from urllib.parse import urljoin, urlparse
+
     STR_TYPE = str
 else:  # Python 2
     try:
         from cStringIO import StringIO
     except ImportError:  # pragma: no cover
         from StringIO import StringIO
+
         StringIO = StringIO  # shut up pyflakes
     from urlparse import urljoin, urlparse
+
     STR_TYPE = basestring  # NOQA
 
-import cssutils
-import requests
-from lxml import etree
-from lxml.cssselect import CSSSelector
-from premailer.merge_style import merge_styles, csstext_to_pairs
-from premailer.cache import function_cache
 
-__all__ = ['PremailerError', 'Premailer', 'transform']
+__all__ = ["PremailerError", "Premailer", "transform"]
 
 
 class PremailerError(Exception):
@@ -45,17 +53,19 @@ class ExternalNotFoundError(ValueError):
 def make_important(bulk):
     """makes every property in a string !important.
     """
-    return ';'.join('%s !important' % p if not p.endswith('!important') else p
-                    for p in bulk.split(';'))
+    return ";".join(
+        "%s !important" % p if not p.endswith("!important") else p
+        for p in bulk.split(";")
+    )
 
 
 def get_or_create_head(root):
     """Ensures that `root` contains a <head> element and returns it.
     """
-    head = CSSSelector('head')(root)
+    head = CSSSelector("head")(root)
     if not head:
-        head = etree.Element('head')
-        body = CSSSelector('body')(root)[0]
+        head = etree.Element("head")
+        body = CSSSelector("body")(root)[0]
         body.getparent().insert(0, head)
         return head
     else:
@@ -85,58 +95,65 @@ def _cache_parse_css_string(css_body, validate=True):
 def capitalize_float_margin(css_body):
     """Capitalize float and margin CSS property names
     """
+
     def _capitalize_property(match):
-        return '{0}:{1}{2}'.format(
-            match.group('property').capitalize(),
-            match.group('value'),
-            match.group('terminator'))
+        return "{0}:{1}{2}".format(
+            match.group("property").capitalize(),
+            match.group("value"),
+            match.group("terminator"),
+        )
 
     return _lowercase_margin_float_rule.sub(_capitalize_property, css_body)
 
 
-_element_selector_regex = re.compile(r'(^|\s)\w')
-_cdata_regex = re.compile(r'\<\!\[CDATA\[(.*?)\]\]\>', re.DOTALL)
+_element_selector_regex = re.compile(r"(^|\s)\w")
+_cdata_regex = re.compile(r"\<\!\[CDATA\[(.*?)\]\]\>", re.DOTALL)
 _lowercase_margin_float_rule = re.compile(
-    r'''(?P<property>margin(-(top|bottom|left|right))?|float)
+    r"""(?P<property>margin(-(top|bottom|left|right))?|float)
         :
         (?P<value>.*?)
-        (?P<terminator>$|;)''',
-    re.IGNORECASE | re.VERBOSE)
-_importants = re.compile('\s*!important')
+        (?P<terminator>$|;)""",
+    re.IGNORECASE | re.VERBOSE,
+)
+_importants = re.compile(r"\s*!important")
 #: The short (3-digit) color codes that cause issues for IBM Notes
-_short_color_codes = re.compile(r'^#([0-9a-f])([0-9a-f])([0-9a-f])$', re.I)
+_short_color_codes = re.compile(r"^#([0-9a-f])([0-9a-f])([0-9a-f])$", re.I)
 
 # These selectors don't apply to all elements. Rather, they specify
 # which elements to apply to.
-FILTER_PSEUDOSELECTORS = [':last-child', ':first-child', 'nth-child']
+FILTER_PSEUDOSELECTORS = [":last-child", ":first-child", "nth-child"]
 
 
 class Premailer(object):
 
-    attribute_name = 'data-premailer'
+    attribute_name = "data-premailer"
 
-    def __init__(self, html, base_url=None,
-                 disable_link_rewrites=False,
-                 preserve_internal_links=False,
-                 preserve_inline_attachments=True,
-                 exclude_pseudoclasses=True,
-                 keep_style_tags=False,
-                 include_star_selectors=False,
-                 remove_classes=False,
-                 capitalize_float_margin=False,
-                 strip_important=True,
-                 external_styles=None,
-                 css_text=None,
-                 method="html",
-                 base_path=None,
-                 disable_basic_attributes=None,
-                 disable_validation=False,
-                 cache_css_parsing=True,
-                 cssutils_logging_handler=None,
-                 cssutils_logging_level=None,
-                 disable_leftover_css=False,
-                 align_floating_images=True,
-                 remove_unset_properties=True):
+    def __init__(
+        self,
+        html,
+        base_url=None,
+        disable_link_rewrites=False,
+        preserve_internal_links=False,
+        preserve_inline_attachments=True,
+        exclude_pseudoclasses=True,
+        keep_style_tags=False,
+        include_star_selectors=False,
+        remove_classes=False,
+        capitalize_float_margin=False,
+        strip_important=True,
+        external_styles=None,
+        css_text=None,
+        method="html",
+        base_path=None,
+        disable_basic_attributes=None,
+        disable_validation=False,
+        cache_css_parsing=True,
+        cssutils_logging_handler=None,
+        cssutils_logging_level=None,
+        disable_leftover_css=False,
+        align_floating_images=True,
+        remove_unset_properties=True,
+    ):
         self.html = html
         self.base_url = base_url
 
@@ -198,29 +215,23 @@ class Premailer(object):
         """
 
         def format_css_property(prop):
-            if self.strip_important or prop.priority != 'important':
-                return '{0}:{1}'.format(prop.name, prop.value)
+            if self.strip_important or prop.priority != "important":
+                return "{0}:{1}".format(prop.name, prop.value)
             else:
-                return '{0}:{1} !important'.format(prop.name, prop.value)
+                return "{0}:{1} !important".format(prop.name, prop.value)
 
         def join_css_properties(properties):
             """ Accepts a list of cssutils Property objects and returns
             a semicolon delimitted string like 'color: red; font-size: 12px'
             """
-            return ';'.join(
-                format_css_property(prop)
-                for prop in properties
-            )
+            return ";".join(format_css_property(prop) for prop in properties)
 
         leftover = []
         rules = []
         # empty string
         if not css_body:
             return rules, leftover
-        sheet = self._parse_css_string(
-            css_body,
-            validate=not self.disable_validation
-        )
+        sheet = self._parse_css_string(css_body, validate=not self.disable_validation)
         for rule in sheet:
             # handle media rule
             if rule.type == rule.MEDIA_RULE:
@@ -232,51 +243,51 @@ class Premailer(object):
 
             # normal means it doesn't have "!important"
             normal_properties = [
-                prop for prop in rule.style.getProperties()
-                if prop.priority != 'important'
+                prop
+                for prop in rule.style.getProperties()
+                if prop.priority != "important"
             ]
             important_properties = [
-                prop for prop in rule.style.getProperties()
-                if prop.priority == 'important'
+                prop
+                for prop in rule.style.getProperties()
+                if prop.priority == "important"
             ]
 
             # Create three strings that we can use to add to the `rules`
             # list later as ready blocks of css.
             bulk_normal = join_css_properties(normal_properties)
             bulk_important = join_css_properties(important_properties)
-            bulk_all = join_css_properties(
-                normal_properties + important_properties
-            )
+            bulk_all = join_css_properties(normal_properties + important_properties)
 
             selectors = (
                 x.strip()
-                for x in rule.selectorText.split(',')
-                if x.strip() and not x.strip().startswith('@')
+                for x in rule.selectorText.split(",")
+                if x.strip() and not x.strip().startswith("@")
             )
             for selector in selectors:
-                if (':' in selector and self.exclude_pseudoclasses and
-                    ':' + selector.split(':', 1)[1]
-                        not in FILTER_PSEUDOSELECTORS):
+                if (
+                    ":" in selector
+                    and self.exclude_pseudoclasses
+                    and ":" + selector.split(":", 1)[1] not in FILTER_PSEUDOSELECTORS
+                ):
                     # a pseudoclass
                     leftover.append((selector, bulk_all))
                     continue
-                elif '*' in selector and not self.include_star_selectors:
+                elif "*" in selector and not self.include_star_selectors:
                     continue
-                elif selector.startswith(':'):
+                elif selector.startswith(":"):
                     continue
 
                 # Crudely calculate specificity
-                id_count = selector.count('#')
-                class_count = selector.count('.')
+                id_count = selector.count("#")
+                class_count = selector.count(".")
                 element_count = len(_element_selector_regex.findall(selector))
 
                 # Within one rule individual properties have different
                 # priority depending on !important.
                 # So we split each rule into two: one that includes all
                 # the !important declarations and another that doesn't.
-                for is_important, bulk in (
-                    (1, bulk_important), (0, bulk_normal)
-                ):
+                for is_important, bulk in ((1, bulk_important), (0, bulk_normal)):
                     if not bulk:
                         # don't bother adding empty css rules
                         continue
@@ -286,7 +297,7 @@ class Premailer(object):
                         class_count,
                         element_count,
                         ruleset_index,
-                        len(rules)  # this is the rule's index number
+                        len(rules),  # this is the rule's index number
                     )
                     rules.append((specificity, selector, bulk))
 
@@ -302,11 +313,8 @@ class Premailer(object):
             page = root
             tree = root
         else:
-            if self.method == 'xml':
-                parser = etree.XMLParser(
-                    ns_clean=False,
-                    resolve_entities=False
-                )
+            if self.method == "xml":
+                parser = etree.XMLParser(ns_clean=False, resolve_entities=False)
             else:
                 parser = etree.HTMLParser()
             stripped = self.html.strip()
@@ -329,36 +337,32 @@ class Premailer(object):
         rules = []
         index = 0
 
-        for element in CSSSelector('style,link[rel~=stylesheet]')(page):
+        for element in CSSSelector("style,link[rel~=stylesheet]")(page):
             # If we have a media attribute whose value is anything other than
             # 'all' or 'screen', ignore the ruleset.
-            media = element.attrib.get('media')
-            if media and media not in ('all', 'screen'):
+            media = element.attrib.get("media")
+            if media and media not in ("all", "screen"):
                 continue
 
             data_attribute = element.attrib.get(self.attribute_name)
             if data_attribute:
-                if data_attribute == 'ignore':
+                if data_attribute == "ignore":
                     del element.attrib[self.attribute_name]
                     continue
                 else:
                     warnings.warn(
-                        'Unrecognized %s attribute (%r)' % (
-                            self.attribute_name,
-                            data_attribute,
-                        )
+                        "Unrecognized %s attribute (%r)"
+                        % (self.attribute_name, data_attribute)
                     )
 
-            is_style = element.tag == 'style'
+            is_style = element.tag == "style"
             if is_style:
                 css_body = element.text
             else:
-                href = element.attrib.get('href')
+                href = element.attrib.get("href")
                 css_body = self._load_external(href)
 
-            these_rules, these_leftover = self._parse_style_rules(
-                css_body, index
-            )
+            these_rules, these_leftover = self._parse_style_rules(css_body, index)
             index += 1
             rules.extend(these_rules)
             parent_of_element = element.getparent()
@@ -366,13 +370,13 @@ class Premailer(object):
                 if is_style:
                     style = element
                 else:
-                    style = etree.Element('style')
-                    style.attrib['type'] = 'text/css'
+                    style = etree.Element("style")
+                    style.attrib["type"] = "text/css"
                 if self.keep_style_tags:
                     style.text = css_body
                 else:
                     style.text = self._css_rules_to_string(these_leftover)
-                if self.method == 'xml':
+                if self.method == "xml":
                     style.text = etree.CDATA(style.text)
 
                 if not is_style:
@@ -407,13 +411,13 @@ class Premailer(object):
         elements = {}
         for _, selector, style in rules:
             new_selector = selector
-            class_ = ''
-            if ':' in selector:
-                new_selector, class_ = re.split(':', selector, 1)
-                class_ = ':%s' % class_
+            class_ = ""
+            if ":" in selector:
+                new_selector, class_ = re.split(":", selector, 1)
+                class_ = ":%s" % class_
             # Keep filter-type selectors untouched.
             if class_ in FILTER_PSEUDOSELECTORS:
-                class_ = ''
+                class_ = ""
             else:
                 selector = new_selector
 
@@ -427,14 +431,10 @@ class Premailer(object):
                 for item in items:
                     item_id = id(item)
                     if item_id not in elements:
-                        elements[item_id] = {
-                            'item': item,
-                            'classes': [],
-                            'style': [],
-                        }
+                        elements[item_id] = {"item": item, "classes": [], "style": []}
 
-                    elements[item_id]['style'].append(processed_style)
-                    elements[item_id]['classes'].append(class_)
+                    elements[item_id]["style"].append(processed_style)
+                    elements[item_id]["classes"].append(class_)
 
         # Now apply inline style
         # merge style only once for each element
@@ -442,84 +442,83 @@ class Premailer(object):
         # and a long list of elements
         for _, element in elements.items():
             final_style = merge_styles(
-                element['item'].attrib.get('style', ''),
-                element['style'],
-                element['classes'],
+                element["item"].attrib.get("style", ""),
+                element["style"],
+                element["classes"],
                 remove_unset_properties=self.remove_unset_properties,
             )
             if final_style:
                 # final style could be empty string because of
                 # remove_unset_properties
-                element['item'].attrib['style'] = final_style
+                element["item"].attrib["style"] = final_style
             self._style_to_basic_html_attributes(
-                element['item'],
-                final_style,
-                force=True
+                element["item"], final_style, force=True
             )
 
         if self.remove_classes:
             # now we can delete all 'class' attributes
-            for item in page.xpath('//@class'):
+            for item in page.xpath("//@class"):
                 parent = item.getparent()
-                del parent.attrib['class']
+                del parent.attrib["class"]
 
         # Capitalize Margin properties
         # To fix weird outlook bug
         # https://www.emailonacid.com/blog/article/email-development/outlook.com-does-support-margins
         if self.capitalize_float_margin:
-            for item in page.xpath('//@style'):
+            for item in page.xpath("//@style"):
                 mangled = capitalize_float_margin(item)
-                item.getparent().attrib['style'] = mangled
+                item.getparent().attrib["style"] = mangled
 
         # Add align attributes to images if they have a CSS float value of
         # right or left. Outlook (both on desktop and on the web) are bad at
         # understanding floats, but they do understand the HTML align attrib.
         if self.align_floating_images:
-            for item in page.xpath('//img[@style]'):
-                image_css = cssutils.parseStyle(item.attrib['style'])
-                if image_css.float == 'right':
-                    item.attrib['align'] = 'right'
-                elif image_css.float == 'left':
-                    item.attrib['align'] = 'left'
+            for item in page.xpath("//img[@style]"):
+                image_css = cssutils.parseStyle(item.attrib["style"])
+                if image_css.float == "right":
+                    item.attrib["align"] = "right"
+                elif image_css.float == "left":
+                    item.attrib["align"] = "left"
 
         #
         # URLs
         #
         if self.base_url and not self.disable_link_rewrites:
             if not urlparse(self.base_url).scheme:
-                raise ValueError('Base URL must have a scheme')
-            for attr in ('href', 'src'):
+                raise ValueError("Base URL must have a scheme")
+            for attr in ("href", "src"):
                 for item in page.xpath("//@%s" % attr):
                     parent = item.getparent()
                     url = parent.attrib[attr]
                     if (
-                        attr == 'href' and self.preserve_internal_links and
-                        url.startswith('#')
+                        attr == "href"
+                        and self.preserve_internal_links
+                        and url.startswith("#")
                     ):
                         continue
                     if (
-                        attr == 'src' and self.preserve_inline_attachments and
-                        url.startswith('cid:')
+                        attr == "src"
+                        and self.preserve_inline_attachments
+                        and url.startswith("cid:")
                     ):
                         continue
-                    if attr == 'href' and url.startswith('tel:'):
+                    if attr == "href" and url.startswith("tel:"):
                         continue
                     parent.attrib[attr] = urljoin(self.base_url, url)
 
         if hasattr(self.html, "getroottree"):
             return root
         else:
-            kwargs.setdefault('method', self.method)
-            kwargs.setdefault('pretty_print', pretty_print)
-            kwargs.setdefault('encoding', 'utf-8')  # As Ken Thompson intended
-            out = etree.tostring(root, **kwargs).decode(kwargs['encoding'])
-            if self.method == 'xml':
+            kwargs.setdefault("method", self.method)
+            kwargs.setdefault("pretty_print", pretty_print)
+            kwargs.setdefault("encoding", "utf-8")  # As Ken Thompson intended
+            out = etree.tostring(root, **kwargs).decode(kwargs["encoding"])
+            if self.method == "xml":
                 out = _cdata_regex.sub(
-                    lambda m: '/*<![CDATA[*/%s/*]]>*/' % m.group(1),
-                    out
+                    lambda m: "/*<![CDATA[*/%s/*]]>*/" % m.group(1), out
                 )
             if self.strip_important:
-                out = _importants.sub('', out)
+                out = _importants.sub("", out)
             return out
 
     def _load_external_url(self, url):
@@ -528,23 +527,23 @@ class Premailer(object):
     def _load_external(self, url):
         """loads an external stylesheet from a remote url or local path
         """
-        if url.startswith('//'):
+        if url.startswith("//"):
             # then we have to rely on the base_url
-            if self.base_url and 'https://' in self.base_url:
-                url = 'https:' + url
+            if self.base_url and "https://" in self.base_url:
+                url = "https:" + url
             else:
-                url = 'http:' + url
+                url = "http:" + url
 
-        if url.startswith('http://') or url.startswith('https://'):
+        if url.startswith("http://") or url.startswith("https://"):
             css_body = self._load_external_url(url)
         else:
             stylefile = url
             if not os.path.isabs(stylefile):
                 stylefile = os.path.abspath(
-                    os.path.join(self.base_path or '', stylefile)
+                    os.path.join(self.base_path or "", stylefile)
                 )
             if os.path.exists(stylefile):
-                with codecs.open(stylefile, encoding='utf-8') as f:
+                with codecs.open(stylefile, encoding="utf-8") as f:
                     css_body = f.read()
             elif self.base_url:
                 url = urljoin(self.base_url, url)
@@ -562,11 +561,10 @@ class Premailer(object):
         see <https://github.com/peterbe/premailer/issues/114>"""
 
         # Turn the color code from three to six digits
-        retval = _short_color_codes.sub(r'#\1\1\2\2\3\3', color_value)
+        retval = _short_color_codes.sub(r"#\1\1\2\2\3\3", color_value)
         return retval
 
-    def _style_to_basic_html_attributes(self, element, style_content,
-                                        force=False):
+    def _style_to_basic_html_attributes(self, element, style_content, force=False):
         """given an element and styles like
         'background-color:red; font-family:Arial' turn some of that into HTML
         attributes. like 'bgcolor', etc.
@@ -574,40 +572,38 @@ class Premailer(object):
         Note, the style_content can contain pseudoclasses like:
         '{color:red; border:1px solid green} :visited{border:1px solid green}'
         """
-        if (
-            style_content.count('}') and
-            style_content.count('{') == style_content.count('}')
+        if style_content.count("}") and style_content.count("{") == style_content.count(
+            "}"
         ):
-            style_content = style_content.split('}')[0][1:]
+            style_content = style_content.split("}")[0][1:]
 
         attributes = OrderedDict()
-        for key, value in [x.split(':') for x in style_content.split(';')
-                           if len(x.split(':')) == 2]:
+        for key, value in [
+            x.split(":") for x in style_content.split(";") if len(x.split(":")) == 2
+        ]:
             key = key.strip()
 
-            if key == 'text-align':
-                attributes['align'] = value.strip()
-            elif key == 'vertical-align':
-                attributes['valign'] = value.strip()
-            elif (
-                key == 'background-color' and
-                'transparent' not in value.lower()
-            ):
+            if key == "text-align":
+                attributes["align"] = value.strip()
+            elif key == "vertical-align":
+                attributes["valign"] = value.strip()
+            elif key == "background-color" and "transparent" not in value.lower():
                 # Only add the 'bgcolor' attribute if the value does not
                 # contain the word "transparent"; before we add it possibly
                 # correct the 3-digit color code to its 6-digit equivalent
                 # ("abc" to "aabbcc") so IBM Notes copes.
-                attributes['bgcolor'] = self.six_color(value.strip())
-            elif key == 'width' or key == 'height':
+                attributes["bgcolor"] = self.six_color(value.strip())
+            elif key == "width" or key == "height":
                 value = value.strip()
-                if value.endswith('px'):
+                if value.endswith("px"):
                     value = value[:-2]
                 attributes[key] = value
 
         for key, value in attributes.items():
             if (
-                key in element.attrib and not force or
-                key in self.disable_basic_attributes
+                key in element.attrib
+                and not force
+                or key in self.disable_basic_attributes
             ):
                 # already set, don't dare to overwrite
                 continue
@@ -620,22 +616,25 @@ class Premailer(object):
         for item in rules:
             if isinstance(item, tuple):
                 k, v = item
-                lines.append('%s {%s}' % (k, make_important(v)))
+                lines.append("%s {%s}" % (k, make_important(v)))
             # media rule
             else:
                 for rule in item.cssRules:
-                    if isinstance(rule, (
-                        cssutils.css.csscomment.CSSComment,
-                        cssutils.css.cssunknownrule.CSSUnknownRule
-                    )):
+                    if isinstance(
+                        rule,
+                        (
+                            cssutils.css.csscomment.CSSComment,
+                            cssutils.css.cssunknownrule.CSSUnknownRule,
+                        ),
+                    ):
                         continue
                     for key in rule.style.keys():
                         rule.style[key] = (
                             rule.style.getPropertyValue(key, False),
-                            '!important'
+                            "!important",
                         )
                 lines.append(item.cssText)
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def _process_css_text(self, css_text, index, rules, head):
         """processes the given css_text by adding rules that can be
@@ -645,8 +644,8 @@ class Premailer(object):
         these_rules, these_leftover = self._parse_style_rules(css_text, index)
         rules.extend(these_rules)
         if head is not None and (these_leftover or self.keep_style_tags):
-            style = etree.Element('style')
-            style.attrib['type'] = 'text/css'
+            style = etree.Element("style")
+            style.attrib["type"] = "text/css"
             if self.keep_style_tags:
                 style.text = css_text
             else:
@@ -658,7 +657,7 @@ def transform(html, pretty_print=False, **kwargs):
     return Premailer(html, **kwargs).transform(pretty_print=pretty_print)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     html = """<html>
         <head>
         <title>Test</title>
