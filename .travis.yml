@@ -5,12 +5,9 @@
 # directive.
 sudo: no
 
-env: PIP_DOWNLOAD_CACHE="pip_cache"
-cache:
-  directories:
-    - pip_cache
-
 language: python
+
+cache: pip
 
 # before_install:
 #   # twine is necessary so that travis can deploy
