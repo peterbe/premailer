@@ -3,7 +3,7 @@ import functools
 
 class _HashedSeq(list):
     # # From CPython
-    __slots__ = 'hashvalue'
+    __slots__ = "hashvalue"
 
     def __init__(self, tup, hash=hash):
         self[:] = tup
@@ -39,13 +39,8 @@ def function_cache(expected_max_entries=1000):
             function
 
     """
-    if (
-        expected_max_entries is not None and
-        not isinstance(expected_max_entries, int)
-    ):
-        raise TypeError(
-            'Expected expected_max_entries to be an integer or None'
-        )
+    if expected_max_entries is not None and not isinstance(expected_max_entries, int):
+        raise TypeError("Expected expected_max_entries to be an integer or None")
 
     # indicator of cache missed
     sentinel = object()
@@ -73,8 +68,8 @@ def function_cache(expected_max_entries=1000):
                 # # something is wrong if we are here more than expected
                 # # empty and turn it off
                 if (
-                    expected_max_entries is not None and
-                    cached.missed > expected_max_entries
+                    expected_max_entries is not None
+                    and cached.missed > expected_max_entries
                 ):
                     cached.off = True
                     cached.cache.clear()
@@ -82,4 +77,5 @@ def function_cache(expected_max_entries=1000):
             return result
 
         return inner
+
     return decorator
