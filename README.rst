@@ -2,10 +2,13 @@ premailer
 =========
 
 .. image:: https://travis-ci.org/peterbe/premailer.svg?branch=master
-    :target: https://travis-ci.org/peterbe/premailer
+  :target: https://travis-ci.org/peterbe/premailer
 
 .. image:: https://badge.fury.io/py/premailer.svg
-    :target: https://pypi.python.org/pypi/premailer
+  :target: https://pypi.python.org/pypi/premailer
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+  :target: https://github.com/ambv/black
 
 Looking for sponsors
 --------------------
