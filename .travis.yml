@@ -17,7 +17,7 @@ language: python
 #   - travis_retry pip install twine coveralls
 
 install:
-  - travis_retry pip install -e ".[dev]"
+  - travis_retry pip install tox-travis
   # coveralls is unique to Travis. It's not something you run locally, like tox.
   - travis_retry pip install coveralls
 
