@@ -62,10 +62,10 @@ def make_important(bulk):
 def get_or_create_head(root):
     """Ensures that `root` contains a <head> element and returns it.
     """
-    head = _create_cssselector('head')(root)
+    head = _create_cssselector("head")(root)
     if not head:
-        head = etree.Element('head')
-        body = _create_cssselector('body')(root)[0]
+        head = etree.Element("head")
+        body = _create_cssselector("body")(root)[0]
         body.getparent().insert(0, head)
         return head
     else:
@@ -342,9 +342,7 @@ class Premailer(object):
         rules = []
         index = 0
 
-        for element in _create_cssselector(
-            'style,link[rel~=stylesheet]'
-        )(page):
+        for element in _create_cssselector("style,link[rel~=stylesheet]")(page):
             # If we have a media attribute whose value is anything other than
             # 'all' or 'screen', ignore the ruleset.
             media = element.attrib.get("media")
