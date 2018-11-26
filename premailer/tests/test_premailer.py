@@ -2216,7 +2216,8 @@ ent:"" !important;display:block !important}
         ok_('/* comment */' in result_html)
 
     def test_unknown_in_media_queries(self):
-        """CSS unknown rule inside a media query block should not be a problem"""
+        """CSS unknown rule inside a media query block should not be a problem
+        """
         html = """<!doctype html>
         <html lang="en">
         <head>
