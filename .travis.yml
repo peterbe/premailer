@@ -12,13 +12,14 @@ cache:
 
 language: python
 
-before_install:
-  # twine is necessary so that travis can deploy
-  - travis_retry pip install -e ".[dev,test]"
-  - travis_retry pip install coveralls
+# before_install:
+#   # twine is necessary so that travis can deploy
+#   - travis_retry pip install twine coveralls
 
 install:
-  - travis_retry python setup.py install
+  - travis_retry pip install -e ".[dev]"
+  # coveralls is unique to Travis. It's not something you run locally, like tox.
+  - travis_retry pip install coveralls
 
 # pypy is not installed on trusty-based containers by default.
 # See https://github.com/travis-ci/travis-ci/issues/6865
