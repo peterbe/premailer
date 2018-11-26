@@ -279,22 +279,58 @@ this, you have to pass in ``cssutils_logging_handler`` and
     >>> from io import StringIO
     >>> mylog = StringIO()
     >>> myhandler = logging.StreamHandler(mylog)
-    >>> p = premailer.Premailer("""
+    >>> p = premailer.Premailer(
+    ...     cssutils_logging_handler=myhandler,
+    ...     cssutils_logging_level=logging.INFO
+    ... )
+    >>> result = p.transform("""
     ...         <html>
     ...         <style type="text/css">
     ...         @keyframes foo { from { opacity: 0; } to { opacity: 1; } }
     ...         </style>
     ...         <p>Hej</p>
     ...         </html>
-    ... """,
-    ... cssutils_logging_handler=myhandler,
-    ... cssutils_logging_level=logging.INFO)
-    >>> result = p.transform()
+    ... """)
     >>> mylog.getvalue()
     'CSSStylesheet: Unknown @rule found. [2:1: @keyframes]\n'
 
-Getting debugging
------------------
+If execution speed is on your mind
+----------------------------------
+
+If execution speed is important, it's very plausible that you're not just converting
+1 HTML document but *a lot* of HTML documents. Then, the first thing you should do
+is avoid using the ``premailer.transform`` function because it creates a ``Premailer``
+class instance every time.
+
+.. code:: python
+
+    # WRONG WAY!
+    from premailer import transform
+
+    for html_string in get_html_documents():
+        transformed = transform(html_string, base_url=MY_BASE_URL)
+        # do something with 'transformed'
+
+Instead...
+
+.. code:: python
+
+    # RIGHT WAY
+    from premailer import Premailer
+
+    instance = Premailer(base_url=MY_BASE_URL)
+    for html_string in get_html_documents():
+        transformed = instance.transform(html_string)
+        # do something with 'transformed'
+
+Another thing to watch out for when you're reusing the same imported Python code
+and reusing it is that internal memoize function caches might build up. The
+environment variable to control is ``PREMAILER_CACHE_MAXSIZE``. This parameter
+requires a little bit of fine-tuning and calibration if your workload is really
+big and memory even becomes an issue.
+
+Getting coding
+--------------
 
 First clone the code and create whatever virtualenv you need, then run:
 

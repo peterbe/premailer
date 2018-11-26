@@ -135,7 +135,7 @@ class Premailer(object):
 
     def __init__(
         self,
-        html,
+        html=None,
         base_url=None,
         disable_link_rewrites=False,
         preserve_internal_links=False,
@@ -308,10 +308,16 @@ class Premailer(object):
 
         return rules, leftover
 
-    def transform(self, pretty_print=True, **kwargs):
+    def transform(self, html=None, pretty_print=True, **kwargs):
         """change the self.html and return it with CSS turned into style
         attributes.
         """
+        if html is not None:
+            if self.html is not None:
+                raise TypeError("Can't pass html argument twice")
+            self.html = html
+        elif self.html is None:
+            raise TypeError("must pass html as first argument")
         if hasattr(self.html, "getroottree"):
             # skip the next bit
             root = self.html.getroottree()
@@ -659,7 +665,7 @@ class Premailer(object):
 
 
 def transform(html, pretty_print=False, **kwargs):
-    return Premailer(html, **kwargs).transform(pretty_print=pretty_print)
+    return Premailer(**kwargs).transform(html, pretty_print=pretty_print)
 
 
 if __name__ == "__main__":  # pragma: no cover
