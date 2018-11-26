@@ -2215,6 +2215,29 @@ ent:"" !important;display:block !important}
         result_html = p.transform()
         ok_('/* comment */' in result_html)
 
+    def test_unknown_in_media_queries(self):
+        """CSS unknown rule inside a media query block should not be a problem
+        """
+        html = """<!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Document</title>
+            <style>
+                @media screen {
+                    @unknownrule {
+                        /* unknown rule */
+                    }
+                }
+            </style>
+        </head>
+        <body></body>
+        </html>"""
+
+        p = Premailer(html, disable_validation=True)
+        result_html = p.transform()
+        ok_('/* unknown rule */' in result_html)
+
     def test_fontface_selectors_with_no_selectortext(self):
         """
         @font-face selectors are weird.
