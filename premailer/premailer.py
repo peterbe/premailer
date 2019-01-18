@@ -158,6 +158,7 @@ class Premailer(object):
         disable_leftover_css=False,
         align_floating_images=True,
         remove_unset_properties=True,
+        skip_load_external=False,
     ):
         self.html = html
         self.base_url = base_url
@@ -199,6 +200,7 @@ class Premailer(object):
         self.disable_leftover_css = disable_leftover_css
         self.align_floating_images = align_floating_images
         self.remove_unset_properties = remove_unset_properties
+        self.skip_load_external = skip_load_external
 
         if cssutils_logging_handler:
             cssutils.log.addHandler(cssutils_logging_handler)
@@ -370,6 +372,8 @@ class Premailer(object):
             if is_style:
                 css_body = element.text
             else:
+                if self.skip_load_external:
+                    continue
                 href = element.attrib.get("href")
                 css_body = self._load_external(href)
 
@@ -398,7 +402,7 @@ class Premailer(object):
                 parent_of_element.remove(element)
 
         # external style files
-        if self.external_styles:
+        if self.external_styles and not self.skip_load_external:
             for stylefile in self.external_styles:
                 css_body = self._load_external(stylefile)
                 self._process_css_text(css_body, index, rules, head)
@@ -540,6 +544,8 @@ class Premailer(object):
     def _load_external(self, url):
         """loads an external stylesheet from a remote url or local path
         """
+        if self.skip_load_external:
+            raise PremailerError('programming error, skip_load_external is True, this method should not be called!')
         if url.startswith("//"):
             # then we have to rely on the base_url
             if self.base_url and "https://" in self.base_url:
