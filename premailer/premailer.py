@@ -350,7 +350,10 @@ class Premailer(object):
         rules = []
         index = 0
 
-        for element in _create_cssselector("style" if self.allow_network else "style,link[rel~=stylesheet]")(page):
+        cssselector = ["style"]
+        if self.allow_network:
+            cssselector.append("link[rel~=stylesheet]")
+        for element in _create_cssselector(",".join(cssselector))(page):
             # If we have a media attribute whose value is anything other than
             # 'all' or 'screen', ignore the ruleset.
             media = element.attrib.get("media")
