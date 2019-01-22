@@ -128,6 +128,7 @@ The ``transform`` shortcut function transforms the given HTML using the defaults
     disable_leftover_css=False, # Output CSS that was not inlined into the HEAD
     align_floating_images=True, # Add align attribute for floated images
     remove_unset_properties=True # Remove CSS properties if their value is unset when merged
+    allow_network=True # allow network access to fetch linked css files
 
 For more advanced options, check out the code of the ``Premailer`` class
 and all its options in its constructor.
