@@ -1919,7 +1919,8 @@ ation/rss+xml" title="RSS" href="/rss.xml">
         expect_html = """<html>
             <head>
             <title>Title</title>
-            <link href="premailer/tests/test-external-links.css" rel="stylesheet" type="text/css">
+            <link href="premailer/tests/test-external-links.css" rel="style
+    sheet" type="text/css">
             <link rel="alternate" type="applic
     ation/rss+xml" title="RSS" href="/rss.xml">
             </head>
