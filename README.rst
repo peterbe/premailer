@@ -61,6 +61,10 @@ premailer does this. It parses an HTML page, looks up ``style`` blocks
 and parses the CSS. It then uses the ``lxml.html`` parser to modify the
 DOM tree of the page accordingly.
 
+Warning!
+By default, premailer will attempt to download any external stylesheets by URL over the Internet.
+If you want to prevent this you can use the ``allow_network=False`` option.
+
 Getting started
 ---------------
 
@@ -128,6 +132,7 @@ The ``transform`` shortcut function transforms the given HTML using the defaults
     disable_leftover_css=False, # Output CSS that was not inlined into the HEAD
     align_floating_images=True, # Add align attribute for floated images
     remove_unset_properties=True # Remove CSS properties if their value is unset when merged
+    allow_network=True # allow network access to fetch linked css files
 
 For more advanced options, check out the code of the ``Premailer`` class
 and all its options in its constructor.

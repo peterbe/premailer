@@ -158,6 +158,7 @@ class Premailer(object):
         disable_leftover_css=False,
         align_floating_images=True,
         remove_unset_properties=True,
+        allow_network=True,
     ):
         self.html = html
         self.base_url = base_url
@@ -199,6 +200,7 @@ class Premailer(object):
         self.disable_leftover_css = disable_leftover_css
         self.align_floating_images = align_floating_images
         self.remove_unset_properties = remove_unset_properties
+        self.allow_network = allow_network
 
         if cssutils_logging_handler:
             cssutils.log.addHandler(cssutils_logging_handler)
@@ -348,7 +350,10 @@ class Premailer(object):
         rules = []
         index = 0
 
-        for element in _create_cssselector("style,link[rel~=stylesheet]")(page):
+        cssselector = ["style"]
+        if self.allow_network:
+            cssselector.append("link[rel~=stylesheet]")
+        for element in _create_cssselector(",".join(cssselector))(page):
             # If we have a media attribute whose value is anything other than
             # 'all' or 'screen', ignore the ruleset.
             media = element.attrib.get("media")
@@ -398,7 +403,7 @@ class Premailer(object):
                 parent_of_element.remove(element)
 
         # external style files
-        if self.external_styles:
+        if self.external_styles and self.allow_network:
             for stylefile in self.external_styles:
                 css_body = self._load_external(stylefile)
                 self._process_css_text(css_body, index, rules, head)

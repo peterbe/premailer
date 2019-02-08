@@ -1886,6 +1886,59 @@ ation/rss+xml" title="RSS" href="/rss.xml">
 
         compare_html(expect_html, result_html)
 
+    def test_external_links_disallow_network(self):
+        """Test loading stylesheets via link tags with disallowed network access"""
+
+        html = """<html>
+            <head>
+            <title>Title</title>
+            <style type="text/css">
+            h1 { color:red; }
+            h3 { color:yellow; }
+            </style>
+            <link href="premailer/tests/test-external-links.css" rel="style
+    sheet" type="text/css">
+            <link rel="alternate" type="applic
+    ation/rss+xml" title="RSS" href="/rss.xml">
+            <style type="text/css">
+            h1 { color:orange; }
+            </style>
+            </head>
+            <body>
+            <h1>Hello</h1>
+            <h2>World</h2>
+            <h3>Test</h3>
+            <a href="#">Link</a>
+            </body>
+            </html>""".replace(
+            "applic\naction", "application"
+        ).replace(
+            "style\nsheet", "stylesheet"
+        )
+
+        expect_html = """<html>
+            <head>
+            <title>Title</title>
+            <link href="premailer/tests/test-external-links.css" rel="style
+    sheet" type="text/css">
+            <link rel="alternate" type="applic
+    ation/rss+xml" title="RSS" href="/rss.xml">
+            </head>
+            <body>
+            <h1 style="color:orange">Hello</h1>
+            <h2>World</h2>
+            <h3 style="color:yellow">Test</h3>
+            <a href="#">Link</a>
+            </body>
+            </html>""".replace(
+            "applic\naction", "application"
+        )
+
+        p = Premailer(html, strip_important=False, allow_network=False)
+        result_html = p.transform()
+
+        compare_html(expect_html, result_html)
+
     def test_external_links_unfindable(self):
         """Test loading stylesheets that can't be found"""
 
