@@ -61,11 +61,9 @@ premailer does this. It parses an HTML page, looks up ``style`` blocks
 and parses the CSS. It then uses the ``lxml.html`` parser to modify the
 DOM tree of the page accordingly.
 
-::
-
-    Warning!
-    By default, premailer will attempt to download any external stylesheets by URL over the Internet.
-    If you want to prevent this you can use the ``allow_network=False`` option.
+Warning!
+By default, premailer will attempt to download any external stylesheets by URL over the Internet.
+If you want to prevent this you can use the ``allow_network=False`` option.
 
 Getting started
 ---------------
