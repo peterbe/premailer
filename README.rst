@@ -65,7 +65,7 @@ DOM tree of the page accordingly.
 
     Warning!
     By default, premailer will attempt to download any external stylesheets by URL over the Internet.
-    If you want to prevent this you can use the allow_network=False option.
+    If you want to prevent this you can use the ``allow_network=False`` option.
 
 Getting started
 ---------------
