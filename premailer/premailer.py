@@ -311,18 +311,18 @@ class Premailer(object):
         return rules, leftover
 
     def transform(self, html=None, pretty_print=True, **kwargs):
-        """change the self.html and return it with CSS turned into style
+        """change the html and return it with CSS turned into style
         attributes.
         """
-        if html is not None:
-            if self.html is not None:
-                raise TypeError("Can't pass html argument twice")
-            self.html = html
-        elif self.html is None:
+        if html is not None and self.html is not None:
+            raise TypeError("Can't pass html argument twice")
+        elif html is None and self.html is None:
             raise TypeError("must pass html as first argument")
-        if hasattr(self.html, "getroottree"):
+        elif html is None:
+            html = self.html
+        if hasattr(html, "getroottree"):
             # skip the next bit
-            root = self.html.getroottree()
+            root = html.getroottree()
             page = root
             tree = root
         else:
@@ -330,7 +330,7 @@ class Premailer(object):
                 parser = etree.XMLParser(ns_clean=False, resolve_entities=False)
             else:
                 parser = etree.HTMLParser()
-            stripped = self.html.strip()
+            stripped = html.strip()
             tree = etree.fromstring(stripped, parser).getroottree()
             page = tree.getroot()
             # lxml inserts a doctype if none exists, so only include it in
@@ -379,6 +379,7 @@ class Premailer(object):
                 css_body = self._load_external(href)
 
             these_rules, these_leftover = self._parse_style_rules(css_body, index)
+
             index += 1
             rules.extend(these_rules)
             parent_of_element = element.getparent()
@@ -522,7 +523,7 @@ class Premailer(object):
                         continue
                     parent.attrib[attr] = urljoin(self.base_url, url)
 
-        if hasattr(self.html, "getroottree"):
+        if hasattr(html, "getroottree"):
             return root
         else:
             kwargs.setdefault("method", self.method)

@@ -215,6 +215,68 @@ class Tests(unittest.TestCase):
         p = Premailer()
         assert_raises(TypeError, p.transform)
 
+    def test_instance_reuse(self):
+        """test whether the premailer instance can be reused"""
+
+        html_1 = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1, h2 { color:red; }
+        strong {
+            text-decoration:none
+            }
+        </style>
+        </head>
+        <body>
+        <h1>Hi!</h1>
+        <p><strong>Yes!</strong></p>
+        </body>
+        </html>"""
+
+        html_2 = """<html>
+        <head>
+        <title>Another Title</title>
+        <style type="text/css">
+        h1, h2 { color:blue; }
+        strong {
+            text-decoration:underline
+            }
+        </style>
+        </head>
+        <body>
+        <h1>Hello!</h1>
+        <p><strong>Nope!</strong></p>
+        </body>
+        </html>"""
+
+        expect_html_1 = """<html>
+        <head>
+        <title>Title</title>
+        </head>
+        <body>
+        <h1 style="color:red">Hi!</h1>
+        <p><strong style="text-decoration:none">Yes!</strong></p>
+        </body>
+        </html>"""
+
+        expect_html_2 = """<html>
+        <head>
+        <title>Another Title</title>
+        </head>
+        <body>
+        <h1 style="color:blue">Hello!</h1>
+        <p><strong style="text-decoration:underline">Nope!</strong></p>
+        </body>
+        </html>"""
+
+        p = Premailer()
+        result_html_1 = p.transform(html_1)
+        result_html_2 = p.transform(html_2)
+
+        compare_html(expect_html_1, result_html_1)
+        compare_html(expect_html_2, result_html_2)
+
     def test_remove_classes(self):
         """test the simplest case"""
 
