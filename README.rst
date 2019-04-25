@@ -155,7 +155,7 @@ module.
     --remove-internal-links PRESERVE_INTERNAL_LINKS
                           Remove links that start with a '#' like anchors.
     --exclude-pseudoclasses
-                          Pseudo classes like p:last-child', p:first-child, etc
+                          Pseudo classes like p:last-child', p:first-child, :nth-child, etc
     --preserve-style-tags
                           Do not delete <style></style> tags from the html
                           document.

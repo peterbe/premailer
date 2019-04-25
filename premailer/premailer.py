@@ -140,7 +140,7 @@ class Premailer(object):
         disable_link_rewrites=False,
         preserve_internal_links=False,
         preserve_inline_attachments=True,
-        exclude_pseudoclasses=False,
+        exclude_pseudoclasses=True,
         keep_style_tags=False,
         include_star_selectors=False,
         remove_classes=False,
