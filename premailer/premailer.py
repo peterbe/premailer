@@ -126,7 +126,7 @@ _short_color_codes = re.compile(r"^#([0-9a-f])([0-9a-f])([0-9a-f])$", re.I)
 
 # These selectors don't apply to all elements. Rather, they specify
 # which elements to apply to.
-FILTER_PSEUDOSELECTORS = [":last-child", ":first-child", "nth-child"]
+FILTER_PSEUDOSELECTORS = [":last-child", ":first-child", ":nth-child"]
 
 
 class Premailer(object):
@@ -433,7 +433,7 @@ class Premailer(object):
                 new_selector, class_ = re.split(":", selector, 1)
                 class_ = ":%s" % class_
             # Keep filter-type selectors untouched.
-            if class_ in FILTER_PSEUDOSELECTORS:
+            if class_ in FILTER_PSEUDOSELECTORS or class_.startswith(":nth-child"):
                 class_ = ""
             else:
                 selector = new_selector
