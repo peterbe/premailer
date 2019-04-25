@@ -433,7 +433,7 @@ class Premailer(object):
                 new_selector, class_ = re.split(":", selector, 1)
                 class_ = ":%s" % class_
             # Keep filter-type selectors untouched.
-            if class_ in FILTER_PSEUDOSELECTORS or class_.startswith(':nth-child'):
+            if class_ in FILTER_PSEUDOSELECTORS or class_.startswith(":nth-child"):
                 class_ = ""
             else:
                 selector = new_selector
