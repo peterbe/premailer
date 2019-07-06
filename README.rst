@@ -299,6 +299,19 @@ this, you have to pass in ``cssutils_logging_handler`` and
     >>> mylog.getvalue()
     'CSSStylesheet: Unknown @rule found. [2:1: @keyframes]\n'
 
+Choosing the cache implementation
+-----------------------------------
+
+By default, ``premailer`` uses `LFUCache
+<https://cachetools.readthedocs.io/en/latest/#cachetools.LRUCache>`__ to cache
+CSS styles during parsing. But it is possible to choose a different
+implementation using below environment variables:
+
+- ``PREMAILER_CACHE``: Can be LRU, LFU, RR or TTL. Default is LRU.
+- ``PREMAILER_CACHE_MAXSIZE``: Maximum no. of items to be stored in cache.
+- ``PREMAILER_CACHE_TTL``: Time to live for cache entries. Only applicable for TTL cache.
+
+
 If execution speed is on your mind
 ----------------------------------
 
