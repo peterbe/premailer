@@ -342,9 +342,9 @@ Below are some advanced configuration options that probably doesn't matter for
 most people with regular load.
 
 Choosing the cache implementation
------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-By default, ``Premailer`` uses `LRUCache
+By default, ``premailer`` uses `LRUCache
 <https://cachetools.readthedocs.io/en/latest/#cachetools.LRUCache>`__ to cache
 selectors, styles and parsed CSS strings. If LRU doesn't serve your purpose, it
 is possible to switch to an alternate implementation using below environment
