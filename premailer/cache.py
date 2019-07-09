@@ -9,7 +9,6 @@ import cachetools
 CACHE_IMPLEMENTATIONS = {
     "LFU": cachetools.LFUCache,
     "LRU": cachetools.LRUCache,
-    "RR": cachetools.RRCache,
     "TTL": cachetools.TTLCache,
 }
 
@@ -17,11 +16,11 @@ CACHE_IMPLEMENTATIONS = {
 TTL_CACHE_TIMEOUT = 1 * 60 * 60
 
 # Lock to prevent multiple threads from accessing the cache at same time.
-CACHE_ACCESS_LOCK = threading.RLock()
+cache_access_lock = threading.RLock()
 
 cache_type = os.environ.get("PREMAILER_CACHE", "LRU")
 if cache_type not in CACHE_IMPLEMENTATIONS:
-    raise Exception(
+    raise ValueError(
         "Unsupported cache implementation. Available options: %s"
         % "/".join(CACHE_IMPLEMENTATIONS.keys())
     )
@@ -37,7 +36,7 @@ cache = CACHE_IMPLEMENTATIONS[cache_type](**cache_init_options)
 
 def function_cache(**options):
     def decorator(func):
-        @cachetools.cached(cache, lock=CACHE_ACCESS_LOCK)
+        @cachetools.cached(cache, lock=cache_access_lock)
         @functools.wraps(func)
         def inner(*args, **kwargs):
             return func(*args, **kwargs)
