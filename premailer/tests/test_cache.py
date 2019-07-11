@@ -104,6 +104,6 @@ class TestFunctionCache(unittest.TestCase):
             thread.join()
 
         exceptions = [thread.exception for thread in threads if thread.exception]
-        self.assertEquals(
-            len(exceptions), 0, "Unexpected exception when accessing Premailer cache."
+        self.assertTrue(
+            not exceptions, "Unexpected exception when accessing Premailer cache."
         )

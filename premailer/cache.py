@@ -15,17 +15,22 @@ CACHE_IMPLEMENTATIONS = {
 # Time to live (seconds) for entries in TTL cache. Defaults to 1 hour.
 TTL_CACHE_TIMEOUT = 1 * 60 * 60
 
+# Maximum no. of items to be saved in cache.
+DEFAULT_CACHE_MAXSIZE = 128
+
 # Lock to prevent multiple threads from accessing the cache at same time.
 cache_access_lock = threading.RLock()
 
-cache_type = os.environ.get("PREMAILER_CACHE", "LRU")
+cache_type = os.environ.get("PREMAILER_CACHE", "LFU")
 if cache_type not in CACHE_IMPLEMENTATIONS:
     raise ValueError(
         "Unsupported cache implementation. Available options: %s"
         % "/".join(CACHE_IMPLEMENTATIONS.keys())
     )
 
-cache_init_options = {"maxsize": int(os.environ.get("PREMAILER_CACHE_MAXSIZE", 128))}
+cache_init_options = {
+    "maxsize": int(os.environ.get("PREMAILER_CACHE_MAXSIZE", DEFAULT_CACHE_MAXSIZE))
+}
 if cache_type == "TTL":
     cache_init_options["ttl"] = int(
         os.environ.get("PREMAILER_CACHE_TTL", TTL_CACHE_TIMEOUT)

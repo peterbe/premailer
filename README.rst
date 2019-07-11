@@ -344,13 +344,13 @@ most people with regular load.
 Choosing the cache implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-By default, ``premailer`` uses `LRUCache
-<https://cachetools.readthedocs.io/en/latest/#cachetools.LRUCache>`__ to cache
-selectors, styles and parsed CSS strings. If LRU doesn't serve your purpose, it
+By default, ``premailer`` uses `LFUCache
+<https://cachetools.readthedocs.io/en/latest/#cachetools.LFUCache>`__ to cache
+selectors, styles and parsed CSS strings. If LFU doesn't serve your purpose, it
 is possible to switch to an alternate implementation using below environment
 variables.
 
-- ``PREMAILER_CACHE``: Can be LRU, LFU or TTL. Default is LRU.
+- ``PREMAILER_CACHE``: Can be LRU, LFU or TTL. Default is LFU.
 - ``PREMAILER_CACHE_MAXSIZE``: Maximum no. of items to be stored in cache. Defaults to 128.
 - ``PREMAILER_CACHE_TTL``: Time to live for cache entries. Only applicable for TTL cache. Defaults to 1 hour.
 
