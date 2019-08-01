@@ -133,7 +133,7 @@ The ``transform`` shortcut function transforms the given HTML using the defaults
     align_floating_images=True, # Add align attribute for floated images
     remove_unset_properties=True # Remove CSS properties if their value is unset when merged
     allow_network=True # allow network access to fetch linked css files
-    allow_insecure_ssl=False # don't allow unverified SSL certificates for exterenal links
+    allow_insecure_ssl=False # Don't allow unverified SSL certificates for external links
 
 For more advanced options, check out the code of the ``Premailer`` class
 and all its options in its constructor.
