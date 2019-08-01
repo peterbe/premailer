@@ -149,6 +149,13 @@ def main(args):
         "--encoding", default="utf-8", help="Output encoding. The default is utf-8"
     )
 
+    parser.add_argument(
+        "--allow-insecure-ssl",
+        default=False,
+        action="store_true",
+        help="Skip SSL certificate verification for external URLs.",
+    )
+
     options = parser.parse_args(args)
 
     if options.disable_basic_attributes:
@@ -173,6 +180,7 @@ def main(args):
         base_path=options.base_path,
         disable_basic_attributes=options.disable_basic_attributes,
         disable_validation=options.disable_validation,
+        allow_insecure_ssl=options.allow_insecure_ssl,
     )
     options.outfile.write(
         p.transform(encoding=options.encoding, pretty_print=options.pretty)

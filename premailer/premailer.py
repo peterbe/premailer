@@ -159,6 +159,7 @@ class Premailer(object):
         align_floating_images=True,
         remove_unset_properties=True,
         allow_network=True,
+        allow_insecure_ssl=False,
     ):
         self.html = html
         self.base_url = base_url
@@ -201,6 +202,7 @@ class Premailer(object):
         self.align_floating_images = align_floating_images
         self.remove_unset_properties = remove_unset_properties
         self.allow_network = allow_network
+        self.allow_insecure_ssl = allow_insecure_ssl
 
         if cssutils_logging_handler:
             cssutils.log.addHandler(cssutils_logging_handler)
@@ -539,7 +541,7 @@ class Premailer(object):
             return out
 
     def _load_external_url(self, url):
-        response = requests.get(url)
+        response = requests.get(url, verify=not self.allow_insecure_ssl)
         response.raise_for_status()
         return response.text
 
