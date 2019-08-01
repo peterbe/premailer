@@ -7,7 +7,7 @@ never too late to start, so let's start here and now.
 dev
 -----
 
-* Add allow_insecure_ssl option for external URLs
+* Add ``allow_insecure_ssl`` option for external URLs
 
 3.5.0
 -----
