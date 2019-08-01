@@ -2084,7 +2084,33 @@ ent:"" !important;display:block !important}
         p = premailer.premailer.Premailer("<p>A paragraph</p>")
         r = p._load_external_url(faux_uri)
 
-        mocked_requests.get.assert_called_once_with(faux_uri)
+        mocked_requests.get.assert_called_once_with(faux_uri, verify=True)
+        eq_(faux_response, r)
+
+    @mock.patch("premailer.premailer.requests")
+    def test_load_external_url_no_insecure_ssl(self, mocked_requests):
+        "Test premailer.premailer.Premailer._load_external_url"
+        faux_response = "This is not a response"
+        faux_uri = "https://example.com/site.css"
+        mocked_requests.get.return_value = MockResponse(faux_response)
+        p = premailer.premailer.Premailer(
+            "<p>A paragraph</p>", allow_insecure_ssl=False
+        )
+        r = p._load_external_url(faux_uri)
+
+        mocked_requests.get.assert_called_once_with(faux_uri, verify=True)
+        eq_(faux_response, r)
+
+    @mock.patch("premailer.premailer.requests")
+    def test_load_external_url_with_insecure_ssl(self, mocked_requests):
+        "Test premailer.premailer.Premailer._load_external_url"
+        faux_response = "This is not a response"
+        faux_uri = "https://example.com/site.css"
+        mocked_requests.get.return_value = MockResponse(faux_response)
+        p = premailer.premailer.Premailer("<p>A paragraph</p>", allow_insecure_ssl=True)
+        r = p._load_external_url(faux_uri)
+
+        mocked_requests.get.assert_called_once_with(faux_uri, verify=False)
         eq_(faux_response, r)
 
     @mock.patch("premailer.premailer.requests")
