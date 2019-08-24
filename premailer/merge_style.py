@@ -20,7 +20,7 @@ def format_value(prop):
 
 
 @function_cache()
-def csstext_to_pairs(csstext):
+def csstext_to_pairs(csstext, validate=True):
     """
     csstext_to_pairs takes css text and make it to list of
     tuple of key,value.
@@ -31,7 +31,7 @@ def csstext_to_pairs(csstext):
         return sorted(
             [
                 (prop.name.strip(), format_value(prop))
-                for prop in cssutils.parseStyle(csstext)
+                for prop in cssutils.parseStyle(csstext, validate=validate)
             ],
             key=itemgetter(0),
         )
