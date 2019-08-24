@@ -4,6 +4,13 @@ premailer Changes
 Peter's note: Unfortunately, ``premailer`` has never kept a change log. But it's
 never too late to start, so let's start here and now.
 
+3.6.1
+-----
+
+* The ``disable_validation`` wasn't passed to ``csstest_to_pairs``
+  See https://github.com/peterbe/premailer/pull/235
+  Thanks @mbenedettini
+
 3.6.0
 -----
 
