@@ -76,7 +76,7 @@ If you haven't already done so, install ``premailer`` first:
 
 Next, the most basic use is to use the shortcut function, like this:
 
-::
+.. code:: python
 
     >>> from premailer import transform
     >>> print(transform("""
@@ -108,7 +108,7 @@ Next, the most basic use is to use the shortcut function, like this:
 
 The ``transform`` shortcut function transforms the given HTML using the defaults for all options:
 
-::
+.. code:: python
 
     base_url=None, # Optional URL prepended to all relative links (both stylesheets and internal)
     disable_link_rewrites=False, # Allow link rewrites (e.g. using base_url)
