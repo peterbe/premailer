@@ -395,6 +395,10 @@ class Premailer(object):
                     style.text = css_body
                 else:
                     style.text = self._css_rules_to_string(these_leftover)
+
+                if self.strip_important:
+                    style.text = _importants.sub("", style.text)
+
                 if self.method == "xml":
                     style.text = etree.CDATA(style.text)
 
@@ -538,8 +542,6 @@ class Premailer(object):
                 out = _cdata_regex.sub(
                     lambda m: "/*<![CDATA[*/%s/*]]>*/" % m.group(1), out
                 )
-            if self.strip_important:
-                out = _importants.sub("", out)
             return out
 
     def _load_external_url(self, url):
