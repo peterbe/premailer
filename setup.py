@@ -1,7 +1,5 @@
-import codecs
 import os.path
 import re
-import sys
 
 from setuptools import setup, find_packages
 
@@ -12,7 +10,8 @@ long_description = open(README).read().strip() + "\n\n"
 
 def find_version(*file_paths):
     version_file_path = os.path.join(os.path.dirname(__file__), *file_paths)
-    version_file = codecs.open(version_file_path, encoding="utf-8").read()
+    with open(version_file_path) as f:
+        version_file = f.read()
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
     if version_match:
         return version_match.group(1)
@@ -20,11 +19,6 @@ def find_version(*file_paths):
 
 
 install_requires = ["lxml", "cssselect", "cssutils", "requests", "cachetools"]
-
-if sys.version_info >= (2, 6) and sys.version_info <= (2, 7):
-    # Python 2.6 is the oldest version we support and it
-    # needs some extra stuff
-    install_requires.extend(["argparse", "ordereddict"])
 
 tests_require = ["nose", "mock"]
 
@@ -46,11 +40,11 @@ setup(
         "License :: OSI Approved :: Python Software Foundation License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Communications",

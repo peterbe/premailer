@@ -25,14 +25,14 @@ matrix:
   include:
     - python: "3.6"
       env: TOX_ENV=lint
-    - python: "2.7"
-      env: TOX_ENV=py27
-    - python: "3.4"
-      env: TOX_ENV=py34
     - python: "3.5"
       env: TOX_ENV=py35
     - python: "3.6"
       env: TOX_ENV=py36
+    - python: "3.7"
+      env: TOX_ENV=py37
+    - python: "3.8"
+      env: TOX_ENV=py38
     # just using pypy2.7 does not work due to travis pypy packaging issues
     - python: "pypy2.7-5.10.0"
       env: TOX_ENV=pypy
