@@ -2638,6 +2638,43 @@ ent:"" !important;display:block !important}
         result_html = p.transform()
         compare_html(expect_html, result_html)
 
+    def test_ignore_does_not_strip_importants(self):
+        """test that it's possible to put a `data-premailer="ignore"`
+        attribute on a <style> tag and important tags do not get stripped."""
+
+        html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1 { color:red; }
+        </style>
+        <style type="text/css" data-premailer="ignore">
+        h1 { color:blue !important; }
+        </style>
+        </head>
+        <body>
+        <h1>Hello</h1>
+        <h2>World</h2>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        <title>Title</title>
+        <style type="text/css">
+        h1 { color:blue !important; }
+        </style>
+        </head>
+        <body>
+        <h1 style="color:red">Hello</h1>
+        <h2>World</h2>
+        </body>
+        </html>"""
+
+        p = Premailer(html, disable_validation=True)
+        result_html = p.transform()
+        compare_html(expect_html, result_html)
+
     @mock.patch("premailer.premailer.warnings")
     def test_ignore_some_incorrectly(self, warnings_mock):
         """You can put `data-premailer="ignore"` but if the attribute value
