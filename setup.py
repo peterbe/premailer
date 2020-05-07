@@ -63,7 +63,7 @@ setup(
     test_suite="nose.collector",
     tests_require=tests_require,
     extras_require={
-        "dev": ["tox", "twine", "therapist", "black", "flake8"],
+        "dev": ["tox", "twine", "therapist", "black", "flake8", "wheel"],
         "test": tests_require,
     },
     zip_safe=False,
