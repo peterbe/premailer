@@ -1,13 +1,7 @@
-from __future__ import absolute_import
 import cssutils
 import threading
 from operator import itemgetter
-
-try:
-    from collections import OrderedDict
-except ImportError:  # pragma: no cover
-    # some old python 2.6 thing then, eh?
-    from ordereddict import OrderedDict
+from collections import OrderedDict
 
 from premailer.cache import function_cache
 

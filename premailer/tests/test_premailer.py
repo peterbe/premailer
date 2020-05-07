@@ -1,11 +1,9 @@
-from __future__ import absolute_import, unicode_literals
-
 import logging
 import re
 import sys
 import unittest
 from contextlib import contextmanager
-from io import StringIO  # Yes, the is an io lib in py2.x
+from io import StringIO
 
 from lxml.etree import XMLSyntaxError, fromstring
 from requests.exceptions import HTTPError
@@ -20,13 +18,6 @@ from premailer.premailer import (
     merge_styles,
     transform,
 )
-
-if sys.version_info >= (3,):  # As in, Python 3
-    from urllib.request import urlopen
-else:  # Python 2
-    from urllib2 import urlopen
-
-    urlopen = urlopen  # shut up pyflakes
 
 
 whitespace_between_tags = re.compile(r">\s*<")

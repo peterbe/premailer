@@ -1,4 +1,3 @@
-from __future__ import absolute_import, unicode_literals
 import unittest
 from premailer.merge_style import csstext_to_pairs, merge_styles
 
