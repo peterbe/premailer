@@ -33,8 +33,7 @@ matrix:
       env: TOX_ENV=py37
     - python: "3.8"
       env: TOX_ENV=py38
-    # just using pypy2.7 does not work due to travis pypy packaging issues
-    - python: "pypy2.7-5.10.0"
+    - python: "pypy3"
       env: TOX_ENV=pypy
 
 script:
