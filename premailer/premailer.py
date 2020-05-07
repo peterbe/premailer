@@ -1,11 +1,10 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import codecs
 import operator
 import os
 import re
-import sys
 import warnings
+from collections import OrderedDict
+from urllib.parse import urljoin, urlparse
 
 import cssutils
 import requests
@@ -14,29 +13,6 @@ from lxml.cssselect import CSSSelector
 
 from premailer.cache import function_cache
 from premailer.merge_style import csstext_to_pairs, merge_styles
-
-try:
-    from collections import OrderedDict
-except ImportError:  # pragma: no cover
-    # some old python 2.6 thing then, eh?
-    from ordereddict import OrderedDict
-
-if sys.version_info >= (3,):  # pragma: no cover
-    # As in, Python 3
-    from io import StringIO
-    from urllib.parse import urljoin, urlparse
-
-    STR_TYPE = str
-else:  # Python 2
-    try:
-        from cStringIO import StringIO
-    except ImportError:  # pragma: no cover
-        from StringIO import StringIO
-
-        StringIO = StringIO  # shut up pyflakes
-    from urlparse import urljoin, urlparse
-
-    STR_TYPE = basestring  # NOQA
 
 
 __all__ = ["PremailerError", "Premailer", "transform"]
@@ -184,10 +160,10 @@ class Premailer(object):
         self.capitalize_float_margin = capitalize_float_margin
         # whether to process or ignore selectors like '* { foo:bar; }'
         self.include_star_selectors = include_star_selectors
-        if isinstance(external_styles, STR_TYPE):
+        if isinstance(external_styles, str):
             external_styles = [external_styles]
         self.external_styles = external_styles
-        if isinstance(css_text, STR_TYPE):
+        if isinstance(css_text, str):
             css_text = [css_text]
         self.css_text = css_text
         self.strip_important = strip_important
