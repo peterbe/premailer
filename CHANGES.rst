@@ -4,6 +4,11 @@ premailer Changes
 Peter's note: Unfortunately, ``premailer`` has never kept a change log. But it's
 never too late to start, so let's start here and now.
 
+dev
+-----
+
+* Drop support for Python 2.7 and 3.4. Add test support for 3.8
+
 3.6.2
 -----
 
