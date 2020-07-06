@@ -139,7 +139,7 @@ The ``transform`` shortcut function transforms the given HTML using the defaults
 For more advanced options, check out the code of the ``Premailer`` class
 and all its options in its constructor.
 
-You can also use premailer from the command line by using his main
+You can also use premailer from the command line by using its main
 module.
 
 ::
@@ -262,7 +262,7 @@ HTML attributes created additionally
 Certain HTML attributes are also created on the HTML if the CSS contains
 any ones that are easily translated into HTML attributes. For example,
 if you have this CSS: ``td { background-color:#eee; }`` then this is
-transformed into ``style="background-color:#eee"`` AND as an HTML
+transformed into ``style="background-color:#eee"`` and as an HTML
 attribute ``bgcolor="#eee"``.
 
 Having these extra attributes basically as a "back up" for really shit
