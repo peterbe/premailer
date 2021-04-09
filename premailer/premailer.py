@@ -4,7 +4,7 @@ import os
 import re
 import warnings
 from collections import OrderedDict
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, unquote
 
 import cssutils
 import requests
@@ -116,6 +116,7 @@ class Premailer(object):
         disable_link_rewrites=False,
         preserve_internal_links=False,
         preserve_inline_attachments=True,
+        preserve_handlebar_syntax=False,
         exclude_pseudoclasses=True,
         keep_style_tags=False,
         include_star_selectors=False,
@@ -152,6 +153,7 @@ class Premailer(object):
         self.disable_link_rewrites = disable_link_rewrites
         self.preserve_internal_links = preserve_internal_links
         self.preserve_inline_attachments = preserve_inline_attachments
+        self.preserve_handlebar_syntax = preserve_handlebar_syntax
         self.exclude_pseudoclasses = exclude_pseudoclasses
         # whether to delete the <style> tag once it's been processed
         # this will always preserve the original css
@@ -518,6 +520,9 @@ class Premailer(object):
                 out = _cdata_regex.sub(
                     lambda m: "/*<![CDATA[*/%s/*]]>*/" % m.group(1), out
                 )
+            if self.preserve_handlebar_syntax:
+                while len(x := out.split('%7B%7B', 1)) > 1 and len(y := x[1].split('%7D%7D', 1)) > 1:
+                    out = x[0] + '{{' + unquote(y[0]) + '}}' + y[1]
             return out
 
     def _load_external_url(self, url):

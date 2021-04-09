@@ -2985,3 +2985,57 @@ sheet" type="text/css">
         p = Premailer(html, exclude_pseudoclasses=False, keep_style_tags=True)
         result_html = p.transform()
         compare_html(expect_html, result_html)
+
+    def test_preserve_handlebar_syntax_false(self):
+        """Demonstrate encoding of handlebar syntax with preservation disabled.
+
+        Original issue: https://github.com/peterbe/premailer/issues/248
+        """
+
+        html = """
+            <html>
+            <img src="{{ img_src }}">
+            <a href="{{ url }}"></a>
+            </html>
+        """
+
+        expect_html = """
+<html>
+    <head>
+    </head>
+    <body>
+    <img src="%7B%7B%20img_src%20%7D%7D">
+    <a href="%7B%7B%20url%20%7D%7D"></a>
+    </body>
+</html>
+        """
+        p = Premailer(html)
+        result_html = p.transform()
+        compare_html(expect_html, result_html)
+
+    def test_preserve_handlebar_syntax_true(self):
+        """Demonstrate encoding of handlebar syntax with preservation enabled.
+
+        Original issue: https://github.com/peterbe/premailer/issues/248
+        """
+
+        html = """
+            <html>
+            <img src="{{ img_src }}">
+            <a href="{{ url }}"></a>
+            </html>
+        """
+
+        expect_html = """
+<html>
+    <head>
+    </head>
+    <body>
+    <img src="{{ img_src }}">
+    <a href="{{ url }}"></a>
+    </body>
+</html>
+        """
+        p = Premailer(html, preserve_handlebar_syntax=True)
+        result_html = p.transform()
+        compare_html(expect_html, result_html)

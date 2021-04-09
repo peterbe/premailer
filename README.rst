@@ -115,6 +115,7 @@ The ``transform`` shortcut function transforms the given HTML using the defaults
     disable_link_rewrites=False, # Allow link rewrites (e.g. using base_url)
     preserve_internal_links=False, # Do not preserve links to named anchors when using base_url
     preserve_inline_attachments=True, # Preserve links with cid: scheme when base_url is specified
+    preserve_handlebar_syntax=False # Preserve handlebar syntax from being encoded
     exclude_pseudoclasses=True, # Ignore pseudoclasses when processing styles
     keep_style_tags=False, # Discard original style tag
     include_star_selectors=False, # Ignore star selectors when processing styles
