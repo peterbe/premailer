@@ -27,8 +27,7 @@ class ExternalNotFoundError(ValueError):
 
 
 def make_important(bulk):
-    """makes every property in a string !important.
-    """
+    """makes every property in a string !important."""
     return ";".join(
         "%s !important" % p if not p.endswith("!important") else p
         for p in bulk.split(";")
@@ -36,8 +35,7 @@ def make_important(bulk):
 
 
 def get_or_create_head(root):
-    """Ensures that `root` contains a <head> element and returns it.
-    """
+    """Ensures that `root` contains a <head> element and returns it."""
     head = _create_cssselector("head")(root)
     if not head:
         head = etree.Element("head")
@@ -51,18 +49,18 @@ def get_or_create_head(root):
 @function_cache()
 def _cache_parse_css_string(css_body, validate=True):
     """
-        This function will cache the result from cssutils
-        It is a big gain when number of rules is big
-        Maximum cache entries are 1000. This is mainly for
-        protecting memory leak in case something gone wild.
-        Be aware that you can turn the cache off in Premailer
+    This function will cache the result from cssutils
+    It is a big gain when number of rules is big
+    Maximum cache entries are 1000. This is mainly for
+    protecting memory leak in case something gone wild.
+    Be aware that you can turn the cache off in Premailer
 
-        Args:
-            css_body(str): css rules in string format
-            validate(bool): if cssutils should validate
+    Args:
+        css_body(str): css rules in string format
+        validate(bool): if cssutils should validate
 
-        Returns:
-            cssutils.css.cssstylesheet.CSSStyleSheet
+    Returns:
+        cssutils.css.cssstylesheet.CSSStyleSheet
 
     """
     return cssutils.parseString(css_body, validate=validate)
@@ -74,8 +72,7 @@ def _create_cssselector(selector):
 
 
 def capitalize_float_margin(css_body):
-    """Capitalize float and margin CSS property names
-    """
+    """Capitalize float and margin CSS property names"""
 
     def _capitalize_property(match):
         return "{0}:{1}{2}".format(
@@ -206,7 +203,7 @@ class Premailer(object):
                 return "{0}:{1} !important".format(prop.name, prop.value)
 
         def join_css_properties(properties):
-            """ Accepts a list of cssutils Property objects and returns
+            """Accepts a list of cssutils Property objects and returns
             a semicolon delimitted string like 'color: red; font-size: 12px'
             """
             return ";".join(format_css_property(prop) for prop in properties)
@@ -526,8 +523,7 @@ class Premailer(object):
         return response.text
 
     def _load_external(self, url):
-        """loads an external stylesheet from a remote url or local path
-        """
+        """loads an external stylesheet from a remote url or local path"""
         if url.startswith("//"):
             # then we have to rely on the base_url
             if self.base_url and "https://" in self.base_url:
@@ -611,8 +607,7 @@ class Premailer(object):
             element.attrib[key] = value
 
     def _css_rules_to_string(self, rules):
-        """given a list of css rules returns a css string
-        """
+        """given a list of css rules returns a css string"""
         lines = []
         for item in rules:
             if isinstance(item, tuple):
