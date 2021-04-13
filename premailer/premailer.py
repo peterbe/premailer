@@ -518,8 +518,16 @@ class Premailer(object):
                     lambda m: "/*<![CDATA[*/%s/*]]>*/" % m.group(1), out
                 )
             if self.preserve_handlebar_syntax:
-                while len(x := out.split('%7B%7B', 1)) > 1 and len(y := x[1].split('%7D%7D', 1)) > 1:
-                    out = x[0] + '{{' + unquote(y[0]) + '}}' + y[1]
+                while True:
+                    x = out.split("%7B%7B", 1)
+                    if len(x) > 1:
+                        y = x[1].split("%7D%7D", 1)
+                        if len(y) > 1:
+                            out = x[0] + "{{" + unquote(y[0]) + "}}" + y[1]
+                        else:
+                            break
+                    else:
+                        break
             return out
 
     def _load_external_url(self, url):
