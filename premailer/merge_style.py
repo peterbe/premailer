@@ -36,23 +36,23 @@ csstext_to_pairs._lock = threading.RLock()
 
 def merge_styles(inline_style, new_styles, classes, remove_unset_properties=False):
     """
-        This will merge all new styles where the order is important
-        The last one will override the first
-        When that is done it will apply old inline style again
-        The old inline style is always important and override
-        all new ones. The inline style must be valid.
+    This will merge all new styles where the order is important
+    The last one will override the first
+    When that is done it will apply old inline style again
+    The old inline style is always important and override
+    all new ones. The inline style must be valid.
 
-        Args:
-            inline_style(str): the old inline style of the element if there
-                is one
-            new_styles: a list of new styles, each element should be
-                a list of tuple
-            classes: a list of classes which maps new_styles, important!
-            remove_unset_properties(bool): Allow us to remove certain CSS
-                properties with rules that set their value to 'unset'
+    Args:
+        inline_style(str): the old inline style of the element if there
+            is one
+        new_styles: a list of new styles, each element should be
+            a list of tuple
+        classes: a list of classes which maps new_styles, important!
+        remove_unset_properties(bool): Allow us to remove certain CSS
+            properties with rules that set their value to 'unset'
 
-        Returns:
-            str: the final style
+    Returns:
+        str: the final style
     """
     # building classes
     styles = OrderedDict([("", OrderedDict())])
