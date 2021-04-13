@@ -308,6 +308,14 @@ class Premailer(object):
             else:
                 parser = etree.HTMLParser()
             stripped = html.strip()
+
+            if self.preserve_handlebar_syntax:
+                stripped = re.sub(
+                    r'="{{(.*?)}}"',
+                    lambda match: '="{{' + match.groups()[0].replace('"', '%22') + '}}"',
+                    stripped
+                )
+
             tree = etree.fromstring(stripped, parser).getroottree()
             page = tree.getroot()
             # lxml inserts a doctype if none exists, so only include it in
@@ -518,16 +526,11 @@ class Premailer(object):
                     lambda m: "/*<![CDATA[*/%s/*]]>*/" % m.group(1), out
                 )
             if self.preserve_handlebar_syntax:
-                while True:
-                    x = out.split("%7B%7B", 1)
-                    if len(x) > 1:
-                        y = x[1].split("%7D%7D", 1)
-                        if len(y) > 1:
-                            out = x[0] + "{{" + unquote(y[0]) + "}}" + y[1]
-                        else:
-                            break
-                    else:
-                        break
+                out = re.sub(
+                    r'="%7B%7B(.+?)%7D%7D"',
+                    lambda match: '="{{' + unquote(match.groups()[0]) + '}}"',
+                    out
+                )
             return out
 
     def _load_external_url(self, url):

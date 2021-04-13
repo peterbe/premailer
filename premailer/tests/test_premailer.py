@@ -2993,8 +2993,8 @@ sheet" type="text/css">
 
         html = """
             <html>
-            <img src="{{ img_src }}">
-            <a href="{{ url }}"></a>
+            <img src="{{ data | default: 'This is a string literal.' }}">
+            <a href="{{ data | default: "This is a string literal." }}"></a>
             </html>
         """
 
@@ -3003,8 +3003,8 @@ sheet" type="text/css">
     <head>
     </head>
     <body>
-    <img src="%7B%7B%20img_src%20%7D%7D">
-    <a href="%7B%7B%20url%20%7D%7D"></a>
+    <img src="%7B%7B%20data%20%7C%20default:%20'This%20is%20a%20string%20literal.'%20%7D%7D">
+    <a href="%7B%7B%20data%20%7C%20default:%20" this is a string literal.></a>
     </body>
 </html>
         """
@@ -3020,8 +3020,8 @@ sheet" type="text/css">
 
         html = """
             <html>
-            <img src="{{ img_src }}">
-            <a href="{{ url }}"></a>
+            <img src="{{ data | default: 'This is a string literal.' }}">
+            <a href="{{ data | default: "This is a string literal." }}"></a>
             </html>
         """
 
@@ -3030,8 +3030,8 @@ sheet" type="text/css">
     <head>
     </head>
     <body>
-    <img src="{{ img_src }}">
-    <a href="{{ url }}"></a>
+    <img src="{{ data | default: 'This is a string literal.' }}">
+    <a href="{{ data | default: "This is a string literal." }}"></a>
     </body>
 </html>
         """
