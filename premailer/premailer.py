@@ -312,8 +312,10 @@ class Premailer(object):
             if self.preserve_handlebar_syntax:
                 stripped = re.sub(
                     r'="{{(.*?)}}"',
-                    lambda match: '="{{' + match.groups()[0].replace('"', '%22') + '}}"',
-                    stripped
+                    lambda match: '="{{'
+                    + match.groups()[0].replace('"', "%22")
+                    + '}}"',
+                    stripped,
                 )
 
             tree = etree.fromstring(stripped, parser).getroottree()
@@ -529,7 +531,7 @@ class Premailer(object):
                 out = re.sub(
                     r'="%7B%7B(.+?)%7D%7D"',
                     lambda match: '="{{' + unquote(match.groups()[0]) + '}}"',
-                    out
+                    out,
                 )
             return out
 
