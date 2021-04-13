@@ -1837,7 +1837,7 @@ lor:purple}">html</a></p>
     def test_multithreading(self):
         """The test tests thread safety of merge_styles function which employs
         thread non-safe cssutils calls.
-        The test would fail if merge_styles would have not been thread-safe """
+        The test would fail if merge_styles would have not been thread-safe"""
 
         import threading
         import logging
@@ -2428,8 +2428,7 @@ ent:"" !important;display:block !important}
         ok_("/* comment */" in result_html)
 
     def test_unknown_in_media_queries(self):
-        """CSS unknown rule inside a media query block should not be a problem
-        """
+        """CSS unknown rule inside a media query block should not be a problem"""
         html = """<!doctype html>
         <html lang="en">
         <head>
@@ -2526,7 +2525,7 @@ ent:"" !important;display:block !important}
 
     def test_capture_cssutils_logging(self):
         """you can capture all the warnings, errors etc. from cssutils
-        with your own logging. """
+        with your own logging."""
         html = """<!doctype html>
         <html>
         <head>
