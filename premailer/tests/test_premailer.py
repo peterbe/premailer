@@ -2993,8 +2993,8 @@ sheet" type="text/css">
 
         html = """
             <html>
-            <img src="{{ data | default: 'Test.' }}">
-            <a href="{{ data | default: "Test." }}"></a>
+            <img src="{{ data | default: 'Test & <code>' }}">
+            <a href="{{ data | default: "Test & <code>" }}"></a>
             </html>
         """
 
@@ -3003,8 +3003,8 @@ sheet" type="text/css">
     <head>
     </head>
     <body>
-    <img src="%7B%7B%20data%20%7C%20default:%20'Test.'%20%7D%7D">
-    <a href="%7B%7B%20data%20%7C%20default:%20" test.></a>
+    <img src="%7B%7B%20data%20%7C%20default:%20'Test%20&amp;%20&lt;code&gt;'%20%7D%7D">
+    <a href="%7B%7B%20data%20%7C%20default:%20" test>" }}"&gt;</a>
     </body>
 </html>
         """
@@ -3020,8 +3020,8 @@ sheet" type="text/css">
 
         html = """
             <html>
-            <img src="{{ data | default: 'Test.' }}">
-            <a href="{{ data | default: "Test." }}"></a>
+            <img src="{{ data | default: 'Test & <code>' }}">
+            <a href="{{ data | default: "Test & <code>" }}"></a>
             </html>
         """
 
@@ -3030,8 +3030,8 @@ sheet" type="text/css">
     <head>
     </head>
     <body>
-    <img src="{{ data | default: 'Test.' }}">
-    <a href="{{ data | default: "Test." }}"></a>
+    <img src="{{ data | default: 'Test & <code>' }}">
+    <a href="{{ data | default: "Test & <code>" }}"></a>
     </body>
 </html>
         """

@@ -4,6 +4,7 @@ import os
 import re
 import warnings
 from collections import OrderedDict
+from html import escape, unescape
 from urllib.parse import urljoin, urlparse, unquote
 
 import cssutils
@@ -312,9 +313,7 @@ class Premailer(object):
             if self.preserve_handlebar_syntax:
                 stripped = re.sub(
                     r'="{{(.*?)}}"',
-                    lambda match: '="{{'
-                    + match.groups()[0].replace('"', "%22")
-                    + '}}"',
+                    lambda match: '="{{' + escape(match.groups()[0]) + '}}"',
                     stripped,
                 )
 
@@ -530,7 +529,7 @@ class Premailer(object):
             if self.preserve_handlebar_syntax:
                 out = re.sub(
                     r'="%7B%7B(.+?)%7D%7D"',
-                    lambda match: '="{{' + unquote(match.groups()[0]) + '}}"',
+                    lambda match: '="{{' + unescape(unquote(match.groups()[0])) + '}}"',
                     out,
                 )
             return out
