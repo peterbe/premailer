@@ -4,6 +4,16 @@ premailer Changes
 Peter's note: Unfortunately, ``premailer`` has never kept a change log. But it's
 never too late to start, so let's start here and now.
 
+3.8.0
+-----
+
+* Add ``preserve_handlebar_syntax`` option.
+  See https://github.com/peterbe/premailer/pull/252
+  Thanks @CraigRobertWhite
+
+* Switch to GitHub Actions instead of TravisCI
+  See https://github.com/peterbe/premailer/pull/253
+
 3.7.0
 -----
 
