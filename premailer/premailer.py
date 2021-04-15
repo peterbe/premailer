@@ -4,7 +4,8 @@ import os
 import re
 import warnings
 from collections import OrderedDict
-from urllib.parse import urljoin, urlparse
+from html import escape, unescape
+from urllib.parse import urljoin, urlparse, unquote
 
 import cssutils
 import requests
@@ -113,6 +114,7 @@ class Premailer(object):
         disable_link_rewrites=False,
         preserve_internal_links=False,
         preserve_inline_attachments=True,
+        preserve_handlebar_syntax=False,
         exclude_pseudoclasses=True,
         keep_style_tags=False,
         include_star_selectors=False,
@@ -149,6 +151,7 @@ class Premailer(object):
         self.disable_link_rewrites = disable_link_rewrites
         self.preserve_internal_links = preserve_internal_links
         self.preserve_inline_attachments = preserve_inline_attachments
+        self.preserve_handlebar_syntax = preserve_handlebar_syntax
         self.exclude_pseudoclasses = exclude_pseudoclasses
         # whether to delete the <style> tag once it's been processed
         # this will always preserve the original css
@@ -306,6 +309,39 @@ class Premailer(object):
             else:
                 parser = etree.HTMLParser()
             stripped = html.strip()
+
+            # Escape all characters in handlebars in HTML attributes.
+            # Without this step, if handlebars were to include a character such as ",
+            # etree.fromstring() would not be able to differentiate the "'s in the value
+            # from the "'s for the attribute.
+            # --------------------------------------------------------------------------
+            # Provided the input below:
+            # <a href="{{ "<Test>" }}"></a>
+            # --------------------------------------------------------------------------
+            # Decoded result without preservation:
+            # <a href="%7B%7B%20">" }}"&gt;</a>
+            # Everything between the first two quotes were treated as the value of the
+            # attribute. Then, the characters between the second quote and the second
+            # > were treated as invalid attributes and discarded. Lastly, the value of
+            # the original attribute after the second and </a> were treated as the
+            # contents of the HTML tag.
+            # ---
+            # Result:
+            # <a href="%7B%7B%20">" }}"&gt;</a>
+            # --------------------------------------------------------------------------
+            # Decoded result with preservation (prior to unescape() & unquote()):
+            # <a href="%7B%7B%20%22&lt;Test&gt;%22%20%7D%7D"></a>
+            # No value was lost in the encoding process.
+            # ---
+            # Result after unquote() and unescape():
+            # <a href="{{ "<Test>" }}"></a>
+            if self.preserve_handlebar_syntax:
+                stripped = re.sub(
+                    r'="{{(.*?)}}"',
+                    lambda match: '="{{' + escape(match.groups()[0]) + '}}"',
+                    stripped,
+                )
+
             tree = etree.fromstring(stripped, parser).getroottree()
             page = tree.getroot()
             # lxml inserts a doctype if none exists, so only include it in
@@ -514,6 +550,14 @@ class Premailer(object):
             if self.method == "xml":
                 out = _cdata_regex.sub(
                     lambda m: "/*<![CDATA[*/%s/*]]>*/" % m.group(1), out
+                )
+            # Replace %xx escapes and HTML entities, within handlebars in HTML
+            # attributes, with their single-character equivalents.
+            if self.preserve_handlebar_syntax:
+                out = re.sub(
+                    r'="%7B%7B(.+?)%7D%7D"',
+                    lambda match: '="{{' + unescape(unquote(match.groups()[0])) + '}}"',
+                    out,
                 )
             return out
 
