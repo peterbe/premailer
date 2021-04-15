@@ -2985,8 +2985,8 @@ sheet" type="text/css">
         result_html = p.transform()
         compare_html(expect_html, result_html)
 
-    def test_preserve_handlebar_syntax_false(self):
-        """Demonstrate encoding of handlebar syntax with preservation disabled.
+    def test_preserve_handlebar_syntax(self):
+        """Demonstrate encoding of handlebar syntax with preservation.
 
         Original issue: https://github.com/peterbe/premailer/issues/248
         """
@@ -2998,34 +2998,7 @@ sheet" type="text/css">
             </html>
         """
 
-        expect_html = """
-<html>
-    <head>
-    </head>
-    <body>
-    <img src="%7B%7B%20data%20%7C%20default:%20'Test%20&amp;%20&lt;code&gt;'%20%7D%7D">
-    <a href="%7B%7B%20data%20%7C%20default:%20" test>" }}"&gt;</a>
-    </body>
-</html>
-        """
-        p = Premailer(html)
-        result_html = p.transform()
-        compare_html(expect_html, result_html)
-
-    def test_preserve_handlebar_syntax_true(self):
-        """Demonstrate encoding of handlebar syntax with preservation enabled.
-
-        Original issue: https://github.com/peterbe/premailer/issues/248
-        """
-
-        html = """
-            <html>
-            <img src="{{ data | default: 'Test & <code>' }}">
-            <a href="{{ data | default: "Test & <code>" }}"></a>
-            </html>
-        """
-
-        expect_html = """
+        expected_preserved_html = """
 <html>
     <head>
     </head>
@@ -3034,7 +3007,22 @@ sheet" type="text/css">
     <a href="{{ data | default: "Test & <code>" }}"></a>
     </body>
 </html>
-        """
+"""
+
+        expected_neglected_html = """
+<html>
+    <head>
+    </head>
+    <body>
+    <img src="%7B%7B%20data%20%7C%20default:%20'Test%20&amp;%20&lt;code&gt;'%20%7D%7D">
+    <a href="%7B%7B%20data%20%7C%20default:%20" test>" }}"&gt;</a>
+    </body>
+</html>
+"""
         p = Premailer(html, preserve_handlebar_syntax=True)
-        result_html = p.transform()
-        compare_html(expect_html, result_html)
+        result_preserved_html = p.transform()
+        compare_html(expected_preserved_html, result_preserved_html)
+
+        p = Premailer(html)
+        result_neglected_html = p.transform()
+        compare_html(expected_neglected_html, result_neglected_html)
