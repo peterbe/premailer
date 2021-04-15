@@ -310,6 +310,31 @@ class Premailer(object):
                 parser = etree.HTMLParser()
             stripped = html.strip()
 
+            # Escape all characters in handlebars in HTML attributes.
+            # Without this step, if handlebars were to include a character such as ",
+            # etree.fromstring() would not be able to differentiate the "'s in the value
+            # from the "'s for the attribute.
+            # --------------------------------------------------------------------------
+            # Provided the input below:
+            # <a href="{{ "<Test>" }}"></a>
+            # --------------------------------------------------------------------------
+            # Decoded result without preservation:
+            # <a href="%7B%7B%20">" }}"&gt;</a>
+            # Everything between the first two quotes were treated as the value of the
+            # attribute. Then, the characters between the second quote and the second
+            # > were treated as invalid attributes and discarded. Lastly, the value of
+            # the original attribute after the second and </a> were treated as the
+            # contents of the HTML tag.
+            # ---
+            # Result:
+            # <a href="%7B%7B%20">" }}"&gt;</a>
+            # --------------------------------------------------------------------------
+            # Decoded result with preservation (prior to unescape() & unquote()):
+            # <a href="%7B%7B%20%22&lt;Test&gt;%22%20%7D%7D"></a>
+            # No value was lost in the encoding process.
+            # ---
+            # Result after unquote() and unescape():
+            # <a href="{{ "<Test>" }}"></a>
             if self.preserve_handlebar_syntax:
                 stripped = re.sub(
                     r'="{{(.*?)}}"',
@@ -526,6 +551,8 @@ class Premailer(object):
                 out = _cdata_regex.sub(
                     lambda m: "/*<![CDATA[*/%s/*]]>*/" % m.group(1), out
                 )
+            # Replace %xx escapes and HTML entities, within handlebars in HTML
+            # attributes, with their single-character equivalents.
             if self.preserve_handlebar_syntax:
                 out = re.sub(
                     r'="%7B%7B(.+?)%7D%7D"',
