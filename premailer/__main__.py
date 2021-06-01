@@ -155,6 +155,13 @@ def main(args):
         help="Skip SSL certificate verification for external URLs.",
     )
 
+    parser.add_argument(
+        "--allow-loading-external-files",
+        default=False,
+        action="store_true",
+        help="Allow opening any non-HTTP external file URL.",
+    )
+
     options = parser.parse_args(args)
 
     if options.disable_basic_attributes:
@@ -180,6 +187,7 @@ def main(args):
         disable_basic_attributes=options.disable_basic_attributes,
         disable_validation=options.disable_validation,
         allow_insecure_ssl=options.allow_insecure_ssl,
+        allow_loading_external_files=options.allow_loading_external_files,
     )
     options.outfile.write(
         p.transform(encoding=options.encoding, pretty_print=options.pretty)

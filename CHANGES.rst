@@ -1,8 +1,16 @@
 premailer Changes
 =================
 
-Peter's note: Unfortunately, ``premailer`` has never kept a change log. But it's
+Peter's note: Unfortunately, ``premailer`` didn't use to keep a change log. But it's
 never too late to start, so let's start here and now.
+
+3.9.0
+-----
+
+* New option ``allow_loading_external_files=False`` when loading externally
+  referenced file URLs. E.g. ``<link rel=stylesheet href=/path/to/file.css>``
+  Be careful to enable this if the HTML loaded isn't trusted. **Big security risk
+  otherwise**.
 
 3.8.0
 -----
