@@ -27,6 +27,10 @@ class ExternalNotFoundError(ValueError):
     pass
 
 
+class ExternalFileLoadingError(Exception):
+    pass
+
+
 def make_important(bulk):
     """makes every property in a string !important."""
     return ";".join(
@@ -135,6 +139,7 @@ class Premailer(object):
         remove_unset_properties=True,
         allow_network=True,
         allow_insecure_ssl=False,
+        allow_loading_external_files=False,
     ):
         self.html = html
         self.base_url = base_url
@@ -179,6 +184,7 @@ class Premailer(object):
         self.remove_unset_properties = remove_unset_properties
         self.allow_network = allow_network
         self.allow_insecure_ssl = allow_insecure_ssl
+        self.allow_loading_external_files = allow_loading_external_files
 
         if cssutils_logging_handler:
             cssutils.log.addHandler(cssutils_logging_handler)
@@ -577,12 +583,16 @@ class Premailer(object):
 
         if url.startswith("http://") or url.startswith("https://"):
             css_body = self._load_external_url(url)
+        elif not self.allow_loading_external_files:
+            raise ExternalFileLoadingError(
+                "Unable to load external file {!r} because it's explicitly not allowed"
+                "".format(url)
+            )
         else:
             stylefile = url
+            base_path = os.path.abspath(self.base_path or os.curdir)
             if not os.path.isabs(stylefile):
-                stylefile = os.path.abspath(
-                    os.path.join(self.base_path or "", stylefile)
-                )
+                stylefile = os.path.abspath(os.path.join(base_path, stylefile))
             if os.path.exists(stylefile):
                 with codecs.open(stylefile, encoding="utf-8") as f:
                     css_body = f.read()

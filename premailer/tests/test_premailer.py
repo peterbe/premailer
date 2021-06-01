@@ -1,9 +1,11 @@
 import logging
 import re
 import sys
+import os
 import unittest
 from contextlib import contextmanager
 from io import StringIO
+import tempfile
 
 from lxml.etree import XMLSyntaxError, fromstring
 from requests.exceptions import HTTPError
@@ -13,6 +15,7 @@ from nose.tools import assert_raises, eq_, ok_
 from premailer.__main__ import main
 from premailer.premailer import (
     ExternalNotFoundError,
+    ExternalFileLoadingError,
     Premailer,
     csstext_to_pairs,
     merge_styles,
@@ -1731,6 +1734,7 @@ ground:red}/*]]>*/</style>
                     "premailer/tests/test-issue78.html",
                     "--preserve-style-tags",
                     "--external-style=premailer/tests/test-external-styles.css",
+                    "--allow-loading-external-files",
                 ]
             )
 
@@ -1800,6 +1804,7 @@ or:purple}">html</a></p>
                     "-f",
                     "premailer/tests/test-issue78.html",
                     "--external-style=premailer/tests/test-external-styles.css",
+                    "--allow-loading-external-files",
                 ]
             )
 
@@ -1934,7 +1939,7 @@ ation/rss+xml" title="RSS" href="/rss.xml">
             "applic\naction", "application"
         )
 
-        p = Premailer(html, strip_important=False)
+        p = Premailer(html, strip_important=False, allow_loading_external_files=True)
         result_html = p.transform()
 
         compare_html(expect_html, result_html)
@@ -2015,7 +2020,7 @@ ation/rss+xml" title="RSS" href="/rss.xml">
         </body>
         </html>"""
 
-        p = Premailer(html, strip_important=False)
+        p = Premailer(html, strip_important=False, allow_loading_external_files=True)
         assert_raises(ExternalNotFoundError, p.transform)
 
     def test_external_styles_and_links(self):
@@ -2061,6 +2066,7 @@ ent:"" !important;display:block !important}
             strip_important=False,
             external_styles="test-external-styles.css",
             base_path="premailer/tests/",
+            allow_loading_external_files=True,
         )
         result_html = p.transform()
 
@@ -2324,7 +2330,9 @@ ent:"" !important;display:block !important}
         </html>"""
 
         mocked_pleu.side_effect = self.mocked_urlopen
-        p = Premailer(html, base_url="https://www.peterbe.com")
+        p = Premailer(
+            html, base_url="https://www.peterbe.com", allow_loading_external_files=True
+        )
         result_html = p.transform()
 
         expected_args = [
@@ -2358,7 +2366,9 @@ ent:"" !important;display:block !important}
         </body>
         </html>"""
         mocked_pleu.return_value = "h1 { color: brown }"
-        p = Premailer(html, base_url="http://www.peterbe.com/")
+        p = Premailer(
+            html, base_url="http://www.peterbe.com/", allow_loading_external_files=True
+        )
         result_html = p.transform()
         expected_args = [(("http://www.peterbe.com/style.css",),)]
         eq_(expected_args, mocked_pleu.call_args_list)
@@ -2739,7 +2749,7 @@ sheet" type="text/css">
             "style\nsheet", "stylesheet"
         )
 
-        p = Premailer(html, disable_validation=True)
+        p = Premailer(html, disable_validation=True, allow_loading_external_files=True)
         result_html = p.transform()
         compare_html(expect_html, result_html)
 
@@ -3026,3 +3036,32 @@ sheet" type="text/css">
         p = Premailer(html)
         result_neglected_html = p.transform()
         compare_html(expected_neglected_html, result_neglected_html)
+
+    def test_allow_loading_external_files(self):
+        """Demonstrate the risks of allow_loading_external_files"""
+        external_content = "foo { bar:buz }"
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            tmp_file = os.path.join(tmpdirname, "external.css")
+            with open(tmp_file, "w") as f:
+                f.write(external_content)
+            html = """
+                <html>
+                <head>
+                <link rel=stylesheet href="{}">
+                </head>
+                </html>
+            """.format(
+                tmp_file
+            )
+
+            p = Premailer(html)
+            assert_raises(ExternalFileLoadingError, p.transform)
+
+            # Imagine if `allow_loading_external_files` and `keep_style_tags` where
+            # both on, in some configuration or instance, but the HTML being
+            # sent in, this program will read that file unconditionally and include
+            # it in the file rendered HTML output.
+            # E.g. `<link rel=stylesheet href=/tmp/credentials.txt>`
+            p = Premailer(html, allow_loading_external_files=True, keep_style_tags=True)
+            out = p.transform()
+            assert external_content in out

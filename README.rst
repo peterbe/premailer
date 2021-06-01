@@ -136,6 +136,7 @@ The ``transform`` shortcut function transforms the given HTML using the defaults
     remove_unset_properties=True # Remove CSS properties if their value is unset when merged
     allow_network=True # allow network access to fetch linked css files
     allow_insecure_ssl=False # Don't allow unverified SSL certificates for external links
+    allow_loading_external_files=False # Allow loading any non-HTTP external file URL
 
 For more advanced options, check out the code of the ``Premailer`` class
 and all its options in its constructor.
@@ -178,6 +179,7 @@ module.
     --disable-validation  Disable CSSParser validation of attributes and values
     --pretty              Pretty-print the outputted HTML.
     --allow-insecure-ssl  Skip SSL certificate verification for external URLs.
+    --allow-loading-external-files Allow opening any non-HTTP external file URL.
 
 A basic example:
 
