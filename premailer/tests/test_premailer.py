@@ -2083,6 +2083,16 @@ ent:"" !important;display:block !important}
 
         mocked_requests.get.assert_called_once_with(faux_uri, verify=True)
         eq_(faux_response, r)
+    
+    def test_load_external_url_with_custom_session(self):
+        mocked_session = mock.MagicMock()
+        faux_response = "This is not a response"
+        faux_uri = "https://example.com/site.css"
+        mocked_session.get.return_value = MockResponse(faux_response)
+        p = premailer.premailer.Premailer("<p>A paragraph</p>", session=mocked_session)
+        
+        mocked_session.get.assert_called_once_with(faux_uri, verify=True)
+        eq_(faux_response, r)
 
     @mock.patch("premailer.premailer.requests")
     def test_load_external_url_no_insecure_ssl(self, mocked_requests):
