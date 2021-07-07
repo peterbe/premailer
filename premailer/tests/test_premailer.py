@@ -2090,6 +2090,7 @@ ent:"" !important;display:block !important}
         faux_uri = "https://example.com/site.css"
         mocked_session.get.return_value = MockResponse(faux_response)
         p = premailer.premailer.Premailer("<p>A paragraph</p>", session=mocked_session)
+        r = p._load_external_url(faux_uri)
         
         mocked_session.get.assert_called_once_with(faux_uri, verify=True)
         eq_(faux_response, r)
