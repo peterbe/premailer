@@ -4,6 +4,10 @@ premailer Changes
 Peter's note: Unfortunately, ``premailer`` didn't use to keep a change log. But it's
 never too late to start, so let's start here and now.
 
+Unreleased
+----------
+* New option ``session=None`` to provide the session used for making http requests.
+
 3.9.0
 -----
 
