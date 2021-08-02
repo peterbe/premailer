@@ -710,8 +710,8 @@ class Tests(unittest.TestCase):
         <head>
         <title>Title</title>
         </head>
-        <body style="background:url(http://exam
-ple.com/bg.png); color:#123; font-family:Omerta">
+        <body style="color:#123; background:url(http://exam
+ple.com/bg.png); font-family:Omerta">
         <h1>Hi!</h1>
         </body>
         </html>""".replace(
@@ -933,7 +933,7 @@ ical-align:middle" bgcolor="red" valign="middle">Cell 2</td>
         </head>
         <body>
         <p style="text-align:center">Text</p>
-        <table style="height:300px; width:200px">
+        <table style="width:200px; height:300px">
           <tr>
             <td style="background-color:red" bgcolor="red">Cell 1</td>
             <td style="background-color:red" bgcolor="red">Cell 2</td>
@@ -1052,7 +1052,7 @@ b
 </head>
 <body>
 <h1 style="Margin:0">a</h1>
-<h2 style="Margin-bottom:0; Margin-left:0; Margin-right:0; Margin-top:0">
+<h2 style="Margin-top:0; Margin-bottom:0; Margin-left:0; Margin-right:0">
 b
 </h2>
 </body>
@@ -1252,6 +1252,39 @@ b
         </head>
         <body>
         <div style="text-align:right" align="right">First div</div>
+        </body>
+        </html>"""
+
+        p = Premailer(html)
+        result_html = p.transform()
+
+        compare_html(expect_html, result_html)
+
+    def test_css_ordering_preserved(self):
+        """For cases like these padding rules, it's important that the style that
+        should be applied comes last so that premailer follows the same rules that
+        browsers use to determine precedence."""
+
+        html = """<html>
+        <head>
+        <style type="text/css">
+        div {
+            padding-left: 6px;
+            padding-right: 6px;
+            padding: 4px;
+        }
+        </style>
+        </head>
+        <body>
+        <div>Some text</div>
+        </body>
+        </html>"""
+
+        expect_html = """<html>
+        <head>
+        </head>
+        <body>
+        <div style="padding-left:6px; padding-right:6px; padding:4px">Some text</div>
         </body>
         </html>"""
 

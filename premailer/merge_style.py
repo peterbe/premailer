@@ -1,6 +1,5 @@
 import cssutils
 import threading
-from operator import itemgetter
 from collections import OrderedDict
 
 from premailer.cache import function_cache
@@ -22,13 +21,10 @@ def csstext_to_pairs(csstext, validate=True):
     # The lock is required to avoid ``cssutils`` concurrency
     # issues documented in issue #65
     with csstext_to_pairs._lock:
-        return sorted(
-            [
-                (prop.name.strip(), format_value(prop))
-                for prop in cssutils.parseStyle(csstext, validate=validate)
-            ],
-            key=itemgetter(0),
-        )
+        return [
+            (prop.name.strip(), format_value(prop))
+            for prop in cssutils.parseStyle(csstext, validate=validate)
+        ]
 
 
 csstext_to_pairs._lock = threading.RLock()
