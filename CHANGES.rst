@@ -4,9 +4,11 @@ premailer Changes
 Peter's note: Unfortunately, ``premailer`` didn't use to keep a change log. But it's
 never too late to start, so let's start here and now.
 
-Unreleased
-----------
+3.10.0
+------
+
 * New option ``session=None`` to provide the session used for making http requests.
+
 * Bug fix: inlined styles are no longer sorted alphabetically. This preserves the input
   rule order so that premailer does not break style precedence where order is significant, e.g.
 
