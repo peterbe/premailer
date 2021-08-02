@@ -8,25 +8,23 @@ Unreleased
 ----------
 * New option ``session=None`` to provide the session used for making http requests.
 * Bug fix: inlined styles are no longer sorted alphabetically. This preserves the input
-rule order so that premailer does not break style precedence where order is significant, e.g.
+  rule order so that premailer does not break style precedence where order is significant, e.g.
 
-```
-div {
-  /* Padding on all sides is 10px. */
-  padding-left: 5px;
-  padding: 10px;
-}
-```
+  .. code-block:: css
 
-```
-div {
-  /* Padding on the left side is 5px, on other sides is 10px. */
-  padding: 10px;
-  padding-left: 5px;
-}
-```
+    div {
+      /* Padding on all sides is 10px. */
+      padding-left: 5px;
+      padding: 10px;
+    }
 
-Prior to this fix premailer would swap the rules in the first example to look like the second.
+    div {
+      /* Padding on the left side is 5px, on other sides is 10px. */
+      padding: 10px;
+      padding-left: 5px;
+    }
+
+  Prior to this fix premailer would swap the rules in the first example to look like the second.
 
 
 3.9.0
