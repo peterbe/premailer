@@ -3049,6 +3049,7 @@ sheet" type="text/css">
             <html>
             <img src="{{ data | default: 'Test & <code>' }}">
             <a href="{{ data | default: "Test & <code>" }}"></a>
+            <a href="mailto:{{ data | default: "Test & <code>" }}?subject=x"></a>
             </html>
         """
 
@@ -3059,6 +3060,7 @@ sheet" type="text/css">
     <body>
     <img src="{{ data | default: 'Test & <code>' }}">
     <a href="{{ data | default: "Test & <code>" }}"></a>
+    <a href="mailto:{{ data | default: "Test & <code>" }}?subject=x"></a>
     </body>
 </html>
 """
@@ -3070,6 +3072,7 @@ sheet" type="text/css">
     <body>
     <img src="%7B%7B%20data%20%7C%20default:%20'Test%20&amp;%20&lt;code&gt;'%20%7D%7D">
     <a href="%7B%7B%20data%20%7C%20default:%20" test>" }}"&gt;</a>
+    <a href="mailto:%7B%7B%20data%20%7C%20default:%20" test>" }}?subject=x"&gt;</a>
     </body>
 </html>
 """
