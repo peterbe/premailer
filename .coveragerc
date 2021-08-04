@@ -1,5 +1,6 @@
 [run]
 source = premailer
+branch = True
 
 [report]
 omit = premailer/test*
