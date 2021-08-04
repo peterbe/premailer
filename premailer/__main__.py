@@ -49,7 +49,7 @@ def main(args):
     parser.add_argument(
         "--exclude-pseudoclasses",
         default=False,
-        help="Pseudo classes like p:last-child', p:first-child, etc",
+        help="Pseudo classes like p:last-child', p:first-child, :nth-child, etc",
         action="store_true",
         dest="exclude_pseudoclasses",
     )
