@@ -40,9 +40,9 @@ class TestFunctionCache(unittest.TestCase):
             "cache.py", os.path.join("premailer", "cache.py")
         )
 
-        self.assertEquals(type(cache_module.cache), cachetools.TTLCache)
-        self.assertEquals(cache_module.cache.maxsize, 50)
-        self.assertEquals(cache_module.cache.ttl, 10)
+        self.assertEqual(type(cache_module.cache), cachetools.TTLCache)
+        self.assertEqual(cache_module.cache.maxsize, 50)
+        self.assertEqual(cache_module.cache.ttl, 10)
 
     def test_cache_multithread_synchronization(self):
         """
