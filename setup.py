@@ -30,7 +30,7 @@ setup(
     keywords="html lxml email mail style",
     author="Peter Bengtsson",
     author_email="mail@peterbe.com",
-    url="http://github.com/peterbe/premailer",
+    url="https://github.com/peterbe/premailer",
     license="Python",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
