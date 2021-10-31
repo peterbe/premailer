@@ -15,3 +15,14 @@ class TestMergeStyle(unittest.TestCase):
         # Invalid syntax does not raise
         inline = "{color:pink} :hover{color:purple} :active{color:red}"
         merge_styles(inline, [], [])
+
+    def test_constituent_styles(self):
+        # "constituent": `margin-bottom` is a constituent style of `margin`
+        new_styles = [[("margin", "5px"), ("margin-bottom", "10px")]]
+        classes = [""]
+        inline_style = "margin: 0"
+        csstext = merge_styles(inline_style, new_styles, classes)
+        self.assertEqual(
+            # ideally premailer could eliminate margin-bottom altogether
+            [("margin-bottom", "5px"), ("margin", "0")], csstext_to_pairs(csstext)
+        )
