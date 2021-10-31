@@ -61,10 +61,13 @@ def merge_styles(inline_style, new_styles, classes, remove_unset_properties=Fals
 
     # keep always the old inline style
     if inline_style:
+        normal_styles_dict = styles[""]
         # inline should be a declaration list as I understand
         # ie property-name:property-value;...
         for k, v in csstext_to_pairs(inline_style):
-            styles[""][k] = v
+            if k in normal_styles_dict:
+                del normal_styles_dict[k]
+            normal_styles_dict[k] = v
 
     normal_styles = []
     pseudo_styles = []
