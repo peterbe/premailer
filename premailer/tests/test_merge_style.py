@@ -24,5 +24,5 @@ class TestMergeStyle(unittest.TestCase):
         csstext = merge_styles(inline_style, new_styles, classes)
         self.assertEqual(
             # ideally premailer could eliminate margin-bottom altogether
-            [("margin-bottom", "5px"), ("margin", "0")], csstext_to_pairs(csstext)
+            [("margin-bottom", "10px"), ("margin", "0")], csstext_to_pairs(csstext)
         )
