@@ -345,8 +345,11 @@ class Premailer(object):
             # <a href="{{ "<Test>" }}"></a>
             if self.preserve_handlebar_syntax:
                 stripped = re.sub(
-                    r'="{{(.*?)}}"',
-                    lambda match: '="{{' + escape(match.groups()[0]) + '}}"',
+                    r'="([^"]*){{(.*?)}}([^"]*?)"',
+                    lambda match: '="' +
+                                  match.groups()[0] +
+                                  '{{' + escape(match.groups()[1]) + '}}' +
+                                  match.groups()[2] + '"',
                     stripped,
                 )
 
@@ -563,8 +566,11 @@ class Premailer(object):
             # attributes, with their single-character equivalents.
             if self.preserve_handlebar_syntax:
                 out = re.sub(
-                    r'="%7B%7B(.+?)%7D%7D"',
-                    lambda match: '="{{' + unescape(unquote(match.groups()[0])) + '}}"',
+                    r'="([^"]*)%7B%7B(.+?)%7D%7D([^"]*?)"',
+                    lambda match: '="' +
+                                  match.groups()[0] +
+                                  '{{' + unescape(unquote(match.groups()[1])) + '}}' +
+                                  match.groups()[2] + '"',
                     out,
                 )
             return out
