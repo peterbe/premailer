@@ -516,7 +516,9 @@ class Premailer(object):
         # understanding floats, but they do understand the HTML align attrib.
         if self.align_floating_images:
             for item in page.xpath("//img[@style]"):
-                image_css = cssutils.parseStyle(item.attrib["style"])
+                image_css = cssutils.parseStyle(
+                    item.attrib["style"], validate=not self.disable_validation
+                )
                 if image_css.float == "right":
                     item.attrib["align"] = "right"
                 elif image_css.float == "left":
