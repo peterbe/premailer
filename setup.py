@@ -20,7 +20,7 @@ def find_version(*file_paths):
 
 install_requires = ["lxml", "cssselect", "cssutils", "requests", "cachetools"]
 
-tests_require = ["nose", "mock"]
+tests_require = ["pytest", "pytest-cov"]
 
 setup(
     name="premailer",
