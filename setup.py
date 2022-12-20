@@ -20,7 +20,7 @@ def find_version(*file_paths):
 
 install_requires = ["lxml", "cssselect", "cssutils", "requests", "cachetools"]
 
-tests_require = ["nose", "mock"]
+tests_require = ["pytest", "pytest-cov"]
 
 setup(
     name="premailer",
@@ -45,6 +45,9 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Communications",

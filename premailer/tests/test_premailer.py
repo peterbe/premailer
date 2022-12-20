@@ -3,15 +3,15 @@ import re
 import sys
 import os
 import unittest
+import tempfile
 from contextlib import contextmanager
 from io import StringIO
-import tempfile
+from unittest import mock
 
+import pytest
 from lxml.etree import XMLSyntaxError, fromstring
 from requests.exceptions import HTTPError
-import mock
 import premailer.premailer  # lint:ok
-from nose.tools import assert_raises, eq_, ok_
 from premailer.__main__ import main
 from premailer.premailer import (
     ExternalNotFoundError,
@@ -21,6 +21,32 @@ from premailer.premailer import (
     merge_styles,
     transform,
 )
+
+
+def ok_(expr, msg=None):
+    """
+    Shorthand for assert.
+
+    Copied from Nose.
+    """
+    if not expr:
+        raise AssertionError(msg)
+
+
+def eq_(a, b, msg=None):
+    """
+    Shorthand for 'assert a == b, "%r != %r" % (a, b).
+
+    Copied from Nose.
+    """
+    if not a == b:
+        raise AssertionError(msg or "%r != %r" % (a, b))
+
+
+def assert_raises(exc_class, func, *args):
+    """Compatibility with Nose API for pytest."""
+    with pytest.raises(exc_class):
+        func(*args)
 
 
 whitespace_between_tags = re.compile(r">\s*<")

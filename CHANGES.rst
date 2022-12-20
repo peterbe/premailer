@@ -4,6 +4,15 @@ premailer Changes
 Peter's note: Unfortunately, ``premailer`` didn't use to keep a change log. But it's
 never too late to start, so let's start here and now.
 
+Unreleased
+----------
+
+* Add support for Python 3.9, 3.10 and 3.11. The code for the distributed code was unchanged,
+  only some tests needed to be adapted.
+
+* Moved from nose test runner to pytest, as nose is no longer supported and has some known issues
+  with Python 3.9+.
+
 3.10.0
 ------
 
