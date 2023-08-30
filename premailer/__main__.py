@@ -179,6 +179,7 @@ def main(args):
         keep_style_tags=options.keep_style_tags,
         include_star_selectors=options.include_star_selectors,
         remove_classes=options.remove_classes,
+        capitalize_float_margin=options.capitalize_float_margin,
         strip_important=options.strip_important,
         external_styles=options.external_styles,
         css_text=options.css_text,
